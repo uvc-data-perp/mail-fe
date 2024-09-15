@@ -3,7 +3,7 @@
     <SidebarLayout class="w-64 flex-shrink-0" />
 
     <div class="flex-grow overflow-hidden flex flex-col">
-      <header class="h-16 bg-white border-b flex items-center px-4">
+      <header class="h-16 bg-white border-b flex items-center px-8">
         <h1 class="text-xl font-semibold">{{ pageTitle }}</h1>
       </header>
       <MailHeader />

@@ -32,7 +32,6 @@ export { AddLocation as ElIconAddLocation, Aim as ElIconAim, AlarmClock as ElIco
 export { injectHead, useHead, useSeoMeta, useHeadSafe, useServerHead, useServerSeoMeta, useServerHeadSafe } from '@unhead/vue';
 export { getBoxplotChartOption } from '../composables/boxplotUtils';
 export { calculateDataRangeX, calculateDataRangeY, getColor, getScatterChartOption } from '../composables/scatterChartUtils';
-export { useStore } from '../stores/api';
 export { useStore1 } from '../stores/basic';
 export { defineStore, acceptHMRUpdate, usePinia, storeToRefs } from '../node_modules/@pinia/nuxt/dist/runtime/composables';
 export { useColorMode } from '../node_modules/@nuxtjs/color-mode/dist/runtime/composables';

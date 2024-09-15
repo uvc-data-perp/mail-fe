@@ -1,9 +1,13 @@
 <template>
   <div
-    class="email-list-header el-row el-row--flex is-justify-space-between mb-4"
+    class="email-list-header el-row el-row--flex is-justify-space-between mx-8 my-4"
   >
-    <el-button type="primary"> 메일 쓰기 </el-button>
-    <el-button> 내게 쓰기 </el-button>
+    <div>
+      <el-button type="primary" @click="navigateToWrite"> 메일 쓰기 </el-button>
+      <el-button type="primary" @click="navigateToWriteToMe">
+        내게 쓰기
+      </el-button>
+    </div>
     <div class="mt-4">
       <el-input
         v-model="searchData"
@@ -42,7 +46,7 @@
                 @save="saveEdit"
               />
               <el-form label-position="top">
-                <el-form-item label="받는 사람">
+                <el-form-item v-if="writeType !== 'toMe'" label="받는 사람">
                   <el-input v-model="receiver" placeholder="이메일 주소" />
                 </el-form-item>
                 <el-form-item label="제목">
@@ -68,6 +72,26 @@ const receiver = ref("");
 const subject = ref("");
 const searchData = ref("");
 const tableData = ref([]);
+
+const route = useRoute();
+const writeType = computed(() => route.query.type);
+
+const navigateToWrite = () => {
+  navigateTo({ name: "mail-Write" });
+};
+
+const navigateToWriteToMe = () => {
+  navigateTo({
+    // name: "mail-Write",
+    path: "/mail/Write",
+    query: {
+      type: "toMe",
+    },
+  });
+};
+
+const router = useRouter();
+// console.log(router.getRoutes());
 
 const saveEdit = (updatedData) => {
   if (editIndex.value === -1) {

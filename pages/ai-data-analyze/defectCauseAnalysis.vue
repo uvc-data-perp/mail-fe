@@ -85,9 +85,7 @@
               <!-- 이미지 영역 -->
               <ObjectImg />
               <!-- 칼럼영역 -->
-              <div class="ColumnList" flex-grow>
-                <ScrollbarEl :data="filteredColumnListInfo" />
-              </div>
+              <div class="ColumnList" flex-grow></div>
             </div>
             <!-- 메인 우측  -->
 
@@ -196,7 +194,6 @@ import EquipsList from "~/components/EquipsList.vue";
 import DefectsList from "~/components/DefectsList.vue";
 import UploadDialogue from "~/components/UploadDialogue.vue";
 import ObjectImg from "~/components/ObjectImg.vue";
-import ScrollbarEl from "~/components/ScrollbarEl.vue";
 
 const isUploaded = ref(false);
 const isSelectedEquip = ref(false);

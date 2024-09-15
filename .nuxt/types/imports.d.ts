@@ -647,7 +647,6 @@ declare global {
   const useStepper: typeof import('../../node_modules/@vueuse/core')['useStepper']
   const useStorageAsync: typeof import('../../node_modules/@vueuse/core')['useStorageAsync']
   const useStore1: typeof import('../../stores/basic')['useStore1']
-  const useStore: typeof import('../../stores/api')['useStore']
   const useStyleTag: typeof import('../../node_modules/@vueuse/core')['useStyleTag']
   const useSupported: typeof import('../../node_modules/@vueuse/core')['useSupported']
   const useSwipe: typeof import('../../node_modules/@vueuse/core')['useSwipe']
@@ -1363,7 +1362,6 @@ declare module 'vue' {
     readonly useStepper: UnwrapRef<typeof import('../../node_modules/@vueuse/core')['useStepper']>
     readonly useStorageAsync: UnwrapRef<typeof import('../../node_modules/@vueuse/core')['useStorageAsync']>
     readonly useStore1: UnwrapRef<typeof import('../../stores/basic')['useStore1']>
-    readonly useStore: UnwrapRef<typeof import('../../stores/api')['useStore']>
     readonly useStyleTag: UnwrapRef<typeof import('../../node_modules/@vueuse/core')['useStyleTag']>
     readonly useSupported: UnwrapRef<typeof import('../../node_modules/@vueuse/core')['useSupported']>
     readonly useSwipe: UnwrapRef<typeof import('../../node_modules/@vueuse/core')['useSwipe']>
