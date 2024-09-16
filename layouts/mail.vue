@@ -18,7 +18,9 @@
 <script setup lang="ts">
 import SidebarLayout from "~/components/SidebarLayout.vue";
 
-const pageTitle = ref("받은 메일함");
+import { usePageTitle } from "~/composables/usePageTitle";
+
+const { pageTitle } = usePageTitle();
 </script>
 
 <style scoped>

@@ -1,16 +1,16 @@
 <template>
   <el-table
     ref="multipleTableRef"
-    :data="tableData"
+    :data="props.mails"
     style="width: 100%"
+    row-key="id"
     @selection-change="handleSelectionChange"
   >
     <el-table-column type="selection" width="55" />
-
-    <el-table-column property="to" label="수신인" width="120" />
+    <el-table-column property="author" label="수신인" width="120" />
     <el-table-column property="title" label="제목" />
     <el-table-column label="Date" width="120">
-      <template #default="scope">{{ scope.row.date }}</template>
+      <template #default="scope">{{ scope.row.publishedAt }}</template>
     </el-table-column>
   </el-table>
 
@@ -26,7 +26,12 @@
 import { ref } from "vue";
 import { ElTable } from "element-plus";
 
+const props = defineProps({
+  mails: Array,
+});
+
 interface User {
+  id: number;
   to: string;
   title: string;
   date: string;
@@ -39,7 +44,6 @@ const toggleSelection = (rows?: User[]) => {
     rows.forEach((row) => {
       // TODO: improvement typing when refactor table
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error
       multipleTableRef.value!.toggleRowSelection(row, undefined);
     });
   } else {
@@ -52,51 +56,61 @@ const handleSelectionChange = (val: User[]) => {
 
 const tableData: User[] = [
   {
+    id: 1,
     to: "Tom",
     title: "No. 189, Grove St, Los Angeles",
     date: "2016-05-03",
   },
   {
+    id: 2,
     to: "Tom",
     title: "No. 189, Grove St, Los Angeles",
     date: "2016-05-03",
   },
   {
+    id: 3,
     to: "Tom",
     title: "No. 189, Grove St, Los Angeles",
     date: "2016-05-03",
   },
   {
+    id: 4,
     to: "Tom",
     title: "No. 189, Grove St, Los Angeles",
     date: "2016-05-03",
   },
   {
+    id: 5,
     to: "Tom",
     title: "No. 189, Grove St, Los Angeles",
     date: "2016-05-03",
   },
   {
+    id: 6,
     to: "Tom",
     title: "No. 189, Grove St, Los Angeles",
     date: "2016-05-03",
   },
   {
+    id: 7,
     to: "Tom",
     title: "No. 189, Grove St, Los Angeles",
     date: "2016-05-03",
   },
   {
+    id: 8,
     to: "Tom",
     title: "No. 189, Grove St, Los Angeles",
     date: "2016-05-03",
   },
   {
+    id: 9,
     to: "Tom",
     title: "No. 189, Grove St, Los Angeles",
     date: "2016-05-03",
   },
   {
+    id: 10,
     to: "Tom",
     title: "No. 189, Grove St, Los Angeles",
     date: "2016-05-03",

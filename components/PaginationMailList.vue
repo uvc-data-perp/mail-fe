@@ -2,11 +2,14 @@
   <div flex justify-center>
     <el-pagination
       v-model:current-page="currentPageValue"
-      :page-size="2"
+      :page-size="9"
       :pager-count="11"
       layout="prev, pager, next"
-      :total="1000"
+      :total="totalResults"
     />
+
+    {{ currentPageValue }},
+    {{ props.totalResults }}
   </div>
 </template>
 
@@ -16,6 +19,14 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  totalResults: {
+    type: Number,
+    required: true,
+  },
+  // totalPages: {
+  //   type: Number,
+  //   required: true,
+  // },
 });
 const emit = defineEmits(["update:currentPage"]);
 

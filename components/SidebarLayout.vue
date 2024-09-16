@@ -146,7 +146,7 @@ const menuItems: MenuItem[] = [
         title: "불량원인 데이터 분석",
         icon: "i-ic:outline-circle",
         index: "/ai-data-analyze/defect-cause-analysis",
-        path: "/ai-data-analyze/defectCauseAnalysis",
+        path: "/",
       },
       // 더 많은 서브 메뉴 아이템들...
     ],
@@ -167,32 +167,32 @@ const menuItems: MenuItem[] = [
         title: "보낸 메일함 📧",
         icon: "i-ic:outline-circle",
         index: "/ai-data-analyze/defect-cause-analysis",
-        path: `/mail/folders/${route.params.id ?? "1"}`,
+        path: `/mail/folders/${route.params.folderId ?? "1"}`,
       },
       {
-        title: "받은 메일함 📧",
+        title: "예약 메일함 📧",
         icon: "i-ic:outline-circle",
         index: "/mail/folders/2",
         path: `/mail/folders/${route.params.folderId ?? "2"}`,
       },
       {
-        title: "임시 보관함 📝",
+        title: "내게 쓴 메일함 📝",
         icon: "i-ic:outline-circle",
         index: "/ai-data-analyze/defect-cause-analysis",
         path: `/mail/folders/3`,
       },
       {
-        title: "내게 쓴 메일함 📧",
+        title: "임시저장 메일함 📧",
         icon: "i-ic:outline-circle",
         index: "/ai-data-analyze/defect-cause-analysis",
-        path: `/mail/folders/3`,
+        path: `/mail/folders/4`,
       },
 
       {
         title: "휴지통 🗑️",
         icon: "i-ic:outline-circle",
         index: "/ai-data-analyze/defect-cause-analysis",
-        path: `/mail/folders/:id`,
+        path: `/mail/folders/5`,
       },
 
       {

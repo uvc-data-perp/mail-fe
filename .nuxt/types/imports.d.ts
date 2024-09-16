@@ -303,8 +303,6 @@ declare global {
   const addRouteMiddleware: typeof import('../../node_modules/nuxt/dist/app/composables/router')['addRouteMiddleware']
   const asyncComputed: typeof import('../../node_modules/@vueuse/core')['asyncComputed']
   const autoResetRef: typeof import('../../node_modules/@vueuse/core')['autoResetRef']
-  const calculateDataRangeX: typeof import('../../composables/scatterChartUtils')['calculateDataRangeX']
-  const calculateDataRangeY: typeof import('../../composables/scatterChartUtils')['calculateDataRangeY']
   const callOnce: typeof import('../../node_modules/nuxt/dist/app/composables/once')['callOnce']
   const cancelIdleCallback: typeof import('../../node_modules/nuxt/dist/app/compat/idle-callback')['cancelIdleCallback']
   const clearError: typeof import('../../node_modules/nuxt/dist/app/composables/error')['clearError']
@@ -352,12 +350,9 @@ declare global {
   const effectScope: typeof import('../../node_modules/vue')['effectScope']
   const extendRef: typeof import('../../node_modules/@vueuse/core')['extendRef']
   const getAppManifest: typeof import('../../node_modules/nuxt/dist/app/composables/manifest')['getAppManifest']
-  const getBoxplotChartOption: typeof import('../../composables/boxplotUtils')['getBoxplotChartOption']
-  const getColor: typeof import('../../composables/scatterChartUtils')['getColor']
   const getCurrentInstance: typeof import('../../node_modules/vue')['getCurrentInstance']
   const getCurrentScope: typeof import('../../node_modules/vue')['getCurrentScope']
   const getRouteRules: typeof import('../../node_modules/nuxt/dist/app/composables/manifest')['getRouteRules']
-  const getScatterChartOption: typeof import('../../composables/scatterChartUtils')['getScatterChartOption']
   const h: typeof import('../../node_modules/vue')['h']
   const hasInjectionContext: typeof import('../../node_modules/vue')['hasInjectionContext']
   const ignorableWatch: typeof import('../../node_modules/@vueuse/core')['ignorableWatch']
@@ -574,6 +569,7 @@ declare global {
   const useOffsetPagination: typeof import('../../node_modules/@vueuse/core')['useOffsetPagination']
   const useOnline: typeof import('../../node_modules/@vueuse/core')['useOnline']
   const usePageLeave: typeof import('../../node_modules/@vueuse/core')['usePageLeave']
+  const usePageTitle: typeof import('../../composables/usePageTitle')['usePageTitle']
   const useParallax: typeof import('../../node_modules/@vueuse/core')['useParallax']
   const useParentElement: typeof import('../../node_modules/@vueuse/core')['useParentElement']
   const usePerformanceObserver: typeof import('../../node_modules/@vueuse/core')['usePerformanceObserver']
@@ -647,6 +643,7 @@ declare global {
   const useStepper: typeof import('../../node_modules/@vueuse/core')['useStepper']
   const useStorageAsync: typeof import('../../node_modules/@vueuse/core')['useStorageAsync']
   const useStore1: typeof import('../../stores/basic')['useStore1']
+  const useStore: typeof import('../../stores/api')['useStore']
   const useStyleTag: typeof import('../../node_modules/@vueuse/core')['useStyleTag']
   const useSupported: typeof import('../../node_modules/@vueuse/core')['useSupported']
   const useSwipe: typeof import('../../node_modules/@vueuse/core')['useSwipe']
@@ -1018,8 +1015,6 @@ declare module 'vue' {
     readonly addRouteMiddleware: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/router')['addRouteMiddleware']>
     readonly asyncComputed: UnwrapRef<typeof import('../../node_modules/@vueuse/core')['asyncComputed']>
     readonly autoResetRef: UnwrapRef<typeof import('../../node_modules/@vueuse/core')['autoResetRef']>
-    readonly calculateDataRangeX: UnwrapRef<typeof import('../../composables/scatterChartUtils')['calculateDataRangeX']>
-    readonly calculateDataRangeY: UnwrapRef<typeof import('../../composables/scatterChartUtils')['calculateDataRangeY']>
     readonly callOnce: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/once')['callOnce']>
     readonly cancelIdleCallback: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/compat/idle-callback')['cancelIdleCallback']>
     readonly clearError: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/error')['clearError']>
@@ -1067,12 +1062,9 @@ declare module 'vue' {
     readonly effectScope: UnwrapRef<typeof import('../../node_modules/vue')['effectScope']>
     readonly extendRef: UnwrapRef<typeof import('../../node_modules/@vueuse/core')['extendRef']>
     readonly getAppManifest: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/manifest')['getAppManifest']>
-    readonly getBoxplotChartOption: UnwrapRef<typeof import('../../composables/boxplotUtils')['getBoxplotChartOption']>
-    readonly getColor: UnwrapRef<typeof import('../../composables/scatterChartUtils')['getColor']>
     readonly getCurrentInstance: UnwrapRef<typeof import('../../node_modules/vue')['getCurrentInstance']>
     readonly getCurrentScope: UnwrapRef<typeof import('../../node_modules/vue')['getCurrentScope']>
     readonly getRouteRules: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/manifest')['getRouteRules']>
-    readonly getScatterChartOption: UnwrapRef<typeof import('../../composables/scatterChartUtils')['getScatterChartOption']>
     readonly h: UnwrapRef<typeof import('../../node_modules/vue')['h']>
     readonly hasInjectionContext: UnwrapRef<typeof import('../../node_modules/vue')['hasInjectionContext']>
     readonly ignorableWatch: UnwrapRef<typeof import('../../node_modules/@vueuse/core')['ignorableWatch']>
@@ -1289,6 +1281,7 @@ declare module 'vue' {
     readonly useOffsetPagination: UnwrapRef<typeof import('../../node_modules/@vueuse/core')['useOffsetPagination']>
     readonly useOnline: UnwrapRef<typeof import('../../node_modules/@vueuse/core')['useOnline']>
     readonly usePageLeave: UnwrapRef<typeof import('../../node_modules/@vueuse/core')['usePageLeave']>
+    readonly usePageTitle: UnwrapRef<typeof import('../../composables/usePageTitle')['usePageTitle']>
     readonly useParallax: UnwrapRef<typeof import('../../node_modules/@vueuse/core')['useParallax']>
     readonly useParentElement: UnwrapRef<typeof import('../../node_modules/@vueuse/core')['useParentElement']>
     readonly usePerformanceObserver: UnwrapRef<typeof import('../../node_modules/@vueuse/core')['usePerformanceObserver']>
@@ -1362,6 +1355,7 @@ declare module 'vue' {
     readonly useStepper: UnwrapRef<typeof import('../../node_modules/@vueuse/core')['useStepper']>
     readonly useStorageAsync: UnwrapRef<typeof import('../../node_modules/@vueuse/core')['useStorageAsync']>
     readonly useStore1: UnwrapRef<typeof import('../../stores/basic')['useStore1']>
+    readonly useStore: UnwrapRef<typeof import('../../stores/api')['useStore']>
     readonly useStyleTag: UnwrapRef<typeof import('../../node_modules/@vueuse/core')['useStyleTag']>
     readonly useSupported: UnwrapRef<typeof import('../../node_modules/@vueuse/core')['useSupported']>
     readonly useSwipe: UnwrapRef<typeof import('../../node_modules/@vueuse/core')['useSwipe']>

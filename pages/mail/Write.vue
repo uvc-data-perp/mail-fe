@@ -1,5 +1,11 @@
 <template>
-  <el-form :model="form" label-position="top" class="mail-form">
+  <el-form
+    :model="form"
+    ref="mailFormRef"
+    label-position="top"
+    :rules="rules"
+    class="mail-form"
+  >
     <el-form-item>
       <el-button-group>
         <el-button type="primary" @click="sendMail">보내기</el-button>
@@ -57,7 +63,11 @@
       </div>
     </el-form-item>
 
-    <el-form-item v-if="route?.query?.type !== 'toMe'" label="받는사람">
+    <el-form-item
+      v-if="route?.query?.type !== 'toMe'"
+      prop="selectedTags"
+      label="받는사람"
+    >
       <el-select
         v-model="form.selectedTags"
         multiple
@@ -94,7 +104,7 @@
       <el-input v-model="form.cc" placeholder="참조 이메일" />
     </el-form-item> -->
 
-    <el-form-item label="제목">
+    <el-form-item prop="subject" label="제목">
       <el-input v-model="form.subject" placeholder="제목">
         <!-- <template #append>
           <el-checkbox v-model="form.important" label="중요!" />
@@ -115,7 +125,7 @@
       </el-upload>
     </el-form-item>
 
-    <el-form-item>
+    <el-form-item prop="content" label="내용">
       <el-input
         v-model="form.content"
         type="textarea"
@@ -137,11 +147,36 @@ import { ArrowDown } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
 import { useDebounceFn } from "@vueuse/core";
 
-// 버릴것
+const mailFormRef = ref(null);
 
-const input = ref("");
-const convertedInput = ref("");
-///
+const rules = computed(() => {
+  const baseRules = {
+    subject: [
+      {
+        required: true,
+        message: "제목을 지정해주세요",
+        trigger: "submit",
+      },
+    ],
+    content: [
+      {
+        required: true,
+        message: "내용을 작성해주세요",
+        trigger: "submit",
+      },
+    ],
+    selectedTags: [
+      {
+        required: true,
+        type: "array",
+        message: "보낼 사람을 작성해주세요",
+        trigger: "submit",
+      },
+    ],
+  };
+
+  return baseRules;
+});
 
 const route = useRoute();
 
@@ -222,13 +257,27 @@ const getDayNames = (days) => {
 };
 //보내기
 const submitForm = () => {
-  if (route.query.type === "toMe") {
-    const a = { ...form, to: "example@email.com", ...scheduleForm.value };
-    console.log(a);
-  }
-  form.selectedTags.forEach((mail) => {
-    const a = { ...form, to: mail, ...scheduleForm.value };
-    console.log(a);
+  if (!mailFormRef.value) return;
+
+  mailFormRef.value.validate((valid) => {
+    if (valid) {
+      // 유효성 검사 통과 시 기존 로직 실행
+      if (route.query.type === "toMe") {
+        const a = { ...form, to: "example@email.com", ...scheduleForm.value };
+        console.log(a);
+      }
+      form.selectedTags.forEach((mail) => {
+        const a = { ...form, to: mail, ...scheduleForm.value };
+        console.log(a);
+      });
+
+      // 여기에 실제 제출 로직 추가 (예: API 호출)
+      ElMessage.success("메일이 성공적으로 전송되었습니다.");
+    } else {
+      // 유효성 검사 실패 시
+      ElMessage.error("폼 유효성 검사에 실패했습니다. 입력을 확인해주세요.");
+      return false;
+    }
   });
 };
 

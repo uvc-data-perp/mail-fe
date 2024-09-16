@@ -33,18 +33,11 @@
             </el-button>
           </div>
 
-          <transition name="slide-fade">
+          <!-- <transition name="slide-fade">
             <div
               v-show="visible"
               class="absolute top-10 right-10 bg-white shadow-md p-4 rounded-b-md z-10"
             >
-              <!-- <SearchDetailForm /> -->
-              <EditModal
-                v-if="visible"
-                v-model:visible="visible"
-                :edit-data="editForm"
-                @save="saveEdit"
-              />
               <el-form label-position="top">
                 <el-form-item v-if="writeType !== 'toMe'" label="받는 사람">
                   <el-input v-model="receiver" placeholder="이메일 주소" />
@@ -54,7 +47,7 @@
                 </el-form-item>
               </el-form>
             </div>
-          </transition>
+          </transition> -->
         </template>
         <template #append>
           <el-button type="primary"> 검색 </el-button>
@@ -65,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-const visible = ref(false);
+const visible = ref(true);
 const editForm = ref({});
 const editIndex = ref(-1);
 const receiver = ref("");

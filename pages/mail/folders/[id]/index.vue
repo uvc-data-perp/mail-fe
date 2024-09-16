@@ -4,27 +4,59 @@
   </div>
 
   <div class="flex mail-list px-8 w-[100%]">
-    <!-- 이메일 목록 아이템들 -->
-
-    <!-- <el-table-v2
-      :columns="columns"
-      :data="data"
-      :estimated-row-height="50"
-      :expand-column-key="columns[2].key"
-      :width="Number(`calc(100vw - 300px)`)"
-      :height="400"
-    >
-      <template #row="props">
-        <Row v-bind="props" />
-      </template>
-    </el-table-v2> -->
-    <TableMailList />
+    <TableMailList :mails="store.articleList" />
   </div>
 
-  <PaginationMailList v-model:currentPage="currentPage" />
+  <!-- <PaginationMailList v-model:currentPage="currentPage" /> -->
+  <PaginationMailList
+    :currentPage="store.currentPage"
+    :totalResults="store.totalResults"
+    @update:currentPage="store.setPage"
+  />
 </template>
 
 <script lang="tsx" setup>
+import { usePageTitle } from "~/composables/usePageTitle";
+import { useStore } from "~/stores/api";
+
+const { setPageTitle } = usePageTitle();
+const route = useRoute();
+
+const store = useStore();
+await useAsyncData("getNews", () => store.fetchArticles());
+
+// 초기 설정
+onMounted(() => {
+  updatePageTitle();
+});
+
+// 라우트 변경 감지
+watch(() => route.path, updatePageTitle);
+function updatePageTitle() {
+  // 라우트에 따라 페이지 제목 설정
+  switch (route.path) {
+    case "/mail/folders/1":
+      setPageTitle("보낸 메일함");
+      break;
+    case "/mail/folders/2":
+      setPageTitle("예약 메일함");
+      break;
+    case "/mail/folders/3":
+      setPageTitle("내게 쓴 메일함");
+      break;
+    case "/mail/folders/4":
+      setPageTitle("임시저장 메일함");
+      break;
+    case "/mail/folders/5":
+      setPageTitle("휴지통");
+      break;
+
+    // 다른 경로에 대한 케이스 추가
+    default:
+      setPageTitle("메일 시스템");
+  }
+}
+
 const detailedText = `Velit sed aspernatur tempora. Natus consequatur officiis dicta vel assumenda.
 Itaque est temporibus minus quis. Ipsum commodiab porro vel voluptas illum.
 Qui quam nulla et dolore autem itaque est.
@@ -73,7 +105,6 @@ const Row = ({ cells, rowData }) => {
 Row.inheritAttrs = false;
 
 //페이지네이션 관련//
-const currentPage = ref(1);
 </script>
 
 <style lang="scss" scoped></style>
