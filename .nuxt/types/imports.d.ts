@@ -636,6 +636,7 @@ declare global {
   const useShadowRoot: typeof import('../../node_modules/vue')['useShadowRoot']
   const useShare: typeof import('../../node_modules/@vueuse/core')['useShare']
   const useSlots: typeof import('../../node_modules/vue')['useSlots']
+  const useSnippetStore: typeof import('../../stores/snippetStore')['useSnippetStore']
   const useSorted: typeof import('../../node_modules/@vueuse/core')['useSorted']
   const useSpeechRecognition: typeof import('../../node_modules/@vueuse/core')['useSpeechRecognition']
   const useSpeechSynthesis: typeof import('../../node_modules/@vueuse/core')['useSpeechSynthesis']
@@ -1348,6 +1349,7 @@ declare module 'vue' {
     readonly useShadowRoot: UnwrapRef<typeof import('../../node_modules/vue')['useShadowRoot']>
     readonly useShare: UnwrapRef<typeof import('../../node_modules/@vueuse/core')['useShare']>
     readonly useSlots: UnwrapRef<typeof import('../../node_modules/vue')['useSlots']>
+    readonly useSnippetStore: UnwrapRef<typeof import('../../stores/snippetStore')['useSnippetStore']>
     readonly useSorted: UnwrapRef<typeof import('../../node_modules/@vueuse/core')['useSorted']>
     readonly useSpeechRecognition: UnwrapRef<typeof import('../../node_modules/@vueuse/core')['useSpeechRecognition']>
     readonly useSpeechSynthesis: UnwrapRef<typeof import('../../node_modules/@vueuse/core')['useSpeechSynthesis']>

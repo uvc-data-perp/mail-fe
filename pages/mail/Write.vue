@@ -146,8 +146,11 @@ import { ref, reactive } from "vue";
 import { ArrowDown } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
 import { useDebounceFn } from "@vueuse/core";
+import { useSnippetStore } from "~/stores/snippetStore"; // 스토어 파일 경로에 맞게 수정해주세요
 
 const mailFormRef = ref(null);
+
+const snippetStore = useSnippetStore();
 
 const rules = computed(() => {
   const baseRules = {
@@ -293,20 +296,34 @@ const handleInput = (value) => {
 
   timeout = setTimeout(() => {
     const textarea = document.querySelector("textarea");
+    if (!textarea) return;
+
     const originalCursorPosition = textarea.selectionStart;
     let result = value;
     let cursorOffset = 0;
 
+    //     // 완전한 키워드 매칭 및 변환
+    // for (const [key, replacement] of Object.entries(snippet)) {
+    //   const regex = new RegExp("\\" + key, "g");
+    //   result = result.replace(regex, (match, index) => {
+    //     if (index < originalCursorPosition) {
+    //       cursorOffset += replacement.length - match.length;
+    //     }
+    //     return replacement;
+    //   });
+    // }
+    // form.content = result;
+
     // 완전한 키워드 매칭 및 변환
-    for (const [key, replacement] of Object.entries(snippet)) {
-      const regex = new RegExp("\\" + key, "g");
+    snippetStore.snippets.forEach((snippet) => {
+      const regex = new RegExp("\\" + snippet.before, "g");
       result = result.replace(regex, (match, index) => {
         if (index < originalCursorPosition) {
-          cursorOffset += replacement.length - match.length;
+          cursorOffset += snippet.after.length - match.length;
         }
-        return replacement;
+        return snippet.after;
       });
-    }
+    });
     form.content = result;
 
     // 변환 완료 후 커서 위치 조정
@@ -316,6 +333,37 @@ const handleInput = (value) => {
     });
   }, 100); // 100ms 지연
 };
+
+// const handleInput = (value) => {
+//   if (timeout) {
+//     clearTimeout(timeout);
+//   }
+
+//   timeout = setTimeout(() => {
+//     const textarea = document.querySelector("textarea");
+//     const originalCursorPosition = textarea.selectionStart;
+//     let result = value;
+//     let cursorOffset = 0;
+
+//     // 완전한 키워드 매칭 및 변환
+//     for (const [key, replacement] of Object.entries(snippet)) {
+//       const regex = new RegExp("\\" + key, "g");
+//       result = result.replace(regex, (match, index) => {
+//         if (index < originalCursorPosition) {
+//           cursorOffset += replacement.length - match.length;
+//         }
+//         return replacement;
+//       });
+//     }
+//     form.content = result;
+
+//     // 변환 완료 후 커서 위치 조정
+//     nextTick(() => {
+//       const newPosition = originalCursorPosition + cursorOffset;
+//       textarea.setSelectionRange(newPosition, newPosition);
+//     });
+//   }, 100); // 100ms 지연
+// };
 const debouncedHandleInput = useDebounceFn(handleInput, 300);
 ///////////// 스니펫 끝//
 

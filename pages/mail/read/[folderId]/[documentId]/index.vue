@@ -1,0 +1,111 @@
+<template>
+  <div class="bg-white rounded-lg shadow-md p-6 w-full">
+    <div class="mb-4 border-b-4 w-full">
+      <div class="title">
+        <h2 class="text-2xl font-bold mb-6">전자금융거래 기본약관 개정 안내</h2>
+      </div>
+      <div class="flex w-full items-center mb-2">
+        <el-tag type="info" class="mr-2 flex-shrink-0">보낸사람</el-tag>
+        <span flex-grow border-b>우리카드 &lt;wooricad@wooricard.com&gt;</span>
+      </div>
+      <div class="flex w-full items-center mb-2">
+        <el-tag type="success" class="mr-2">받는사람</el-tag>
+        <span flex-grow border-b>고객님</span>
+      </div>
+      <div
+        v-if="route.params.folderId === '2'"
+        class="flex-1 items-center mb-2"
+      >
+        <el-tag
+          type="primary"
+          @click="scheduleDialogVisible = !scheduleDialogVisible"
+          class="mr-2 flex-shrink-0 cursor-pointer"
+          >예약 변경</el-tag
+        >
+        <el-button
+          @click="() => (isSchedulePending = !isSchedulePending)"
+          :type="isSchedulePending ? 'success' : 'danger'"
+          >{{ isSchedulePending ? "예약 중" : "보류 중" }}
+        </el-button>
+        <ScheduleModal
+          v-if="scheduleDialogVisible"
+          v-model:visible="scheduleDialogVisible"
+          :edit-data="scheduleForm"
+          @save="saveSchedule"
+        />
+        <span class="text-sm text-gray-600">
+          {{
+            scheduleForm.startDate
+              ? `최초 전송:  ${scheduleForm.startDate}  ${scheduleForm.startTime}`
+              : ""
+          }}
+          {{
+            scheduleForm.expiryDate ? ` 만료일:${scheduleForm.expiryDate}` : ""
+          }}
+          {{
+            scheduleForm.periodType !== "no"
+              ? ` 주기: ${
+                  scheduleForm.periodType === "weekly"
+                    ? `${scheduleForm.interval}주`
+                    : `${scheduleForm.interval}개월`
+                } ${
+                  scheduleForm?.periodType === "weekly"
+                    ? ` ${getDayNames(scheduleForm.days).join(", ")}요일`
+                    : ` ${scheduleForm.days?.join(", ")}일`
+                }`
+              : ""
+          }}
+        </span>
+      </div>
+      <div v-else class="flex-1 items-center mb-2">
+        <el-tag type="info" class="mr-2 flex-shrink-0">보낸날짜</el-tag>
+        <span class="text-sm text-gray-600"> 2022. 5. 14. </span>
+      </div>
+    </div>
+
+    <div class="content flex overflow-x-auto w-full border-b-4">내용쩜반복</div>
+
+    <div class="footer">
+      <TableMailList
+        :mails="mailStore.articleList"
+        :currentMailId="currentMailId"
+        mode="adjacent"
+      />
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { useStore } from "~/stores/api";
+
+const mailStore = useStore();
+
+const route = useRoute();
+
+const scheduleDialogVisible = ref(false);
+const scheduleForm = ref({
+  startDate: "",
+  startTime: "",
+  expiryDate: "",
+  periodType: "no",
+  interval: 1,
+  days: [],
+  // ...props.editData,
+});
+
+const saveSchedule = (updatedData) => {
+  scheduleForm.value = updatedData;
+  ElMessage.success("변경된 예약설정이 반영되었습니다.");
+
+  scheduleDialogVisible.value = false;
+};
+
+const getDayNames = (days) => {
+  const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
+  return days.map((day) => dayNames[day]);
+};
+
+const isSchedulePending = ref(false);
+
+const currentMailId = ref(Number(route.params.documentId)); // 예시 ID, 실제로는 prop이나 상태 관리를 통해 받아올 수 있습니다.
+</script>

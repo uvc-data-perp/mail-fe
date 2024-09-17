@@ -1,119 +1,105 @@
 <template>
   <el-table
     ref="multipleTableRef"
-    :data="props.mails"
+    :data="tableData"
     style="width: 100%"
     row-key="id"
     @selection-change="handleSelectionChange"
   >
-    <el-table-column type="selection" width="55" />
-    <el-table-column property="author" label="수신인" width="120" />
-    <el-table-column property="title" label="제목" />
+    <el-table-column v-if="mode === 'full'" type="selection" width="55" />
+    <el-table-column
+      v-if="mode === 'adjacent'"
+      property="type"
+      label="구분"
+      width="80"
+    >
+      <template #default="scope">
+        <el-tag :type="scope.row.type === 'prev' ? 'info' : 'success'">
+          {{ scope.row.type === "prev" ? "이전" : "다음" }}
+        </el-tag>
+      </template>
+    </el-table-column>
+    <el-table-column
+      property="author"
+      label="수신인"
+      width="120"
+      v-if="mode === 'full'"
+    />
+    <el-table-column property="title" label="제목">
+      <template #default="scope">
+        <NuxtLink
+          :to="'/mail/read/' + route.params.folderId + '/' + scope.row.id"
+          class="text-blue-600 hover:underline"
+        >
+          <p class="font-bold text-lg">{{ scope.row.title }}</p>
+          {{
+            scope.row.content.length > 50
+              ? scope.row.content.slice(0, 47) + "..."
+              : scope.row.content
+          }}
+        </NuxtLink>
+      </template>
+    </el-table-column>
     <el-table-column label="Date" width="120">
       <template #default="scope">{{ scope.row.publishedAt }}</template>
     </el-table-column>
   </el-table>
-
-  <!-- <div style="margin-top: 20px">
-    <el-button @click="toggleSelection([tableData[1], tableData[2]])">
-      Toggle selection status of second and third rows
-    </el-button>
-    <el-button @click="toggleSelection()">Clear selection</el-button>
-  </div> -->
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
-import { ElTable } from "element-plus";
+import { ref, computed } from "vue";
+import { ElTable, ElTag } from "element-plus";
 
 const props = defineProps({
-  mails: Array,
+  mails: {
+    type: Array,
+    required: true,
+  },
+  currentMailId: {
+    type: Number,
+    default: null,
+  },
+  mode: {
+    type: String,
+    default: "full",
+    validator: (value: string) => ["full", "adjacent"].includes(value),
+  },
 });
+const route = useRoute();
 
-interface User {
+interface Mail {
   id: number;
-  to: string;
+  author: string;
   title: string;
-  date: string;
+  content: string;
+  publishedAt: string;
+  type?: "prev" | "next";
 }
 
 const multipleTableRef = ref<InstanceType<typeof ElTable>>();
-const multipleSelection = ref<User[]>([]);
-const toggleSelection = (rows?: User[]) => {
-  if (rows) {
-    rows.forEach((row) => {
-      // TODO: improvement typing when refactor table
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      multipleTableRef.value!.toggleRowSelection(row, undefined);
-    });
+
+const tableData = computed(() => {
+  if (props.mode === "full") {
+    return props.mails;
   } else {
-    multipleTableRef.value!.clearSelection();
+    const currentIndex = props.mails.findIndex(
+      (mail: Mail) => mail.id === props.currentMailId
+    );
+    const prevMail =
+      currentIndex > 0
+        ? { ...props.mails[currentIndex - 1], type: "prev" as const }
+        : null;
+    const nextMail =
+      currentIndex < props.mails.length - 1
+        ? { ...props.mails[currentIndex + 1], type: "next" as const }
+        : null;
+    return [prevMail, nextMail].filter(Boolean) as Mail[];
+  }
+});
+
+const handleSelectionChange = (selectedRows: Mail[]) => {
+  if (props.mode === "full") {
+    console.log("Selected rows:", selectedRows);
   }
 };
-const handleSelectionChange = (val: User[]) => {
-  multipleSelection.value = val;
-};
-
-const tableData: User[] = [
-  {
-    id: 1,
-    to: "Tom",
-    title: "No. 189, Grove St, Los Angeles",
-    date: "2016-05-03",
-  },
-  {
-    id: 2,
-    to: "Tom",
-    title: "No. 189, Grove St, Los Angeles",
-    date: "2016-05-03",
-  },
-  {
-    id: 3,
-    to: "Tom",
-    title: "No. 189, Grove St, Los Angeles",
-    date: "2016-05-03",
-  },
-  {
-    id: 4,
-    to: "Tom",
-    title: "No. 189, Grove St, Los Angeles",
-    date: "2016-05-03",
-  },
-  {
-    id: 5,
-    to: "Tom",
-    title: "No. 189, Grove St, Los Angeles",
-    date: "2016-05-03",
-  },
-  {
-    id: 6,
-    to: "Tom",
-    title: "No. 189, Grove St, Los Angeles",
-    date: "2016-05-03",
-  },
-  {
-    id: 7,
-    to: "Tom",
-    title: "No. 189, Grove St, Los Angeles",
-    date: "2016-05-03",
-  },
-  {
-    id: 8,
-    to: "Tom",
-    title: "No. 189, Grove St, Los Angeles",
-    date: "2016-05-03",
-  },
-  {
-    id: 9,
-    to: "Tom",
-    title: "No. 189, Grove St, Los Angeles",
-    date: "2016-05-03",
-  },
-  {
-    id: 10,
-    to: "Tom",
-    title: "No. 189, Grove St, Los Angeles",
-    date: "2016-05-03",
-  },
-];
 </script>

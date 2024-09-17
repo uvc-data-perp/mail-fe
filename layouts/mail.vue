@@ -20,7 +20,48 @@ import SidebarLayout from "~/components/SidebarLayout.vue";
 
 import { usePageTitle } from "~/composables/usePageTitle";
 
-const { pageTitle } = usePageTitle();
+const route = useRoute();
+
+const { pageTitle, setPageTitle } = usePageTitle();
+watch(
+  [() => route.path, () => route.query],
+  () => {
+    updatePageTitle();
+  },
+  { immediate: true }
+);
+function updatePageTitle() {
+  // 라우트에 따라 페이지 제목 설정
+  switch (route.path) {
+    case "/mail/write":
+      if (route.query.type === "toMe") {
+        setPageTitle("내게 쓰기");
+      } else {
+        setPageTitle("메일 쓰기");
+      }
+      break;
+
+    case "/mail/folders/1":
+      setPageTitle("보낸 메일함");
+      break;
+    case "/mail/folders/2":
+      setPageTitle("예약 메일함");
+      break;
+    case "/mail/folders/3":
+      setPageTitle("내게 쓴 메일함");
+      break;
+    case "/mail/folders/4":
+      setPageTitle("임시저장 메일함");
+      break;
+    case "/mail/folders/5":
+      setPageTitle("휴지통");
+      break;
+
+    // 다른 경로에 대한 케이스 추가
+    default:
+      setPageTitle("메일 시스템");
+  }
+}
 </script>
 
 <style scoped>
