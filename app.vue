@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <NuxtLayout name="mail">
+  <div class="font-pretendard">
+    <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
   </div>

@@ -1,12 +1,17 @@
 <template>
   <el-dialog
     v-model="dialogVisible"
-    title="축약어 수정"
+    title="단축어 수정"
     width="60%"
     @close="handleClose"
   >
     <el-input v-model="newSnippet.before" placeholder="before" />
     <el-input v-model="newSnippet.after" placeholder="after" />
+    <ElInput
+      v-model="newSnippet.keyBoard"
+      @keydown="onKeyDown"
+      placeholder="단축키 입력 (예: Ctrl+I)"
+    />
     <el-button @click="addSnippet">추가</el-button>
     <el-table
       ref="multipleTableRef"
@@ -18,6 +23,7 @@
       <el-table-column type="selection" width="55" />
       <el-table-column property="before" label="변경 전" width="120" />
       <el-table-column property="after" label="변경 후" />
+      <el-table-column property="keyBoard" label="단축키" />
       <el-table-column fixed="right" width="120">
         <template #default="scope">
           <el-button
@@ -39,6 +45,7 @@
 import { ref } from "vue";
 import { ElTable } from "element-plus";
 import { useSnippetStore } from "~/stores/snippetStore"; // 스토어 파일 경로에 맞게 수정해주세요
+import type { Snippet } from "~/types/snippetStore";
 
 const props = defineProps({
   visible: Boolean,
@@ -46,23 +53,40 @@ const props = defineProps({
 });
 
 const snippetStore = useSnippetStore();
+const newSnippet = ref<Snippet>({ before: "", after: "", keyBoard: "" });
+const validationSnippet = (snippet: Snippet) => {
+  if (snippet.before === "") {
+    return "변경 전 문자를 입력해주세요";
+  }
+  if (snippet.after === "") {
+    return "변경 후 문자를 입력해주세요";
+  }
+  if (snippetStore.snippets.some((s) => s.before === snippet.before)) {
+    return "변경 전 문자가 이미 존재합니다.";
+  }
+  if (snippetStore.snippets.some((s) => s.keyBoard === snippet.keyBoard)) {
+    return "사용 중인 단축키가 이미 존재합니다.";
+  }
 
-const newSnippet = ref({ before: "", after: "" });
-
-const addSnippet = () => {
-  snippetStore.addSnippet(newSnippet.value);
-  newSnippet.value = { before: "", after: "" };
+  return null;
 };
 
-interface snippet {
-  id: number;
-  before: string;
-  after: string;
-}
+const addSnippet = () => {
+  const validationResult = validationSnippet(newSnippet.value);
+  if (validationResult !== null) {
+    ElMessage.error(validationResult);
+    return; // 여기서 함수를 종료합니다. 등록을 진행하지 않습니다.
+  }
+
+  // 검증을 통과한 경우에만 이 부분이 실행됩니다
+  snippetStore.addSnippet(newSnippet.value);
+  ElMessage.success("스니펫이 추가되었습니다");
+  newSnippet.value = { before: "", after: "", keyBoard: "" };
+};
 
 const multipleTableRef = ref<InstanceType<typeof ElTable>>();
-const multipleSelection = ref<snippet[]>([]);
-const toggleSelection = (rows?: snippet[]) => {
+const multipleSelection = ref<Snippet[]>([]);
+const toggleSelection = (rows?: Snippet[]) => {
   if (rows) {
     rows.forEach((row) => {
       multipleTableRef.value!.toggleRowSelection(row, undefined);
@@ -71,7 +95,7 @@ const toggleSelection = (rows?: snippet[]) => {
     multipleTableRef.value!.clearSelection();
   }
 };
-const handleSelectionChange = (val: snippet[]) => {
+const handleSelectionChange = (val: Snippet[]) => {
   multipleSelection.value = val;
 };
 
@@ -89,5 +113,25 @@ watch(
 
 const handleClose = () => {
   emit("update:visible", false);
+};
+
+////
+const onKeyDown = (evt: Event) => {
+  // 타입 가드: evt가 KeyboardEvent인지 확인
+  if (!(evt instanceof KeyboardEvent)) return;
+
+  evt.preventDefault();
+
+  const modifiers = [];
+  if (evt.ctrlKey) modifiers.push("Ctrl");
+  if (evt.altKey) modifiers.push("Alt");
+  if (evt.shiftKey) modifiers.push("Shift");
+  if (evt.metaKey) modifiers.push("Meta");
+
+  let key = evt.key;
+  if (key === " ") key = "Space";
+  if (key.length === 1) key = key.toUpperCase();
+
+  newSnippet.value.keyBoard = [...modifiers, key].join("+");
 };
 </script>

@@ -284,9 +284,6 @@ const submitForm = () => {
   });
 };
 
-//////////////// 스니펫 시작//
-const snippet = { $안녕: "hello", $잘가: "hello", $잘나1: "hello" };
-
 let timeout = null;
 
 const handleInput = (value) => {
@@ -421,6 +418,61 @@ const togglePersonalMode = () => {
 const handleFileChange = (file, fileList) => {
   form.attachments = fileList;
 };
+
+/////////
+
+const handleShortcut = (event) => {
+  // 모든 단축키 조합을 처리
+
+  const pressedKey = event.key.toLowerCase();
+  const ctrlKey = event.ctrlKey;
+  const altKey = event.altKey;
+  const shiftKey = event.shiftKey;
+
+  const matchedSnippet = snippetStore.snippets.find((snippet) => {
+    const shortcut = snippet.keyBoard.toLowerCase();
+    const [modifier, key] = shortcut.split("+");
+    if (key === pressedKey) {
+      if (modifier === "ctrl" && ctrlKey) return true;
+      if (modifier === "alt" && altKey) return true;
+      if (modifier === "shift" && shiftKey) return true;
+    }
+    return false;
+  });
+
+  if (matchedSnippet) {
+    event.preventDefault();
+    insertSnippetText(matchedSnippet.after);
+    ElMessage.success(
+      `단축키 "${matchedSnippet.keyBoard}"가 입력되었습니다: "${matchedSnippet.after}"`
+    );
+  }
+};
+
+const insertSnippetText = (text) => {
+  const textarea = document.querySelector("textarea");
+  if (!textarea) return;
+
+  const cursorPosition = textarea.selectionStart;
+  const textBefore = form.content.slice(0, cursorPosition);
+  const textAfter = form.content.slice(textarea.selectionEnd);
+
+  form.content = textBefore + text + textAfter;
+
+  nextTick(() => {
+    const newCursorPosition = cursorPosition + text.length;
+    textarea.setSelectionRange(newCursorPosition, newCursorPosition);
+    textarea.focus();
+  });
+};
+
+onMounted(() => {
+  document.addEventListener("keydown", handleShortcut);
+});
+
+onUnmounted(() => {
+  document.removeEventListener("keydown", handleShortcut);
+});
 </script>
 
 <style scoped>

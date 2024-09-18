@@ -1,17 +1,21 @@
 <template>
   <div class="bg-white rounded-lg shadow-md p-6 w-full">
     <div class="mb-4 border-b-4 w-full">
+      <!-- 제목 -->
       <div class="title">
         <h2 class="text-2xl font-bold mb-6">전자금융거래 기본약관 개정 안내</h2>
       </div>
+      <!-- 보낸 사람 -->
       <div class="flex w-full items-center mb-2">
         <el-tag type="info" class="mr-2 flex-shrink-0">보낸사람</el-tag>
         <span flex-grow border-b>우리카드 &lt;wooricad@wooricard.com&gt;</span>
       </div>
+      <!-- 받는 사람 -->
       <div class="flex w-full items-center mb-2">
         <el-tag type="success" class="mr-2">받는사람</el-tag>
         <span flex-grow border-b>고객님</span>
       </div>
+      <!-- 예약날짜 or 보낸 날짜 표시 -->
       <div
         v-if="route.params.folderId === '2'"
         class="flex-1 items-center mb-2"
@@ -24,8 +28,13 @@
         >
         <el-button
           @click="() => (isSchedulePending = !isSchedulePending)"
-          :type="isSchedulePending ? 'success' : 'danger'"
-          >{{ isSchedulePending ? "예약 중" : "보류 중" }}
+          :type="isSchedulePending ? 'danger' : 'success'"
+          >{{ isSchedulePending ? "보류 중" : "예약 중" }}
+        </el-button>
+        <el-button
+          @click="() => (isScheduleDeleted = true)"
+          :type="isScheduleDeleted ? 'danger' : 'success'"
+          >{{ isScheduleDeleted ? "취소됨" : "예약 취소" }}
         </el-button>
         <ScheduleModal
           v-if="scheduleDialogVisible"
@@ -33,7 +42,10 @@
           :edit-data="scheduleForm"
           @save="saveSchedule"
         />
-        <span class="text-sm text-gray-600">
+        <span
+          class="text-sm text-gray-600"
+          :class="isSchedulePending || isScheduleDeleted ? 'line-through' : ''"
+        >
           {{
             scheduleForm.startDate
               ? `최초 전송:  ${scheduleForm.startDate}  ${scheduleForm.startTime}`
@@ -62,9 +74,9 @@
         <span class="text-sm text-gray-600"> 2022. 5. 14. </span>
       </div>
     </div>
-
+    <!-- 본문내용 -->
     <div class="content flex overflow-x-auto w-full border-b-4">내용쩜반복</div>
-
+    <!-- 이전/이후 목록 조회 -->
     <div class="footer">
       <TableMailList
         :mails="mailStore.articleList"
@@ -106,6 +118,8 @@ const getDayNames = (days) => {
 };
 
 const isSchedulePending = ref(false);
+
+const isScheduleDeleted = ref(false);
 
 const currentMailId = ref(Number(route.params.documentId)); // 예시 ID, 실제로는 prop이나 상태 관리를 통해 받아올 수 있습니다.
 </script>

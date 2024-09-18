@@ -1,11 +1,6 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
-
-interface Snippet {
-  id?: number;
-  before: string;
-  after: string;
-}
+import type { Snippet } from "~/types/snippetStore";
 
 export const useSnippetStore = defineStore("snippetStore", () => {
   // state
@@ -14,6 +9,7 @@ export const useSnippetStore = defineStore("snippetStore", () => {
       id: 1,
       before: "$안녕",
       after: "hello",
+      keyBoard: "Ctrl+I",
     },
   ]);
 

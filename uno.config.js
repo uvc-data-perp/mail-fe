@@ -1,4 +1,3 @@
-// unocss.config.js 또는 uno.config.js
 import { defineConfig } from "unocss";
 import {
   presetAttributify,
@@ -6,15 +5,18 @@ import {
   presetTypography,
   presetUno,
   presetWebFonts,
-  transformerDirectives,
-  transformerVariantGroup,
 } from "unocss";
 import { presetScrollbar } from "unocss-preset-scrollbar";
 import { animatedUno } from "animated-unocss";
 
 export default defineConfig({
+  theme: {
+    fontFamily: {
+      sans: ["Pretendard", "sans-serif"],
+    },
+  },
   rules: [
-    ["pretendard", { "font-family": "Pretendard" }],
+    ["font-pretendard", { "font-family": "Pretendard, sans-serif" }],
     [/^btn-(.*)$/, ([, c]) => `bg-${c}-400 text-${c}-100 py-2 px-4 rounded-lg`],
     [/^wp-(\d+)$/, ([, d]) => ({ width: `${d}%` })],
     [/^hp-(\d+)$/, ([, d]) => ({ height: `${d}%` })],
@@ -69,7 +71,7 @@ export default defineConfig({
     ],
     [
       "custom-card-radio-active",
-      "border-blue-100 active:border-blue-100 text-blue ",
+      "border-blue-100 active:border-blue-100 text-blue",
     ],
     [
       "custom-card",
@@ -84,28 +86,13 @@ export default defineConfig({
       "light:bg-green-100 custom-card border-green-200 dark:border-green-400 wp-100",
     ],
     ["outsourcing-custom-card", "light:bg-gray-100"],
-
-    // {
-    //   "btn-green": "text-white bg-green-500 hover:bg-green-500", // 여러 class 합치기
-    //   red: "text-red-100", // 하나의 class를 다른 규칙으로 명명
-    // },
-    // 여러 class에 정규표현식 적용
   ],
   presets: [
-    presetUno({
-      variants: ["hover"],
-    }),
+    presetUno(),
     presetAttributify(),
     presetIcons({
-      ic: () => import("@iconify-json/ic/icons.json").then((i) => i.default),
-      mdi: () => import("@iconify-json/mdi/icons.json").then((i) => i.default),
-      material: () =>
-        import("@iconify-json/material-symbols/icons.json").then(
-          (i) => i.default
-        ),
-      carbon: () =>
-        import("@iconify-json/carbon/icons.json").then((i) => i.default),
       scale: 1.2,
+      warn: true,
     }),
     presetScrollbar({
       scrollbarWidth: "6px",
@@ -115,12 +102,16 @@ export default defineConfig({
     presetTypography(),
     animatedUno(),
     presetWebFonts({
-      provider: {
-        name: "none",
-        getImportUrl: () =>
-          "https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff",
+      fonts: {
+        sans: "Pretendard",
+        pretendard: [
+          {
+            name: "Pretendard",
+            weights: [100, 200, 300, 400, 500, 600, 700, 800, 900],
+            provider: "google",
+          },
+        ],
       },
     }),
   ],
-  // 기타 설정...
 });
