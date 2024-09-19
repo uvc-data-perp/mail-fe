@@ -1,19 +1,73 @@
 import { defineStore } from "pinia";
 import axios from "axios";
-import type { Article } from "~/types/api";
+import type { Article, Mail } from "~/types/api";
 
 export const useStore = defineStore("store", () => {
   // State
   const searchValue = ref<string>("korea");
   const articleList = ref<Article[]>([]);
   const currentPage = ref(1);
-  const pageSize = ref(9);
+  const pageSize = ref(6);
   const totalResults = ref(0);
+
+  // mail State
+  const mailList = ref(<Mail>[
+    {
+      _id: "66ebd34f7dd992837e473407",
+      from: "jjoo08152@gmail.com",
+      to: "jjoo0815@gmail.com",
+      subject: "Hello ✔",
+      text: "Hello Jisang?",
+      html: "<b>안녕하세요 김신영2입니다 반갑습니다!!</b>",
+      status: "Waiting",
+      sent_timestamp: null,
+      __v: 0,
+      reserved_time: "9726709750",
+    },
+  ]);
 
   // Actions
   // Mutations => State를 변경할 목적으로 작성된 코드
   const changeSearchValue = (payload: string) => {
     searchValue.value = payload;
+  };
+
+  const api = axios.create({
+    baseURL: "http://158.247.200.126:3001",
+    timeout: 10000000,
+    withCredentials: false, // 쿠키 포함
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+  });
+
+  const fetchWillSendList = async () => {
+    try {
+      const response = await api.get("/will-send", {
+        headers: {
+          // 필요한 경우 여기에 추가 헤더를 설정할 수 있습니다.
+        },
+      });
+
+      mailList.value = response.data.result;
+
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching will-send list:", error);
+      if (error.response) {
+        console.error(
+          "Server responded with:",
+          error.response.status,
+          error.response.data
+        );
+      } else if (error.request) {
+        console.error("No response received:", error.request);
+      } else {
+        console.error("Error setting up request:", error.message);
+      }
+      throw error;
+    }
   };
 
   const fetchArticles = async () => {
@@ -40,6 +94,7 @@ export const useStore = defineStore("store", () => {
   };
 
   return {
+    mailList,
     searchValue,
     articleList,
     currentPage,
@@ -47,5 +102,6 @@ export const useStore = defineStore("store", () => {
     changeSearchValue,
     fetchArticles,
     setPage,
+    fetchWillSendList,
   };
 });

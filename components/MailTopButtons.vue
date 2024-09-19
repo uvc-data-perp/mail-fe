@@ -28,11 +28,6 @@ const buttonsInfo = ref([
   },
   {
     type: "primary",
-    buttonName: "읽음",
-    clickEvent: () => {},
-  },
-  {
-    type: "primary",
     buttonName: "삭제",
     clickEvent: () => {},
   },

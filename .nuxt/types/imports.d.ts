@@ -681,6 +681,7 @@ declare global {
   const useWindowFocus: typeof import('../../node_modules/@vueuse/core')['useWindowFocus']
   const useWindowScroll: typeof import('../../node_modules/@vueuse/core')['useWindowScroll']
   const useWindowSize: typeof import('../../node_modules/@vueuse/core')['useWindowSize']
+  const useWriteMailStore: typeof import('../../stores/writeMailStore')['useWriteMailStore']
   const watch: typeof import('../../node_modules/vue')['watch']
   const watchArray: typeof import('../../node_modules/@vueuse/core')['watchArray']
   const watchAtMost: typeof import('../../node_modules/@vueuse/core')['watchAtMost']
@@ -1394,6 +1395,7 @@ declare module 'vue' {
     readonly useWindowFocus: UnwrapRef<typeof import('../../node_modules/@vueuse/core')['useWindowFocus']>
     readonly useWindowScroll: UnwrapRef<typeof import('../../node_modules/@vueuse/core')['useWindowScroll']>
     readonly useWindowSize: UnwrapRef<typeof import('../../node_modules/@vueuse/core')['useWindowSize']>
+    readonly useWriteMailStore: UnwrapRef<typeof import('../../stores/writeMailStore')['useWriteMailStore']>
     readonly watch: UnwrapRef<typeof import('../../node_modules/vue')['watch']>
     readonly watchArray: UnwrapRef<typeof import('../../node_modules/@vueuse/core')['watchArray']>
     readonly watchAtMost: UnwrapRef<typeof import('../../node_modules/@vueuse/core')['watchAtMost']>

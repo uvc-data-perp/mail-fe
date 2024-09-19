@@ -1,6 +1,6 @@
 export interface Snippet {
-  id?: number;
-  before: string;
-  after: string;
+  _id?: string;
+  from: string;
+  to: string;
   keyBoard?: string;
 }

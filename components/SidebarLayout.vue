@@ -36,7 +36,7 @@
         <div i-mdi-close md:hidden></div>
       </div>
     </div>
-    <el-scrollbar>
+    <el-scrollbar height="100%">
       <el-menu :default-active="activeIndex">
         <template v-for="item in menuItems" :key="item.index">
           <el-menu-item

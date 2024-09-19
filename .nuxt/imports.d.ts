@@ -34,6 +34,7 @@ export { usePageTitle } from '../composables/usePageTitle';
 export { useStore } from '../stores/api';
 export { useStore1 } from '../stores/basic';
 export { useSnippetStore } from '../stores/snippetStore';
+export { useWriteMailStore } from '../stores/writeMailStore';
 export { defineStore, acceptHMRUpdate, usePinia, storeToRefs } from '../node_modules/@pinia/nuxt/dist/runtime/composables';
 export { useColorMode } from '../node_modules/@nuxtjs/color-mode/dist/runtime/composables';
 export { useI18n } from '../node_modules/vue-i18n/dist/vue-i18n';

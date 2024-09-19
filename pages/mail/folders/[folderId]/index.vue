@@ -3,8 +3,11 @@
     <MailTopButtons />
   </div>
 
-  <div class="flex mail-list px-8 w-[100%]">
+  <!-- <div class="flex mail-list px-8 w-[100%]">
     <TableMailList :mails="store.articleList" mode="full" />
+  </div> -->
+  <div class="flex mail-list px-8 w-[100%]">
+    <TableMailList2 :mails="store.mailList" mode="full" />
   </div>
 
   <!-- <PaginationMailList v-model:currentPage="currentPage" /> -->
@@ -23,6 +26,11 @@ const { setPageTitle } = usePageTitle();
 const route = useRoute();
 
 const store = useStore();
+await useAsyncData("getWillSendList", async () => {
+  await store.fetchWillSendList();
+  return store.articleList;
+});
+
 await useAsyncData("getNews", async () => {
   await store.fetchArticles();
   return store.articleList;

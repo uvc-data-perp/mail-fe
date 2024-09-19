@@ -2,18 +2,21 @@
   <div class="bg-white rounded-lg shadow-md p-6 w-full">
     <div class="mb-4 border-b-4 w-full">
       <!-- 제목 -->
+
       <div class="title">
-        <h2 class="text-2xl font-bold mb-6">전자금융거래 기본약관 개정 안내</h2>
+        <h2 class="text-2xl font-bold mb-6">
+          {{ route.params.documentId }} {{ route.query.subject }}
+        </h2>
       </div>
       <!-- 보낸 사람 -->
       <div class="flex w-full items-center mb-2">
         <el-tag type="info" class="mr-2 flex-shrink-0">보낸사람</el-tag>
-        <span flex-grow border-b>우리카드 &lt;wooricad@wooricard.com&gt;</span>
+        <span flex-grow border-b> {{ route.query.from }} </span>
       </div>
       <!-- 받는 사람 -->
       <div class="flex w-full items-center mb-2">
         <el-tag type="success" class="mr-2">받는사람</el-tag>
-        <span flex-grow border-b>고객님</span>
+        <span flex-grow border-b>{{ route.query.to }}</span>
       </div>
       <!-- 예약날짜 or 보낸 날짜 표시 -->
       <div
@@ -56,11 +59,8 @@
           }}
           {{
             scheduleForm.periodType !== "no"
-              ? ` 주기: ${
-                  scheduleForm.periodType === "weekly"
-                    ? `${scheduleForm.interval}주`
-                    : `${scheduleForm.interval}개월`
-                } ${
+              ? `주기
+                ${
                   scheduleForm?.periodType === "weekly"
                     ? ` ${getDayNames(scheduleForm.days).join(", ")}요일`
                     : ` ${scheduleForm.days?.join(", ")}일`
@@ -75,7 +75,9 @@
       </div>
     </div>
     <!-- 본문내용 -->
-    <div class="content flex overflow-x-auto w-full border-b-4">내용쩜반복</div>
+    <div class="content flex overflow-x-auto w-full border-b-4">
+      {{ route.query.text }}
+    </div>
     <!-- 이전/이후 목록 조회 -->
     <div class="footer">
       <TableMailList
@@ -100,7 +102,7 @@ const scheduleForm = ref({
   startTime: "",
   expiryDate: "",
   periodType: "no",
-  interval: 1,
+
   days: [],
   // ...props.editData,
 });

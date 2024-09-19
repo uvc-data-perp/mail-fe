@@ -5,8 +5,8 @@
     width="60%"
     @close="handleClose"
   >
-    <el-input v-model="newSnippet.before" placeholder="before" />
-    <el-input v-model="newSnippet.after" placeholder="after" />
+    <el-input v-model="newSnippet.from" placeholder="from" />
+    <el-input v-model="newSnippet.to" placeholder="to" />
     <ElInput
       v-model="newSnippet.keyBoard"
       @keydown="onKeyDown"
@@ -17,18 +17,18 @@
       ref="multipleTableRef"
       :data="snippetStore.snippets"
       style="width: 100%"
-      row-key="id"
+      row-key="_id"
       @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="55" />
-      <el-table-column property="before" label="변경 전" width="120" />
-      <el-table-column property="after" label="변경 후" />
+      <el-table-column property="from" label="변경 전" width="120" />
+      <el-table-column property="to" label="변경 후" />
       <el-table-column property="keyBoard" label="단축키" />
       <el-table-column fixed="right" width="120">
         <template #default="scope">
           <el-button
             size="small"
-            @click="(id) => snippetStore.deleteSnippet(scope.row.id)"
+            @click="() => snippetStore.deleteSnippet(scope.row._id)"
           >
             Delete
           </el-button>
@@ -53,15 +53,26 @@ const props = defineProps({
 });
 
 const snippetStore = useSnippetStore();
-const newSnippet = ref<Snippet>({ before: "", after: "", keyBoard: "" });
+//바로 스닙펫 불러오기 확인
+await useAsyncData("fetchSnippetList", async () => {
+  await snippetStore.fetchSnippetList();
+  console.log(snippetStore.snippets);
+  console.log(snippetStore.snippets);
+  console.log(snippetStore.snippets);
+  console.log(snippetStore.snippets);
+  console.log(snippetStore.snippets);
+  console.log(snippetStore.snippets);
+});
+
+const newSnippet = ref<Snippet>({ from: "", to: "", keyBoard: "" });
 const validationSnippet = (snippet: Snippet) => {
-  if (snippet.before === "") {
+  if (snippet.from === "") {
     return "변경 전 문자를 입력해주세요";
   }
-  if (snippet.after === "") {
+  if (snippet.to === "") {
     return "변경 후 문자를 입력해주세요";
   }
-  if (snippetStore.snippets.some((s) => s.before === snippet.before)) {
+  if (snippetStore.snippets.some((s) => s.from === snippet.from)) {
     return "변경 전 문자가 이미 존재합니다.";
   }
   if (snippetStore.snippets.some((s) => s.keyBoard === snippet.keyBoard)) {
@@ -81,7 +92,7 @@ const addSnippet = () => {
   // 검증을 통과한 경우에만 이 부분이 실행됩니다
   snippetStore.addSnippet(newSnippet.value);
   ElMessage.success("스니펫이 추가되었습니다");
-  newSnippet.value = { before: "", after: "", keyBoard: "" };
+  newSnippet.value = { from: "", to: "", keyBoard: "" };
 };
 
 const multipleTableRef = ref<InstanceType<typeof ElTable>>();

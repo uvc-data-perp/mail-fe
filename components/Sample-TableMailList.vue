@@ -29,9 +29,13 @@
       <template #default="scope">
         <NuxtLink
           :to="'/mail/read/' + route.params.folderId + '/' + scope.row.id"
-          class="text-blue-600 hover:underline"
+          class="hover:underline"
         >
-          <p class="font-bold text-lg">{{ scope.row.title }}</p>
+          <p
+            :class="true ? 'font-semibold' : 'text-blue-600 font-bold text-lg'"
+          >
+            {{ scope.row.title }}
+          </p>
           {{
             scope.row.content.length > 50
               ? scope.row.content.slice(0, 47) + "..."

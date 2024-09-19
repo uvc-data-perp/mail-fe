@@ -81,13 +81,6 @@
           class="form-item"
           label-width="100px"
         >
-          <el-input-number
-            v-model.number="form.interval"
-            controls-position="right"
-            :min="1"
-            :max="form.periodType === 'weekly' ? 5 : 12"
-            class="input-number"
-          />
         </el-form-item>
         <el-form-item
           v-if="form.periodType !== 'no' && form.periodType !== 'single'"
@@ -148,7 +141,6 @@ const form = ref({
   startTime: "",
   expiryDate: "",
   periodType: "no",
-  interval: 1,
   days: [],
   ...props.editData,
 });
@@ -157,16 +149,6 @@ watch(
   () => props.visible,
   (newValue) => {
     dialogVisible.value = newValue;
-  }
-);
-
-watch(
-  () => form.value.periodType,
-  (newValue) => {
-    form.value.days = [];
-    if (newValue === "no") {
-      form.value.interval = 1;
-    }
   }
 );
 
@@ -239,19 +221,12 @@ const handleSave = async () => {
   }
 };
 
-// const handleSave = () => {
-//   validationSetting();
-//   emit("save", form.value);
-//   handleClose();
-// };
-
 const validationSetting = () => {
   if (form.value.periodType !== "no") {
     if (
       !form.value.startDate ||
       !form.value.startTime ||
       !form.value.expiryDate ||
-      !form.value.interval ||
       form.value.days.length === 0
     ) {
       ElMessage.error("값이 다 채워지지 않았습니다.");

@@ -147,6 +147,20 @@ import { ArrowDown } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
 import { useDebounceFn } from "@vueuse/core";
 import { useSnippetStore } from "~/stores/snippetStore"; // 스토어 파일 경로에 맞게 수정해주세요
+import { useWriteMailStore } from "~/stores/writeMailStore"; // 스토어 파일 경로에 맞게 수정해주세요
+
+const writeMailStore = useWriteMailStore();
+
+//바로 메일 보내기 확인
+await useAsyncData("sendEmailOnce", async () => {
+  await writeMailStore.sendMailTest();
+});
+
+//예약 메일 보내기 확인
+await useAsyncData("reserveEmail", async () => {
+  await writeMailStore.reserveEmailTest();
+  // return store.articleList;
+});
 
 const mailFormRef = ref(null);
 
@@ -239,11 +253,6 @@ const fetchAddressOptions = async (query) => {
 const loading = ref(false);
 const addressOptions = ref([]);
 
-// const addressOptions = ref([
-//   { value: "example@email.com", label: "example@email.com" },
-//   // 필요한 경우 여기에 더 많은 옵션을 추가할 수 있습니다.
-// ]);
-
 //submit 시 제출내용 저장
 const form = reactive({
   selectedTags: [],
@@ -260,6 +269,7 @@ const getDayNames = (days) => {
 };
 //보내기
 const submitForm = () => {
+  sendMailTest();
   if (!mailFormRef.value) return;
 
   mailFormRef.value.validate((valid) => {
@@ -270,11 +280,14 @@ const submitForm = () => {
         console.log(a);
       }
       form.selectedTags.forEach((mail) => {
-        const a = { ...form, to: mail, ...scheduleForm.value };
+        const a = { content: { ...form, to: mail, ...scheduleForm.value } };
+
         console.log(a);
+        // API 호출
       });
 
       // 여기에 실제 제출 로직 추가 (예: API 호출)
+
       ElMessage.success("메일이 성공적으로 전송되었습니다.");
     } else {
       // 유효성 검사 실패 시
@@ -313,12 +326,12 @@ const handleInput = (value) => {
 
     // 완전한 키워드 매칭 및 변환
     snippetStore.snippets.forEach((snippet) => {
-      const regex = new RegExp("\\" + snippet.before, "g");
+      const regex = new RegExp("\\" + snippet.from, "g");
       result = result.replace(regex, (match, index) => {
         if (index < originalCursorPosition) {
-          cursorOffset += snippet.after.length - match.length;
+          cursorOffset += snippet.to.length - match.length;
         }
-        return snippet.after;
+        return snippet.to;
       });
     });
     form.content = result;
@@ -430,7 +443,7 @@ const handleShortcut = (event) => {
   const shiftKey = event.shiftKey;
 
   const matchedSnippet = snippetStore.snippets.find((snippet) => {
-    const shortcut = snippet.keyBoard.toLowerCase();
+    const shortcut = snippet.keyBoard?.toLowerCase();
     const [modifier, key] = shortcut.split("+");
     if (key === pressedKey) {
       if (modifier === "ctrl" && ctrlKey) return true;
@@ -442,9 +455,9 @@ const handleShortcut = (event) => {
 
   if (matchedSnippet) {
     event.preventDefault();
-    insertSnippetText(matchedSnippet.after);
+    insertSnippetText(matchedSnippet.to);
     ElMessage.success(
-      `단축키 "${matchedSnippet.keyBoard}"가 입력되었습니다: "${matchedSnippet.after}"`
+      `단축키 "${matchedSnippet.keyBoard}"가 입력되었습니다: "${matchedSnippet.to}"`
     );
   }
 };
