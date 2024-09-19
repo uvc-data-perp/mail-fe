@@ -1,13 +1,19 @@
 import { defineStore } from "pinia";
 import axios from "axios";
+import type { MailMessage, MailContents } from "~/types/writeMailStore";
 
 export const useWriteMailStore = defineStore("writeMail", () => {
   // State
-  const articleList = ref([]);
-  const currentPage = ref(1);
-  const pageSize = ref(9);
-  const totalResults = ref(0);
 
+  const mailMessage = ref<MailMessage>({
+    contents: {
+      from: "a@gmail.com",
+      to: "a@gmail.com",
+      subject: "Hello ✔",
+      text: "Hello ?",
+      html: "<b>ㅋㅋㅋㅋㅋㅋㅋㅋ</b>",
+    },
+  });
   // Actions
   // Mutations => State를 변경할 목적으로 작성된 코드
 
@@ -20,18 +26,28 @@ export const useWriteMailStore = defineStore("writeMail", () => {
   });
 
   const sendMailTest = async () => {
-    const mailContent = {
-      contents: {
-        from: "a@gmail.com",
-        to: "a@gmail.com",
-        subject: "Hello ✔",
-        text: "Hello ?",
-        html: "<b>ㅋㅋㅋㅋㅋㅋㅋㅋ</b>",
-      },
-    };
+    // const mailContent = {
+    //   contents: {
+    //     from: "a@gmail.com",
+    //     to: "a@gmail.com",
+    //     subject: "Hello ✔",
+    //     text: "Hello ?",
+    //     html: "<b>ㅋㅋㅋㅋㅋㅋㅋㅋ</b>",
+    //   },
+    // };
 
     try {
-      const response = await axiosInstance.post("/send/once", mailContent);
+      console.log(mailMessage.value);
+      console.log(mailMessage.value);
+      console.log(mailMessage.value);
+      console.log(mailMessage.value);
+      console.log(mailMessage.value);
+      console.log(mailMessage.value);
+
+      const response = await axiosInstance.post(
+        "/send/once",
+        mailMessage.value
+      );
       console.log("스토어 Email sent successfully:", response.data);
       return response.data;
     } catch (error) {
@@ -51,20 +67,20 @@ export const useWriteMailStore = defineStore("writeMail", () => {
   };
 
   const reserveEmailTest = async () => {
-    const mailContent = {
-      contents: {
-        from: "jjoo08152@gmail.com",
-        to: "jjoo0815@gmail.com",
-        subject: "Hello ✔",
-        text: "Hello Jisang?",
-        html: "<b>안녕하세요 김신영2입니다 반갑습니다!!</b>",
+    // const mailContent = {
+    //   contents: {
+    //     from: "jjoo08152@gmail.com",
+    //     to: "jjoo0815@gmail.com",
+    //     subject: "Hello ✔",
+    //     text: "Hello Jisang?",
+    //     html: "<b>안녕하세요 김신영2입니다 반갑습니다!!</b>",
 
-        reserved_timestamp: "9726709750",
-      },
-    };
+    //     reserved_timestamp: "9726709750",
+    //   },
+    // };
 
     try {
-      const response = await axiosInstance.post("/send/booking", mailContent);
+      const response = await axiosInstance.post("/send/booking", mailMessage);
       console.log("스토어예약 Email sent successfully:", response.data);
       return response.data;
     } catch (error) {
@@ -84,9 +100,7 @@ export const useWriteMailStore = defineStore("writeMail", () => {
   };
 
   return {
-    articleList,
-    currentPage,
-    totalResults,
+    mailMessage,
 
     sendMailTest,
     reserveEmailTest,

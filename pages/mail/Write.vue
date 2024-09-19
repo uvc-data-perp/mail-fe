@@ -112,7 +112,7 @@
       </el-input>
     </el-form-item>
 
-    <el-form-item label="파일첨부">
+    <!-- <el-form-item label="파일첨부">
       <el-upload
         action="#"
         multiple
@@ -123,7 +123,7 @@
           <el-button type="primary">파일 선택</el-button>
         </template>
       </el-upload>
-    </el-form-item>
+    </el-form-item> -->
 
     <el-form-item prop="content" label="내용">
       <el-input
@@ -149,22 +149,16 @@ import { useDebounceFn } from "@vueuse/core";
 import { useSnippetStore } from "~/stores/snippetStore"; // 스토어 파일 경로에 맞게 수정해주세요
 import { useWriteMailStore } from "~/stores/writeMailStore"; // 스토어 파일 경로에 맞게 수정해주세요
 
+//store 불러오기
 const writeMailStore = useWriteMailStore();
+const snippetStore = useSnippetStore();
 
-//바로 메일 보내기 확인
-await useAsyncData("sendEmailOnce", async () => {
-  await writeMailStore.sendMailTest();
-});
-
-//예약 메일 보내기 확인
-await useAsyncData("reserveEmail", async () => {
-  await writeMailStore.reserveEmailTest();
-  // return store.articleList;
-});
+console.log(writeMailStore.mailMessage);
+console.log(writeMailStore.mailMessage);
+console.log(writeMailStore.mailMessage);
+console.log(writeMailStore.mailMessage);
 
 const mailFormRef = ref(null);
-
-const snippetStore = useSnippetStore();
 
 const rules = computed(() => {
   const baseRules = {
@@ -259,6 +253,7 @@ const form = reactive({
   to: "",
   subject: "",
   content: "",
+  periodType: "no",
 });
 //예약관련 내용 저장
 const scheduleForm = ref({ periodType: "no" });
@@ -268,23 +263,49 @@ const getDayNames = (days) => {
   return days.map((day) => dayNames[day]);
 };
 //보내기
-const submitForm = () => {
-  sendMailTest();
+async function submitForm() {
+  //예약 메일 보내기 확인
+
+  for (const key in scheduleForm.value) {
+    form[key] = scheduleForm.value[key];
+  }
+
   if (!mailFormRef.value) return;
 
   mailFormRef.value.validate((valid) => {
     if (valid) {
       // 유효성 검사 통과 시 기존 로직 실행
       if (route.query.type === "toMe") {
-        const a = { ...form, to: "example@email.com", ...scheduleForm.value };
+        const a = { ...form, to: "example@email.com" };
         console.log(a);
       }
       form.selectedTags.forEach((mail) => {
-        const a = { content: { ...form, to: mail, ...scheduleForm.value } };
+        const a = { content: { ...form, to: mail } };
 
-        console.log(a);
         // API 호출
       });
+      switch (form.periodType) {
+        case "no":
+          useAsyncData("sendEmailOnce", async () => {
+            await writeMailStore.sendMailTest();
+          });
+          console.log("finish-no send");
+          console.log("finish-no send");
+          console.log("finish-no send");
+
+          break;
+        case "single":
+          useAsyncData("reserveEmail", async () => {
+            await writeMailStore.reserveEmailTest();
+          });
+          console.log("finish-single send");
+          console.log("finish-single send");
+          console.log("finish-single send");
+          console.log("finish-single send");
+          console.log("finish-single send");
+          console.log("finish-single send");
+          break;
+      }
 
       // 여기에 실제 제출 로직 추가 (예: API 호출)
 
@@ -295,7 +316,7 @@ const submitForm = () => {
       return false;
     }
   });
-};
+}
 
 let timeout = null;
 
