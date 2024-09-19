@@ -56,12 +56,6 @@ const snippetStore = useSnippetStore();
 //바로 스닙펫 불러오기 확인
 await useAsyncData("fetchSnippetList", async () => {
   await snippetStore.fetchSnippetList();
-  console.log(snippetStore.snippets);
-  console.log(snippetStore.snippets);
-  console.log(snippetStore.snippets);
-  console.log(snippetStore.snippets);
-  console.log(snippetStore.snippets);
-  console.log(snippetStore.snippets);
 });
 
 const newSnippet = ref<Snippet>({ from: "", to: "", keyBoard: "" });

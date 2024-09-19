@@ -1,6 +1,6 @@
 <template>
   <el-form
-    :model="form"
+    :model="writeMailStore.mailMessage.contents"
     ref="mailFormRef"
     label-position="top"
     :rules="rules"
@@ -69,7 +69,7 @@
       label="받는사람"
     >
       <el-select
-        v-model="form.selectedTags"
+        v-model="writeMailStore.mailMessage.contents.selectedTags"
         multiple
         filterable
         allow-create
@@ -88,7 +88,7 @@
         />
         <template #tag>
           <el-tag
-            v-for="tag in form.selectedTags"
+            v-for="tag in writeMailStore.mailMessage.contents.selectedTags"
             :key="tag"
             :type="isValidEmail(tag) ? 'success' : 'danger'"
             closable
@@ -105,7 +105,10 @@
     </el-form-item> -->
 
     <el-form-item prop="subject" label="제목">
-      <el-input v-model="form.subject" placeholder="제목">
+      <el-input
+        v-model="writeMailStore.mailMessage.contents.subject"
+        placeholder="제목"
+      >
         <!-- <template #append>
           <el-checkbox v-model="form.important" label="중요!" />
         </template> -->
@@ -125,9 +128,9 @@
       </el-upload>
     </el-form-item> -->
 
-    <el-form-item prop="content" label="내용">
+    <el-form-item prop="text" label="내용">
       <el-input
-        v-model="form.content"
+        v-model="writeMailStore.mailMessage.contents.text"
         type="textarea"
         :rows="10"
         placeholder="내용을 입력하세요"
@@ -152,11 +155,6 @@ import { useWriteMailStore } from "~/stores/writeMailStore"; // 스토어 파일
 //store 불러오기
 const writeMailStore = useWriteMailStore();
 const snippetStore = useSnippetStore();
-
-console.log(writeMailStore.mailMessage);
-console.log(writeMailStore.mailMessage);
-console.log(writeMailStore.mailMessage);
-console.log(writeMailStore.mailMessage);
 
 const mailFormRef = ref(null);
 
@@ -264,59 +262,127 @@ const getDayNames = (days) => {
 };
 //보내기
 async function submitForm() {
-  //예약 메일 보내기 확인
-
   for (const key in scheduleForm.value) {
-    form[key] = scheduleForm.value[key];
+    writeMailStore.mailMessage.contents[key] = scheduleForm.value[key];
   }
-
   if (!mailFormRef.value) return;
 
-  mailFormRef.value.validate((valid) => {
+  try {
+    const valid = await mailFormRef.value.validate();
     if (valid) {
       // 유효성 검사 통과 시 기존 로직 실행
       if (route.query.type === "toMe") {
-        const a = { ...form, to: "example@email.com" };
+        const a = {
+          ...writeMailStore.mailMessage.contents,
+          to: "example@email.com",
+        };
         console.log(a);
       }
-      form.selectedTags.forEach((mail) => {
-        const a = { content: { ...form, to: mail } };
 
-        // API 호출
-      });
-      switch (form.periodType) {
+      switch (writeMailStore.mailMessage.contents.periodType) {
         case "no":
-          useAsyncData("sendEmailOnce", async () => {
-            await writeMailStore.sendMailTest();
-          });
-          console.log("finish-no send");
-          console.log("finish-no send");
-          console.log("finish-no send");
+          try {
+            const results = await writeMailStore
+              .sendMailTest
+              // writeMailStore.mailMessage.contents.selectedTags
+              ();
+            console.log("All email sending results:", results);
 
+            const successCount = results.filter((r) => r.success).length;
+            const failCount = results.length - successCount;
+
+            if (failCount === 0) {
+              ElMessage.success(
+                `${successCount}개의 메일이 성공적으로 전송되었습니다.`
+              );
+            } else {
+              ElMessage.warning(
+                `${successCount}개의 메일 전송 성공, ${failCount}개의 메일 전송 실패.`
+              );
+            }
+          } catch (error) {
+            console.error("Error sending emails:", error);
+            ElMessage.error("메일 전송 중 오류가 발생했습니다.");
+          }
           break;
+
         case "single":
-          useAsyncData("reserveEmail", async () => {
-            await writeMailStore.reserveEmailTest();
-          });
-          console.log("finish-single send");
-          console.log("finish-single send");
-          console.log("finish-single send");
-          console.log("finish-single send");
-          console.log("finish-single send");
-          console.log("finish-single send");
+          try {
+            const result = await writeMailStore.reserveEmailTest();
+            console.log("Email reservation result:", result);
+            ElMessage.success("메일이 성공적으로 예약되었습니다.");
+          } catch (error) {
+            console.error("Error reserving email:", error);
+            ElMessage.error("메일 예약 중 오류가 발생했습니다.");
+          }
+          break;
+
+        default:
+          ElMessage.error("지원하지 않는 전송 유형입니다.");
           break;
       }
-
-      // 여기에 실제 제출 로직 추가 (예: API 호출)
-
-      ElMessage.success("메일이 성공적으로 전송되었습니다.");
     } else {
       // 유효성 검사 실패 시
       ElMessage.error("폼 유효성 검사에 실패했습니다. 입력을 확인해주세요.");
-      return false;
     }
-  });
+  } catch (error) {
+    console.error("Form validation error:", error);
+    ElMessage.error("폼 검증 중 오류가 발생했습니다.");
+  }
 }
+
+// async function submitForm() {
+//   //예약 메일 보내기 확인
+
+//   //예약설정 추가
+//   for (const key in scheduleForm.value) {
+//     writeMailStore.mailMessage.contents[key] = scheduleForm.value[key];
+//   }
+
+//   // for (const singleMail of writeMailStore.mailMessage.contents.selectedTags) {
+//     // writeMailStore.mailMessage.contents.to = singleMail;
+//     // const a = { contents: writeMailStore.mailMessage.contents };
+//     // console.log("A:", a);
+
+//     if (!mailFormRef.value) return;
+
+//     mailFormRef.value.validate((valid) => {
+//       if (valid) {
+//     switch (writeMailStore.mailMessage.contents.periodType) {
+//       case "no":
+//         try {
+//           const results = await writeMailStore.sendMailTest(writeMailStore.mailMessage.contents.selectedTags);
+//           console.log("All email sending results:", results);
+//           ElMessage.success("모든 메일이 성공적으로 전송되었습니다.");
+//         } catch (error) {
+//           console.error("Error sending emails:", error);
+//           ElMessage.error("메일 전송 중 오류가 발생했습니다.");
+//         }
+//         break;
+//           case "single":
+//             useAsyncData("reserveEmail", async () => {
+//               await writeMailStore.reserveEmailTest();
+//             });
+//             console.log("finish-single send");
+//             console.log("finish-single send");
+//             console.log("finish-single send");
+//             console.log("finish-single send");
+//             console.log("finish-single send");
+//             console.log("finish-single send");
+//             break;
+//         }
+
+//         // 여기에 실제 제출 로직 추가 (예: API 호출)
+
+//         ElMessage.success("메일이 성공적으로 전송되었습니다.");
+//       } else {
+//         // 유효성 검사 실패 시
+//         ElMessage.error("폼 유효성 검사에 실패했습니다. 입력을 확인해주세요.");
+//         return false;
+//       }
+//     });
+
+// }
 
 let timeout = null;
 
@@ -355,7 +421,7 @@ const handleInput = (value) => {
         return snippet.to;
       });
     });
-    form.content = result;
+    writeMailStore.mailMessage.text = result;
 
     // 변환 완료 후 커서 위치 조정
     nextTick(() => {
@@ -402,7 +468,7 @@ const debouncedHandleInput = useDebounceFn(handleInput, 300);
 const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
 const validateEmails = () => {
-  form.selectedTags.forEach((email) => {
+  writeMailStore.mailMessage.contents.selectedTags.forEach((email) => {
     if (!isValidEmail(email)) {
       ElMessage.error(`유효하지 않은 이메일 주소: ${email}`);
     }
@@ -410,9 +476,9 @@ const validateEmails = () => {
 };
 
 const handleClose = (tag) => {
-  const index = form.selectedTags.indexOf(tag);
+  const index = writeMailStore.mailMessage.contents.selectedTags.indexOf(tag);
   if (index > -1) {
-    form.selectedTags.splice(index, 1);
+    writeMailStore.mailMessage.contents.selectedTags.splice(index, 1);
   }
 };
 
@@ -449,9 +515,9 @@ const togglePersonalMode = () => {
   ElMessage.info("개인별 모드 전환");
 };
 
-const handleFileChange = (file, fileList) => {
-  form.attachments = fileList;
-};
+// const handleFileChange = (file, fileList) => {
+//   writeMailStore.mailMessage.contents.attachments = fileList;
+// };
 
 /////////
 
@@ -488,10 +554,15 @@ const insertSnippetText = (text) => {
   if (!textarea) return;
 
   const cursorPosition = textarea.selectionStart;
-  const textBefore = form.content.slice(0, cursorPosition);
-  const textAfter = form.content.slice(textarea.selectionEnd);
+  const textBefore = writeMailStore.mailMessage.contents.text.slice(
+    0,
+    cursorPosition
+  );
+  const textAfter = writeMailStore.mailMessage.contents.text.slice(
+    textarea.selectionEnd
+  );
 
-  form.content = textBefore + text + textAfter;
+  writeMailStore.mailMessage.contents.text = textBefore + text + textAfter;
 
   nextTick(() => {
     const newCursorPosition = cursorPosition + text.length;

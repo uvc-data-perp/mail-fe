@@ -7,11 +7,11 @@ export const useWriteMailStore = defineStore("writeMail", () => {
 
   const mailMessage = ref<MailMessage>({
     contents: {
-      from: "a@gmail.com",
-      to: "a@gmail.com",
-      subject: "Hello ✔",
-      text: "Hello ?",
-      html: "<b>ㅋㅋㅋㅋㅋㅋㅋㅋ</b>",
+      from: "pinia@gmail.com",
+      to: "pinia@gmail.com",
+      subject: "p Sub ✔",
+      text: "p text ?",
+      html: "<b>p html</b>",
     },
   });
   // Actions
@@ -24,46 +24,32 @@ export const useWriteMailStore = defineStore("writeMail", () => {
       "Content-Type": "application/json",
     },
   });
-
+  // selectedTags: string[]
   const sendMailTest = async () => {
-    // const mailContent = {
-    //   contents: {
-    //     from: "a@gmail.com",
-    //     to: "a@gmail.com",
-    //     subject: "Hello ✔",
-    //     text: "Hello ?",
-    //     html: "<b>ㅋㅋㅋㅋㅋㅋㅋㅋ</b>",
-    //   },
-    // };
+    const results = [];
 
-    try {
-      console.log(mailMessage.value);
-      console.log(mailMessage.value);
-      console.log(mailMessage.value);
-      console.log(mailMessage.value);
-      console.log(mailMessage.value);
-      console.log(mailMessage.value);
+    for (const toEmail of mailMessage.value.contents.selectedTags) {
+      console.log(`Sending email to: ${toEmail}`);
+      mailMessage.value.contents.to = toEmail;
 
-      const response = await axiosInstance.post(
-        "/send/once",
-        mailMessage.value
-      );
-      console.log("스토어 Email sent successfully:", response.data);
-      return response.data;
-    } catch (error) {
-      if (error.response) {
-        // 서버가 2xx 범위를 벗어난 상태 코드로 응답한 경우
-        console.error("Server responded with an error:", error.response.data);
-        console.error("Status code:", error.response.status);
-      } else if (error.request) {
-        // 요청이 전송되었지만 응답을 받지 못한 경우
-        console.error("No response received:", error.request);
-      } else {
-        // 요청 설정 중 오류가 발생한 경우
-        console.error("Error setting up the request:", error.message);
+      try {
+        const response = await axiosInstance.post(
+          "/send/once",
+          mailMessage.value
+        );
+        console.log(`Email sent successfully to ${toEmail}:`, response.data);
+        results.push({
+          email: toEmail,
+          success: true,
+          response: response.data,
+        });
+      } catch (error) {
+        console.error(`Error sending email to ${toEmail}:`, error);
+        results.push({ email: toEmail, success: false, error });
       }
-      throw error;
     }
+
+    return results;
   };
 
   const reserveEmailTest = async () => {
