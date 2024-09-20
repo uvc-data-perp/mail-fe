@@ -6,7 +6,8 @@ export interface MailContents {
   html: string;
   selectedTags: string[];
   periodType?: string;
-  reservedTimestamp?: Date;
+  reservedDate?: Date;
+  reservedTimestamp?: String;
   expiryDate?: Date;
   days?: Array<number>;
 }

@@ -45,7 +45,7 @@
         class="mr-4"
       >
         {{
-          `최초 전송:  ${writeMailStore.mailMessage.contents.reservedTimestamp} 
+          `최초 전송:  ${writeMailStore.mailMessage.contents.reservedDate} 
         `
         }}
         <br />

@@ -14,11 +14,11 @@
       <el-form-item
         label="시작일"
         class="form-item"
-        prop="reservedTimestamp"
+        prop="reservedDate"
         label-width="100px"
       >
         <el-date-picker
-          v-model="writeMailContents.reservedTimestamp"
+          v-model="writeMailContents.reservedDate"
           type="datetime"
           placeholder="Pick a Date"
           format="YYYY/MM/DD HH:mm:ss"
@@ -38,6 +38,7 @@
           value-format="YYYY-MM-DD"
           :disabled-date="disabledDate"
           class="date-picker"
+          @change="updateReservedTimestamp"
         />
       </el-form-item>
       <el-form-item label="예약주기" class="form-item" label-width="100px">
@@ -123,18 +124,17 @@
     </template>
     {{ writeMailContents.reservedTimestamp }}
     {{ typeof writeMailContents.reservedTimestamp }}
-    {{ Math.floor(writeMailContents.reservedTimestamp.getTime() / 1000) }}
+    {{ Math.floor(writeMailContents.reservedDate.getTime() / 1000) }}
   </el-dialog>
 </template>
 
 <script setup>
 import { ref, watch } from "vue";
-
 import { useWriteMailStore } from "~/stores/writeMailStore";
 
 const writeMailStore = useWriteMailStore();
-const { mailMessage } = storeToRefs(writeMailStore);
-
+const { updateReservedTimestamp, sendMailTest } = writeMailStore;
+const { mailMessage, computedTimestamp } = storeToRefs(writeMailStore);
 const writeMailContents = computed(() => mailMessage.value.contents);
 
 const props = defineProps({
@@ -241,9 +241,7 @@ const validationSetting = () => {
   }
 };
 const disabledDate = (time) => {
-  return (
-    time.getTime() < new Date(writeMailContents.reservedTimestamp).getTime()
-  );
+  return time.getTime() < new Date(writeMailContents.reservedDate).getTime();
 };
 </script>
 <style scoped>

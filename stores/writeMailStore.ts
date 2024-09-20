@@ -8,16 +8,35 @@ export const useWriteMailStore = defineStore("writeMail", () => {
 
   const mailMessage = ref<MailMessage>({
     contents: {
-      from: "pinia@gmail.com",
-      to: "pinia@gmail.com",
+      from: "jjoo08152@gmail.com",
+      to: "jjoo08152@gmail.com",
       subject: "p Sub ✔",
       text: "p text ?",
       html: "<b>p html</b>",
       periodType: "no",
-      reservedTimestamp: new Date(),
+      reservedDate: new Date(),
+      reservedTimestamp: "0",
       selectedTags: [],
     },
   });
+  const computedTimestamp = computed(() =>
+    String(Math.floor(mailMessage.value.contents.reservedDate.getTime() / 1000))
+  );
+
+  watch(
+    () => mailMessage.value.contents.reservedDate,
+    (newDate) => {
+      mailMessage.value.contents.reservedTimestamp = String(
+        Math.floor(newDate.getTime() / 1000)
+      );
+    }
+  );
+
+  // reservedTimestamp를 업데이트하는 함수
+  function updateReservedTimestamp() {
+    mailMessage.value.contents.reservedTimestamp = computedTimestamp.value;
+  }
+
   // Actions
   // Mutations => State를 변경할 목적으로 작성된 코드
 
@@ -60,6 +79,20 @@ export const useWriteMailStore = defineStore("writeMail", () => {
 
       try {
         const snakeData = convertKeysToSnakeCase(mailMessage.value);
+        console.log(mailMessage.value);
+        console.log(mailMessage.value);
+        console.log(mailMessage.value);
+        console.log(mailMessage.value);
+        console.log(mailMessage.value);
+        console.log(mailMessage.value);
+        console.log(mailMessage.value);
+        console.log(mailMessage.value);
+        console.log(mailMessage.value);
+        console.log(mailMessage.value);
+        console.log(mailMessage.value);
+        console.log(mailMessage.value);
+        console.log(mailMessage.value);
+        console.log(mailMessage.value);
         const response = await $axios.post(apiEndpoint, snakeData);
         console.log(`Email sent successfully to ${toEmail}:`, response.data);
         results.push({
@@ -78,6 +111,8 @@ export const useWriteMailStore = defineStore("writeMail", () => {
 
   return {
     mailMessage,
+    computedTimestamp,
+    updateReservedTimestamp,
     sendMailTest,
   };
 });
