@@ -1,13 +1,14 @@
 export interface Mail {
-  _id: number;
+  _id: string;
   from: string;
   to: string;
   subject: string;
   text: string;
   html: string;
-  reserved_time: string;
-  sent_timestamp?: string;
+  status: string;
+  sentTimestamp?: string;
   __v?: number;
+  reservedTime: string;
   type?: "prev" | "next";
 }
 export interface ApiStructure {

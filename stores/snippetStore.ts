@@ -4,15 +4,6 @@ import type { Snippet } from "~/types/snippetStore";
 import axios from "axios";
 
 export const useSnippetStore = defineStore("snippetStore", () => {
-  const api = axios.create({
-    baseURL: "http://158.247.200.126:3001",
-    timeout: 10000000,
-    withCredentials: false, // 쿠키 포함
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-  });
   // state
   const snippets = ref<Snippet[]>([
     {
@@ -23,14 +14,17 @@ export const useSnippetStore = defineStore("snippetStore", () => {
     },
   ]);
 
+  const newSnippet = ref<Snippet>({ _id: "", from: "", to: "", keyBoard: "" });
+
   // getters
   const snippetCount = computed(() => snippets.value.length);
 
   // actions
 
   const fetchSnippetList = async () => {
+    const { $axios } = useNuxtApp();
     try {
-      const response = await api.get("/snippets", {
+      const response = await $axios.get("/snippets", {
         headers: {
           // 필요한 경우 여기에 추가 헤더를 설정할 수 있습니다.
         },
@@ -55,15 +49,27 @@ export const useSnippetStore = defineStore("snippetStore", () => {
     }
   };
 
-  const addSnippet = async (newSnippet: Snippet) => {
-    try {
-      const response = await api.post("/snippets", newSnippet);
+  const validationSnippet = (snippet: Snippet) => {
+    if (snippet.from === "") {
+      return "변경 전 문자를 입력해주세요";
+    }
+    if (snippet.to === "") {
+      return "변경 후 문자를 입력해주세요";
+    }
+    if (snippets.value.some((s) => s.from === snippet.from)) {
+      return "변경 전 문자가 이미 존재합니다.";
+    }
+    if (snippets.value.some((s) => s.keyBoard === snippet.keyBoard)) {
+      return "사용 중인 단축키가 이미 존재합니다.";
+    }
 
-      snippets.value.push({
-        ...newSnippet,
-        from: "$" + newSnippet.from,
-        _id: Date.now(), // 간단한 고유 ID 생성 (실제 앱에서는 더 강력한 방법 사용 권장)
-      });
+    return null;
+  };
+
+  const addSnippet = async (newSnippet: Snippet) => {
+    const { $axios } = useNuxtApp();
+    try {
+      const response = await $axios.post("/snippets", newSnippet);
 
       return response.data;
     } catch (error) {
@@ -84,13 +90,9 @@ export const useSnippetStore = defineStore("snippetStore", () => {
   };
 
   const deleteSnippet = async (_id: string) => {
-    console.log(_id);
-    console.log(_id);
-    console.log(_id);
-    console.log(_id);
-
+    const { $axios } = useNuxtApp();
     try {
-      const response = await api.delete(`/snippets/${_id}`);
+      const response = await $axios.delete(`/snippets/${_id}`);
       snippets.value = snippets.value.filter((s) => s._id !== _id);
       return response.data;
     } catch (error) {
@@ -110,21 +112,30 @@ export const useSnippetStore = defineStore("snippetStore", () => {
     }
   };
 
-  function updateSnippet(_id: number, updatedSnippet: Snippet) {
-    const index = snippets.value.findIndex((s) => s._id === _id);
-    if (index !== -1) {
-      snippets.value[index] = { ...updatedSnippet, _id };
+  const updateSnippet = async (scopeInfo) => {
+    const target = snippets.value.find((s) => s._id === scopeInfo._id);
+    if (target) {
+      await deleteSnippet(target._id);
+      await addSnippet({ ...target, ...scopeInfo });
+      await fetchSnippetList();
     }
-  }
+  };
 
   function clearSnippets() {
-    snippets.value = [];
+    snippets.value.forEach((s) => {
+      deleteSnippet(s._id);
+    });
+    fetchSnippetList();
+    // const { $axios } = useNuxtApp();
+    // snippets.value = [];
   }
 
   return {
     snippets,
+    newSnippet,
     snippetCount,
     addSnippet,
+    validationSnippet,
     updateSnippet,
     deleteSnippet,
     clearSnippets,

@@ -406,7 +406,7 @@ const handleInput = (value) => {
         return snippet.to;
       });
     });
-    writeMailStore.mailMessage.text = result;
+    writeMailStore.mailMessage.contents.text = result;
 
     // 변환 완료 후 커서 위치 조정
     nextTick(() => {
@@ -515,7 +515,8 @@ const handleShortcut = (event) => {
   const shiftKey = event.shiftKey;
 
   const matchedSnippet = snippetStore.snippets.find((snippet) => {
-    const shortcut = snippet.keyBoard?.toLowerCase();
+    if (!snippet.keyBoard) return false;
+    const shortcut = snippet.keyBoard.toLowerCase();
     const [modifier, key] = shortcut.split("+");
     if (key === pressedKey) {
       if (modifier === "ctrl" && ctrlKey) return true;

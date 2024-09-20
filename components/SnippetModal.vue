@@ -13,6 +13,8 @@
       placeholder="단축키 입력 (예: Ctrl+I)"
     />
     <el-button @click="addSnippet">추가</el-button>
+    <el-button @click="snippetStore.clearSnippets">리셋</el-button>
+
     <el-table
       ref="multipleTableRef"
       :data="snippetStore.snippets"
@@ -21,9 +23,33 @@
       @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="55" />
-      <el-table-column property="from" label="변경 전" width="120" />
-      <el-table-column property="to" label="변경 후" />
-      <el-table-column property="keyBoard" label="단축키" />
+      <el-table-column property="from" label="변경 전" width="120">
+        <template #default="scope">
+          <el-input
+            v-model="scope.row.from"
+            type="text"
+            @change="snippetStore.updateSnippet(scope.row)"
+          />
+        </template>
+      </el-table-column>
+      <el-table-column property="to" label="변경 후">
+        <template #default="scope">
+          <el-input
+            v-model="scope.row.to"
+            type="text"
+            @change="snippetStore.updateSnippet(scope.row)"
+          />
+        </template>
+      </el-table-column>
+      <el-table-column property="keyBoard" label="단축키">
+        <template #default="scope">
+          <el-input
+            v-model="scope.row.keyBoard"
+            type="text"
+            @change="snippetStore.updateSnippet(scope.row)"
+          />
+        </template>
+      </el-table-column>
       <el-table-column fixed="right" width="120">
         <template #default="scope">
           <el-button
@@ -47,36 +73,27 @@ import { ElTable } from "element-plus";
 import { useSnippetStore } from "~/stores/snippetStore"; // 스토어 파일 경로에 맞게 수정해주세요
 import type { Snippet } from "~/types/snippetStore";
 
+const updateSnippet = (snippet) => {};
 const props = defineProps({
   visible: Boolean,
   editData: Array,
 });
-
 const snippetStore = useSnippetStore();
+const { newSnippet } = storeToRefs(snippetStore);
+const { validationSnippet } = snippetStore;
+
 //바로 스닙펫 불러오기 확인
 await useAsyncData("fetchSnippetList", async () => {
   await snippetStore.fetchSnippetList();
 });
 
-const newSnippet = ref<Snippet>({ from: "", to: "", keyBoard: "" });
-const validationSnippet = (snippet: Snippet) => {
-  if (snippet.from === "") {
-    return "변경 전 문자를 입력해주세요";
-  }
-  if (snippet.to === "") {
-    return "변경 후 문자를 입력해주세요";
-  }
-  if (snippetStore.snippets.some((s) => s.from === snippet.from)) {
-    return "변경 전 문자가 이미 존재합니다.";
-  }
-  if (snippetStore.snippets.some((s) => s.keyBoard === snippet.keyBoard)) {
-    return "사용 중인 단축키가 이미 존재합니다.";
-  }
-
-  return null;
-};
-
-const addSnippet = () => {
+const addSnippet = async () => {
+  newSnippet.value = {
+    ...newSnippet.value,
+    from: `$` + newSnippet.value.from.trim(),
+    to: newSnippet.value.to.trim(),
+    keyBoard: newSnippet.value.keyBoard.trim(),
+  };
   const validationResult = validationSnippet(newSnippet.value);
   if (validationResult !== null) {
     ElMessage.error(validationResult);
@@ -84,9 +101,10 @@ const addSnippet = () => {
   }
 
   // 검증을 통과한 경우에만 이 부분이 실행됩니다
-  snippetStore.addSnippet(newSnippet.value);
+  await snippetStore.addSnippet(newSnippet.value);
   ElMessage.success("스니펫이 추가되었습니다");
   newSnippet.value = { from: "", to: "", keyBoard: "" };
+  await snippetStore.fetchSnippetList();
 };
 
 const multipleTableRef = ref<InstanceType<typeof ElTable>>();
@@ -104,7 +122,7 @@ const handleSelectionChange = (val: Snippet[]) => {
   multipleSelection.value = val;
 };
 
-const emit = defineEmits(["update:visible", "save"]);
+const emit = defineEmits(["update:visible"]);
 
 const dialogVisible = ref(props.visible);
 const form = ref({ ...props.editData });

@@ -1,7 +1,13 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 
 export default defineNuxtConfig({
+  runtimeConfig: {
+    public: {
+      apiBaseUrl: process.env.API_BASE_URL,
+    },
+  },
   devtools: { enabled: true },
+
   build: {
     transpile: ["echarts", "vue-echarts"],
   },
@@ -12,7 +18,7 @@ export default defineNuxtConfig({
     "element-plus/dist/index.css",
   ],
 
-  plugins: ["~/plugins/element-plus.ts"],
+  plugins: ["~/plugins/element-plus.ts", "~/plugins/axios.ts"],
 
   postcss: {
     plugins: {

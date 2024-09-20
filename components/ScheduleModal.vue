@@ -121,6 +121,9 @@
         <el-button type="primary" @click="handleSave">확인</el-button>
       </span>
     </template>
+    {{ writeMailContents.reservedTimestamp }}
+    {{ typeof writeMailContents.reservedTimestamp }}
+    {{ Math.floor(writeMailContents.reservedTimestamp.getTime() / 1000) }}
   </el-dialog>
 </template>
 

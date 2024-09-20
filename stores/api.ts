@@ -20,7 +20,7 @@ export const useStore = defineStore("store", () => {
       text: "Hello Jisang?",
       html: "<b>안녕하세요 김신영2입니다 반갑습니다!!</b>",
       status: "Waiting",
-      sent_timestamp: null,
+      sent_timestamp: "9726709750",
       __v: 0,
       reserved_time: "9726709750",
     },
@@ -32,19 +32,11 @@ export const useStore = defineStore("store", () => {
     searchValue.value = payload;
   };
 
-  const api = axios.create({
-    baseURL: "http://158.247.200.126:3001",
-    timeout: 10000000,
-    withCredentials: false, // 쿠키 포함
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-  });
-
   const fetchWillSendList = async () => {
+    const { $axios } = useNuxtApp();
+
     try {
-      const response = await api.get("/will-send", {
+      const response = await $axios.get("/will-send", {
         headers: {
           // 필요한 경우 여기에 추가 헤더를 설정할 수 있습니다.
         },

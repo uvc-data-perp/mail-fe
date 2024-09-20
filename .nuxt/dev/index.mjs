@@ -101,6 +101,7 @@ const _inlineRuntimeConfig = {
     }
   },
   "public": {
+    "apiBaseUrl": "http://158.247.200.126:3001",
     "i18n": {
       "baseUrl": "",
       "defaultLocale": "",

@@ -101,17 +101,6 @@ export default defineConfig({
     }),
     presetTypography(),
     animatedUno(),
-    presetWebFonts({
-      fonts: {
-        sans: "Pretendard",
-        pretendard: [
-          {
-            name: "Pretendard",
-            weights: [100, 200, 300, 400, 500, 600, 700, 800, 900],
-            provider: "google",
-          },
-        ],
-      },
-    }),
+    presetWebFonts({}),
   ],
 });
