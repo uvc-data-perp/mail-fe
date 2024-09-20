@@ -6,14 +6,17 @@
     :rules="rules"
     class="mail-form"
   >
+    <div>
+      {{ writeMailStore.mailMessage.contents }}
+    </div>
     <el-form-item>
       <el-button-group>
-        <el-button type="primary" @click="sendMail">보내기</el-button>
+        <el-button type="primary" @click="submitForm">보내기</el-button>
         <el-button @click="scheduleDialogVisible = true">예약</el-button>
         <ScheduleModal
           v-if="scheduleDialogVisible"
           v-model:visible="scheduleDialogVisible"
-          :edit-data="scheduleForm"
+          :edit-data="writeMailStore.mailMessage.contents"
           @save="saveSchedule"
         />
 
@@ -33,32 +36,31 @@
     </el-form-item>
 
     <el-form-item
-      v-if="scheduleForm.periodType !== 'no'"
+      v-if="writeMailStore.mailMessage.contents.periodType !== 'no'"
       class="flex gap-4"
       label="예약"
     >
-      <div v-if="scheduleForm.startDate" class="mr-4">
+      <div
+        v-if="writeMailStore.mailMessage.contents.reservedTimestamp"
+        class="mr-4"
+      >
         {{
-          `최초 전송:  ${scheduleForm.startDate} 
-           ${scheduleForm.startTime}
+          `최초 전송:  ${writeMailStore.mailMessage.contents.reservedTimestamp} 
         `
         }}
         <br />
       </div>
-      <div v-if="scheduleForm.expiryDate" class="mr-4">
-        {{ `만료일:${scheduleForm.expiryDate}` }}
-      </div>
-      <div v-if="scheduleForm.periodType !== 'no'" class="mr-4">
-        주기:
+      <div
+        v-if="writeMailStore.mailMessage.contents.periodType !== 'single'"
+        class="mr-4"
+      >
+        {{ `만료일:${writeMailStore.mailMessage.contents.expiryDate}` }}
         {{
-          scheduleForm.periodType === "weekly"
-            ? `${scheduleForm.interval}주`
-            : `${scheduleForm.interval}개월`
-        }}
-        {{
-          scheduleForm?.periodType === "weekly"
-            ? ` ${getDayNames(scheduleForm.days).join(", ")}요일`
-            : ` ${scheduleForm.days?.join(", ")}일`
+          writeMailStore.mailMessage.contents?.periodType === "weekly"
+            ? ` ${getDayNames(writeMailStore.mailMessage.contents.days).join(
+                ", "
+              )}요일`
+            : ` ${writeMailStore.mailMessage.contents.days?.join(", ")}일`
         }}
       </div>
     </el-form-item>
@@ -245,26 +247,12 @@ const fetchAddressOptions = async (query) => {
 const loading = ref(false);
 const addressOptions = ref([]);
 
-//submit 시 제출내용 저장
-const form = reactive({
-  selectedTags: [],
-  to: "",
-  subject: "",
-  content: "",
-  periodType: "no",
-});
-//예약관련 내용 저장
-const scheduleForm = ref({ periodType: "no" });
-
 const getDayNames = (days) => {
   const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
   return days.map((day) => dayNames[day]);
 };
 //보내기
 async function submitForm() {
-  for (const key in scheduleForm.value) {
-    writeMailStore.mailMessage.contents[key] = scheduleForm.value[key];
-  }
   if (!mailFormRef.value) return;
 
   try {
@@ -282,10 +270,7 @@ async function submitForm() {
       switch (writeMailStore.mailMessage.contents.periodType) {
         case "no":
           try {
-            const results = await writeMailStore
-              .sendMailTest
-              // writeMailStore.mailMessage.contents.selectedTags
-              ();
+            const results = await writeMailStore.sendMailTest();
             console.log("All email sending results:", results);
 
             const successCount = results.filter((r) => r.success).length;
@@ -308,7 +293,7 @@ async function submitForm() {
 
         case "single":
           try {
-            const result = await writeMailStore.reserveEmailTest();
+            const result = await writeMailStore.sendMailTest();
             console.log("Email reservation result:", result);
             ElMessage.success("메일이 성공적으로 예약되었습니다.");
           } catch (error) {
@@ -489,7 +474,7 @@ const sendMail = () => {
 const scheduleDialogVisible = ref(false);
 
 const saveSchedule = (updatedData) => {
-  scheduleForm.value = updatedData;
+  writeMailStore.mailMessage.contents.value = updatedData;
   ElMessage.success("변경된 예약설정이 반영되었습니다.");
 
   scheduleDialogVisible.value = false;

@@ -4,8 +4,11 @@ export interface MailContents {
   subject: string;
   text: string;
   html: string;
+  selectedTags: string[];
   periodType?: string;
-  selectedTags?: string[];
+  reservedTimestamp?: Date;
+  expiryDate?: Date;
+  days?: Array<number>;
 }
 
 export interface MailMessage {

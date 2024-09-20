@@ -6,7 +6,7 @@
     @close="handleClose"
   >
     <el-form
-      :model="form"
+      :model="writeMailContents"
       :rules="rules"
       ref="formRef"
       class="schedule-form flex flex-col gap-4"
@@ -14,30 +14,14 @@
       <el-form-item
         label="시작일"
         class="form-item"
-        prop="startDate"
+        prop="reservedTimestamp"
         label-width="100px"
       >
         <el-date-picker
-          v-model="form.startDate"
-          type="date"
-          placeholder="시작 날짜 선택"
-          format="YYYY/MM/DD"
-          value-format="YYYY-MM-DD"
-          class="date-picker"
-        />
-      </el-form-item>
-      <el-form-item
-        label="시작 시간"
-        class="form-item"
-        prop="startTime"
-        label-width="100px"
-      >
-        <el-time-picker
-          v-model="form.startTime"
-          placeholder="시작 시간 선택"
-          format="HH:mm"
-          value-format="HH:mm"
-          class="time-picker"
+          v-model="writeMailContents.reservedTimestamp"
+          type="datetime"
+          placeholder="Pick a Date"
+          format="YYYY/MM/DD HH:mm:ss"
         />
       </el-form-item>
       <el-form-item
@@ -47,7 +31,7 @@
         label-width="100px"
       >
         <el-date-picker
-          v-model="form.expiryDate"
+          v-model="writeMailContents.expiryDate"
           type="date"
           placeholder="만료 날짜 선택"
           format="YYYY/MM/DD"
@@ -58,7 +42,7 @@
       </el-form-item>
       <el-form-item label="예약주기" class="form-item" label-width="100px">
         <el-select
-          v-model="form.periodType"
+          v-model="writeMailContents.periodType"
           placeholder="주기 선택"
           class="select-picker period-select w-56"
         >
@@ -69,12 +53,17 @@
         </el-select>
       </el-form-item>
 
-      <template v-if="form.periodType !== 'no' && form.periodType !== 'single'">
+      <template
+        v-if="
+          writeMailContents.periodType !== 'no' &&
+          writeMailContents.periodType !== 'single'
+        "
+      >
         <el-form-item
           :label="
-            form.periodType === 'weekly'
+            writeMailContents.periodType === 'weekly'
               ? '주 간격'
-              : form.periodType === 'monthly'
+              : writeMailContents.periodType === 'monthly'
               ? '월 간격'
               : null
           "
@@ -83,15 +72,25 @@
         >
         </el-form-item>
         <el-form-item
-          v-if="form.periodType !== 'no' && form.periodType !== 'single'"
-          :label="form.periodType === 'weekly' ? '요일 선택' : '날짜 선택'"
+          v-if="
+            writeMailContents.periodType !== 'no' &&
+            writeMailContents.periodType !== 'single'
+          "
+          :label="
+            writeMailContents.periodType === 'weekly'
+              ? '요일 선택'
+              : '날짜 선택'
+          "
           prop="days"
           class="form-item text-right"
           label-width="100px"
           label-position="right"
         >
-          <el-checkbox-group v-model="form.days" class="checkbox-group">
-            <template v-if="form.periodType === 'weekly'">
+          <el-checkbox-group
+            v-model="writeMailContents.days"
+            class="checkbox-group"
+          >
+            <template v-if="writeMailContents.periodType === 'weekly'">
               <el-checkbox :value="0">월</el-checkbox>
               <el-checkbox :value="1">화</el-checkbox>
               <el-checkbox :value="2">수</el-checkbox>
@@ -100,7 +99,7 @@
               <el-checkbox :value="5">토</el-checkbox>
               <el-checkbox :value="6">일</el-checkbox>
             </template>
-            <template v-else-if="form.periodType === 'monthly'">
+            <template v-else-if="writeMailContents.periodType === 'monthly'">
               <div class="grid grid-cols-7 gap-1">
                 <el-checkbox
                   v-for="day in 31"
@@ -128,6 +127,13 @@
 <script setup>
 import { ref, watch } from "vue";
 
+import { useWriteMailStore } from "~/stores/writeMailStore";
+
+const writeMailStore = useWriteMailStore();
+const { mailMessage } = storeToRefs(writeMailStore);
+
+const writeMailContents = computed(() => mailMessage.value.contents);
+
 const props = defineProps({
   visible: Boolean,
   editData: Object,
@@ -136,14 +142,6 @@ const props = defineProps({
 const emit = defineEmits(["update:visible", "save"]);
 
 const dialogVisible = ref(props.visible);
-const form = ref({
-  startDate: "",
-  startTime: "",
-  expiryDate: "",
-  periodType: "no",
-  days: [],
-  ...props.editData,
-});
 
 watch(
   () => props.visible,
@@ -161,8 +159,8 @@ const rules = computed(() => {
     // 다른 필드에 대한 규칙들...
   };
 
-  if (form.value.periodType !== "no") {
-    baseRules.startDate = [
+  if (writeMailContents.periodType !== "no") {
+    baseRules.reservedTimestamp = [
       {
         required: true,
         message: "시작 날짜를 선택해주세요",
@@ -184,7 +182,9 @@ const rules = computed(() => {
       },
       {
         validator: (rule, value, callback) => {
-          if (new Date(value) <= new Date(form.value.startDate)) {
+          if (
+            new Date(value) <= new Date(writeMailContents.reserved_timestamp)
+          ) {
             callback(new Error("만료 시각은 시작 시각보다 늦어야 합니다."));
           } else {
             callback();
@@ -194,7 +194,10 @@ const rules = computed(() => {
       },
     ];
   }
-  if (form.value.periodType == "weekly" || form.value.periodType == "monthly") {
+  if (
+    writeMailContents.periodType == "weekly" ||
+    writeMailContents.periodType == "monthly"
+  ) {
     baseRules.days = [
       {
         required: true,
@@ -214,7 +217,7 @@ const handleSave = async () => {
 
   try {
     await formRef.value.validate();
-    emit("save", form.value);
+    // emit("save", form.value);
     handleClose();
   } catch (error) {
     console.error("Validation failed", error);
@@ -222,12 +225,12 @@ const handleSave = async () => {
 };
 
 const validationSetting = () => {
-  if (form.value.periodType !== "no") {
+  if (writeMailContents.periodType !== "no") {
     if (
-      !form.value.startDate ||
-      !form.value.startTime ||
-      !form.value.expiryDate ||
-      form.value.days.length === 0
+      !writeMailContents.reservedTimestamp ||
+      !writeMailContents.startTime ||
+      !writeMailContents.expiryDate ||
+      writeMailContents.days.length === 0
     ) {
       ElMessage.error("값이 다 채워지지 않았습니다.");
       return;
@@ -235,7 +238,9 @@ const validationSetting = () => {
   }
 };
 const disabledDate = (time) => {
-  return time.getTime() < new Date(form.value.startDate).getTime();
+  return (
+    time.getTime() < new Date(writeMailContents.reservedTimestamp).getTime()
+  );
 };
 </script>
 <style scoped>
