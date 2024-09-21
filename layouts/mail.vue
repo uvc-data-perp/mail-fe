@@ -3,7 +3,19 @@
     <SidebarLayout class="w-64 flex-shrink-0" />
 
     <div class="flex-grow overflow-hidden flex flex-col">
-      <header class="h-16 bg-white border-b flex items-center px-8">
+      <header class="h-16 border-b flex items-center px-8 cursor-pointer">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="1em"
+          height="1em"
+          viewBox="0 0 24 24"
+        >
+          <path
+            fill="currentColor"
+            fill-rule="evenodd"
+            d="m15 4l2 2l-6 6l6 6l-2 2l-8-8z"
+          />
+        </svg>
         <h1 class="text-xl font-semibold">{{ pageTitle }}</h1>
       </header>
       <MailHeader />
