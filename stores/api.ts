@@ -6,12 +6,36 @@ export const useStore = defineStore("store", () => {
   // State
   const searchValue = ref<string>("korea");
   const articleList = ref<Article[]>([]);
+
   const currentPage = ref(1);
   const pageSize = ref(6);
   const totalResults = ref(0);
+  const pagerCount = ref(11);
+
+  // 필터 조건 (예: 검색어)
+  const filterCondition = ref("");
+
+  // 필터링된 메일 리스트
+
+  // 필터 조건 변경 함수
+  function setFilterCondition(condition: string) {
+    filterCondition.value = condition;
+  }
 
   // mail State
-  const mailList = ref(<Mail>[
+  const currentMail = ref<Mail>({
+    id: "66ebd34f7dd992837e473407",
+    from: "jjoo08152@gmail.com",
+    to: "jjoo0815@gmail.com",
+    subject: "Hello ✔",
+    text: "Hello Jisang?",
+    html: "<b>안녕하세요 김신영2입니다 반갑습니다!!</b>",
+    status: "Waiting",
+    sentTimestamp: "9726709750",
+    v: 0,
+    reservedTime: "9726709750",
+  });
+  const mailList = ref(<Mail[]>[
     {
       id: "66ebd34f7dd992837e473407",
       from: "jjoo08152@gmail.com",
@@ -20,11 +44,26 @@ export const useStore = defineStore("store", () => {
       text: "Hello Jisang?",
       html: "<b>안녕하세요 김신영2입니다 반갑습니다!!</b>",
       status: "Waiting",
-      sent_timestamp: "9726709750",
-      __v: 0,
-      reserved_time: "9726709750",
+      sentTimestamp: "9726709750",
+      v: 0,
+      reservedTime: "9726709750",
     },
   ]);
+  const filteredMailList = computed(() => {
+    return mailList.value.filter(
+      (mail) =>
+        mail.subject
+          .toLowerCase()
+          .includes(filterCondition.value.toLowerCase()) ||
+        mail.text.toLowerCase().includes(filterCondition.value.toLowerCase())
+    );
+  });
+
+  const paginatedFilteredMailList = computed(() => {
+    const startIndex = (currentPage.value - 1) * pageSize.value;
+    const endIndex = startIndex + pageSize.value;
+    return filteredMailList.value.slice(startIndex, endIndex);
+  });
 
   // Actions
   // Mutations => State를 변경할 목적으로 작성된 코드
@@ -45,9 +84,9 @@ export const useStore = defineStore("store", () => {
         mail["reservedDate"] = new Date(mail.reservedTime.split("_")[0] * 1000);
       });
 
-      // mailList.value=(...mailList.value, reservedTime:new Date(Number(mailList.value.reservedTime.split("_")[0]) * 1000);
-
       mailList.value = response.data.result;
+      setmailList(response.data.result);
+      setTotalResults(response.data.result.length);
       return response.data;
     } catch (error) {
       console.error("Error fetching will-send list:", error);
@@ -66,38 +105,60 @@ export const useStore = defineStore("store", () => {
     }
   };
 
-  const fetchArticles = async () => {
-    const API_KEY = "06f671fa9166414cb0a08dab3e00a616";
-    const API_URL = `https://newsapi.org/v2/everything?q=${searchValue.value}&from=2024-09-10&sortBy=popularity&page=${currentPage.value}&pageSize=${pageSize.value}&apiKey=${API_KEY}`;
-
+  const fetchMailDetail = async (mailId: string) => {
+    const { $axios } = useNuxtApp();
     try {
-      const data = await await axios.get(API_URL).then((res) => {
-        return res.data;
-      });
-      articleList.value = data.articles.map((article, idx) => ({
-        id: idx + 1,
-        ...article,
-      }));
-      totalResults.value = data.totalResults;
+      const response = await $axios.get(`/email/${mailId}`);
+      currentMail.value = response.data.result;
+      return response.data;
     } catch (error) {
-      console.error("Error fetching articles:", error);
+      console.error("Error fetching will-send list:", error);
+      if (error.response) {
+        console.error(
+          "Server responded with:",
+          error.response.status,
+          error.response.data
+        );
+      } else if (error.request) {
+        console.error("No response received:", error.request);
+      } else {
+        console.error("Error setting up request:", error.message);
+      }
+      throw error;
     }
   };
 
-  const setPage = (page) => {
+  const setPage = (page: number) => {
     currentPage.value = page;
-    fetchArticles();
+    // fetchArticles();
+  };
+
+  const setmailList = (a: Mail[]) => {
+    mailList.value = a;
+  };
+
+  const setTotalResults = (total: number) => {
+    totalResults.value = total;
   };
 
   return {
+    currentMail,
     mailList,
     searchValue,
     articleList,
     currentPage,
     totalResults,
+    pagerCount,
+    pageSize,
+    filteredMailList,
+    filterCondition,
+    paginatedFilteredMailList,
+    setFilterCondition,
     changeSearchValue,
-    fetchArticles,
     setPage,
     fetchWillSendList,
+    setmailList,
+    setTotalResults,
+    fetchMailDetail,
   };
 });

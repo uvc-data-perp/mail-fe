@@ -5,18 +5,18 @@
 
       <div class="title">
         <h2 class="text-2xl font-bold mb-6">
-          {{ route.params.documentId }} {{ route.query.subject }}
+          {{ currentMail.subject }}
         </h2>
       </div>
       <!-- 보낸 사람 -->
       <div class="flex w-full items-center mb-2">
         <el-tag type="info" class="mr-2 flex-shrink-0">보낸사람</el-tag>
-        <span flex-grow border-b> {{ route.query.from }} </span>
+        <span flex-grow border-b> {{ currentMail.from }} </span>
       </div>
       <!-- 받는 사람 -->
       <div class="flex w-full items-center mb-2">
         <el-tag type="success" class="mr-2">받는사람</el-tag>
-        <span flex-grow border-b>{{ route.query.to }}</span>
+        <span flex-grow border-b>{{ currentMail.to }}</span>
       </div>
       <!-- 예약날짜 or 보낸 날짜 표시 -->
       <div
@@ -31,8 +31,8 @@
         >
         <el-button
           @click="() => (isSchedulePending = !isSchedulePending)"
-          :type="isSchedulePending ? 'danger' : 'success'"
-          >{{ isSchedulePending ? "보류 중" : "예약 중" }}
+          :type="currentMail.status ? 'danger' : 'success'"
+          >{{ currentMail.status }}
         </el-button>
         <el-button
           @click="() => (isScheduleDeleted = true)"
@@ -71,12 +71,14 @@
       </div>
       <div v-else class="flex-1 items-center mb-2">
         <el-tag type="info" class="mr-2 flex-shrink-0">보낸날짜</el-tag>
-        <span class="text-sm text-gray-600"> 2022. 5. 14. </span>
+        <span class="text-sm text-gray-600">
+          {{ currentMail.sentTimestamp ? currentMail.sentTimestamp : "미전송" }}
+        </span>
       </div>
     </div>
     <!-- 본문내용 -->
     <div class="content flex overflow-x-auto w-full border-b-4">
-      {{ route.query.text }}
+      <div v-html="currentMail.html"></div>
     </div>
     <!-- 이전/이후 목록 조회 -->
     <div class="footer">
@@ -93,6 +95,7 @@
 import { useStore } from "~/stores/api";
 
 const mailStore = useStore();
+const { currentMail } = storeToRefs(mailStore);
 
 const route = useRoute();
 
@@ -105,6 +108,11 @@ const scheduleForm = ref({
 
   days: [],
   // ...props.editData,
+});
+
+await useAsyncData("getWillSendList", async () => {
+  await mailStore.fetchMailDetail(route.params.documentId as string);
+  return null;
 });
 
 const saveSchedule = (updatedData) => {

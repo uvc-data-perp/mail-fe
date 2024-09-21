@@ -90,31 +90,31 @@ interface MenuItem {
 const menuItems: MenuItem[] = [
   {
     title: "커스텀 대시보드",
-    icon: "i-carbon:cloud-monitoring",
+    icon: "i-ic:outline-circle",
     index: "/dashboard",
     path: "/",
   },
   {
     title: "설비 관리",
-    icon: "i-carbon:industry",
+    icon: "i-ic:outline-circle",
     index: "/facility",
     path: "/",
   },
   {
     title: "엣지 관리",
-    icon: "i-carbon:edge-node-alt",
+    icon: "i-ic:outline-circle",
     index: "/edge",
     path: "/",
   },
   {
     title: "인증서 관리",
-    icon: "i-carbon:edge-node-alt",
+    icon: "i-ic:outline-circle",
     index: "/certification",
     path: "/",
   },
   {
     title: "데이터 수집",
-    icon: "i-carbon:data-collection",
+    icon: "i-ic:outline-circle",
     index: "data-collect",
     path: "/",
     children: [
@@ -129,7 +129,7 @@ const menuItems: MenuItem[] = [
   },
   {
     title: "데이터 조회",
-    icon: "i-carbon:data-collection",
+    icon: "i-ic:outline-circle",
     index: "data-retrieve",
     path: "/",
     children: [
@@ -138,7 +138,7 @@ const menuItems: MenuItem[] = [
   },
   {
     title: "AI 데이터 분석",
-    icon: "i-carbon:data-collection",
+    icon: "i-ic:outline-circle",
     index: "ai-data-analyze",
     path: "/",
     children: [
@@ -153,7 +153,7 @@ const menuItems: MenuItem[] = [
   },
   {
     title: "메일함 📧",
-    icon: "i-carbon:data-collection",
+    icon: "i-ic:outline-circle",
     index: "system-management",
     path: "/",
     children: [

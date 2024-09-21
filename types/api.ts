@@ -7,8 +7,8 @@ export interface Mail {
   html: string;
   status: string;
   sentTimestamp?: string;
-  __v?: number;
-  reservedTime: Date;
+  v?: number;
+  reservedTime: String;
   type?: "prev" | "next";
 }
 export interface ApiStructure {

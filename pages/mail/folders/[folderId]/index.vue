@@ -1,22 +1,25 @@
 <template>
   <div class="px-8 py-4 border-b border-t bg-gray-200 flex">
     <MailTopButtons />
+    <div class="flex wp-10">
+      <el-input v-model="store.filterCondition" placeholder="검색"></el-input>
+      <el-input v-model="store.filterCondition" placeholder="검색"></el-input>
+    </div>
   </div>
 
-  <!-- <div class="flex mail-list px-8 w-[100%]">
-    <TableMailList :mails="store.articleList" mode="full" />
-  </div> -->
   <div class="flex mail-list px-8 w-[100%]">
-    <TableMailList2 :mails="store.mailList" mode="full" />
+    <TableMailList :mails="store.paginatedFilteredMailList" mode="full" />
   </div>
 
   <!-- <PaginationMailList v-model:currentPage="currentPage" /> -->
   <PaginationMailList
     :currentPage="store.currentPage"
     :totalResults="store.totalResults"
+    :pagerCount="store.pagerCount"
+    :pageSize="store.pageSize"
     @update:currentPage="store.setPage"
   />
-  {{ store.mailList }}
+  <!-- {{ store.paginatedFilteredMailList }} -->
 </template>
 
 <script lang="tsx" setup>
@@ -29,11 +32,6 @@ const route = useRoute();
 const store = useStore();
 await useAsyncData("getWillSendList", async () => {
   await store.fetchWillSendList();
-  return store.articleList;
-});
-
-await useAsyncData("getNews", async () => {
-  await store.fetchArticles();
   return store.articleList;
 });
 
