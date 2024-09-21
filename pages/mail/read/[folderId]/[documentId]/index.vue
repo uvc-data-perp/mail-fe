@@ -42,10 +42,9 @@
         <ScheduleModal
           v-if="scheduleDialogVisible"
           v-model:visible="scheduleDialogVisible"
-          :edit-data="scheduleForm"
           @save="saveSchedule"
         />
-        <span
+        <!-- <span
           class="text-sm text-gray-600"
           :class="isSchedulePending || isScheduleDeleted ? 'line-through' : ''"
         >
@@ -67,7 +66,7 @@
                 }`
               : ""
           }}
-        </span>
+        </span> -->
       </div>
       <div v-else class="flex-1 items-center mb-2">
         <el-tag type="info" class="mr-2 flex-shrink-0">보낸날짜</el-tag>

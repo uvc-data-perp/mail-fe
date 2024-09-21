@@ -27,11 +27,11 @@
       <el-form-item
         label="만료일"
         class="form-item"
-        prop="expiryDate"
+        prop="expiredTimestamp"
         label-width="100px"
       >
         <el-date-picker
-          v-model="writeMailContents.expiryDate"
+          v-model="writeMailContents.expiredTimestamp"
           type="date"
           placeholder="만료 날짜 선택"
           format="YYYY/MM/DD"
@@ -46,6 +46,7 @@
           v-model="writeMailContents.periodType"
           placeholder="주기 선택"
           class="select-picker period-select w-56"
+          @change="writeMailContents = { ...writeMailContents, days: [] }"
         >
           <el-option label="없음" value="no" />
           <el-option label="1번" value="single" />
@@ -122,9 +123,11 @@
         <el-button type="primary" @click="handleSave">확인</el-button>
       </span>
     </template>
-    {{ writeMailContents.reservedTimestamp }}
-    {{ typeof writeMailContents.reservedTimestamp }}
-    {{ Math.floor(writeMailContents.reservedDate.getTime() / 1000) }}
+    {{ new Date(writeMailContents.expiredTimestamp).setHours(23, 59, 59, 999) }}
+
+    {{
+      `${writeMailContents.reservedDate.getHours()}:${writeMailContents.reservedDate.getMinutes()}`
+    }}
   </el-dialog>
 </template>
 
@@ -177,7 +180,7 @@ const rules = computed(() => {
         trigger: "change",
       },
     ];
-    baseRules.expiryDate = [
+    baseRules.expiredTimestamp = [
       {
         required: true,
         message: "만료 시각을 선택해주세요",
@@ -232,7 +235,7 @@ const validationSetting = () => {
     if (
       !writeMailContents.reservedTimestamp ||
       !writeMailContents.startTime ||
-      !writeMailContents.expiryDate ||
+      !writeMailContents.expiredTimestamp ||
       writeMailContents.days.length === 0
     ) {
       ElMessage.error("값이 다 채워지지 않았습니다.");

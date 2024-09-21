@@ -8,8 +8,9 @@ export interface MailContents {
   periodType?: string;
   reservedDate?: Date;
   reservedTimestamp?: String;
-  expiryDate?: Date;
-  days?: Array<number>;
+  expiredTimestamp?: String;
+  days?: Array<number | boolean>;
+  sendTime?: String;
 }
 
 export interface MailMessage {

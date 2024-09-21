@@ -54,14 +54,14 @@
         v-if="writeMailStore.mailMessage.contents.periodType !== 'single'"
         class="mr-4"
       >
-        {{ `만료일:${writeMailStore.mailMessage.contents.expiryDate}` }}
-        {{
+        {{ `만료일:${writeMailStore.mailMessage.contents.expiredTimestamp}` }}
+        <!-- {{
           writeMailStore.mailMessage.contents?.periodType === "weekly"
             ? ` ${getDayNames(writeMailStore.mailMessage.contents.days).join(
                 ", "
               )}요일`
             : ` ${writeMailStore.mailMessage.contents.days?.join(", ")}일`
-        }}
+        }} -->
       </div>
     </el-form-item>
 
@@ -247,10 +247,10 @@ const fetchAddressOptions = async (query) => {
 const loading = ref(false);
 const addressOptions = ref([]);
 
-const getDayNames = (days) => {
-  const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
-  return days.map((day) => dayNames[day]);
-};
+// const getDayNames = (days) => {
+//   const dayNames = ["월", "화", "수", "목", "금", "토", "일"];
+//   return days.map((day) => dayNames[day]);
+// };
 
 const submitForm = () => {
   writeMailStore.submitForm(mailFormRef.value);
