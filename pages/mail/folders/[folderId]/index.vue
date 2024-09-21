@@ -16,6 +16,7 @@
     :totalResults="store.totalResults"
     @update:currentPage="store.setPage"
   />
+  {{ store.mailList }}
 </template>
 
 <script lang="tsx" setup>

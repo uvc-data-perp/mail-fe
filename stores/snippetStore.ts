@@ -7,14 +7,14 @@ export const useSnippetStore = defineStore("snippetStore", () => {
   // state
   const snippets = ref<Snippet[]>([
     {
-      _id: "111e",
+      id: "111e",
       from: "$기본값",
       to: "hello",
       keyBoard: "Ctrl+I",
     },
   ]);
 
-  const newSnippet = ref<Snippet>({ _id: "", from: "", to: "", keyBoard: "" });
+  const newSnippet = ref<Snippet>({ id: "", from: "", to: "", keyBoard: "" });
 
   // getters
   const snippetCount = computed(() => snippets.value.length);
@@ -89,11 +89,11 @@ export const useSnippetStore = defineStore("snippetStore", () => {
     }
   };
 
-  const deleteSnippet = async (_id: string) => {
+  const deleteSnippet = async (id: string) => {
     const { $axios } = useNuxtApp();
     try {
-      const response = await $axios.delete(`/snippets/${_id}`);
-      snippets.value = snippets.value.filter((s) => s._id !== _id);
+      const response = await $axios.delete(`/snippets/${id}`);
+      snippets.value = snippets.value.filter((s) => s.id !== id);
       return response.data;
     } catch (error) {
       console.error("Error fetching will-send list:", error);
@@ -113,9 +113,9 @@ export const useSnippetStore = defineStore("snippetStore", () => {
   };
 
   const updateSnippet = async (scopeInfo) => {
-    const target = snippets.value.find((s) => s._id === scopeInfo._id);
+    const target = snippets.value.find((s) => s.id === scopeInfo.id);
     if (target) {
-      await deleteSnippet(target._id);
+      await deleteSnippet(target.id);
       await addSnippet({ ...target, ...scopeInfo });
       await fetchSnippetList();
     }
@@ -123,7 +123,7 @@ export const useSnippetStore = defineStore("snippetStore", () => {
 
   function clearSnippets() {
     snippets.value.forEach((s) => {
-      deleteSnippet(s._id);
+      deleteSnippet(s.id);
     });
     fetchSnippetList();
     // const { $axios } = useNuxtApp();

@@ -1,5 +1,5 @@
 export interface Mail {
-  _id: string;
+  id: string;
   from: string;
   to: string;
   subject: string;
@@ -8,7 +8,7 @@ export interface Mail {
   status: string;
   sentTimestamp?: string;
   __v?: number;
-  reservedTime: string;
+  reservedTime: Date;
   type?: "prev" | "next";
 }
 export interface ApiStructure {

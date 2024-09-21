@@ -3,7 +3,7 @@
     ref="multipleTableRef"
     :data="tableData"
     style="width: 100%"
-    row-key="_id"
+    row-key="id"
     @selection-change="handleSelectionChange"
   >
     <el-table-column v-if="mode === 'full'" type="selection" width="55" />
@@ -32,7 +32,7 @@
             name: 'mail-read-folderId-documentId',
             params: {
               folderId: route.params.folderId,
-              documentId: scope.row._id,
+              documentId: scope.row.id,
             },
             query: {
               ...scope.row,
@@ -50,7 +50,7 @@
       </template>
     </el-table-column>
     <el-table-column label="Date" width="120">
-      <template #default="scope">{{ scope.row.reserved_time }}</template>
+      <template #default="scope">{{ scope.row.reservedDate }}</template>
     </el-table-column>
   </el-table>
 </template>
@@ -58,6 +58,7 @@
 <script lang="ts" setup>
 import { ref, computed } from "vue";
 import { ElTable, ElTag } from "element-plus";
+import type { Mail } from "~/types/api";
 
 const props = defineProps({
   mails: {
@@ -76,17 +77,6 @@ const props = defineProps({
 });
 const route = useRoute();
 
-interface Mail {
-  _id: number;
-  from: string;
-  to: string;
-  subject: string;
-  text: string;
-  html: string;
-  reserved_time: string;
-  type?: "prev" | "next";
-}
-
 const multipleTableRef = ref<InstanceType<typeof ElTable>>();
 
 const tableData = computed(() => {
@@ -94,7 +84,7 @@ const tableData = computed(() => {
     return props.mails;
   } else {
     const currentIndex = props.mails.findIndex(
-      (mail: Mail) => mail._id === props.currentMailId
+      (mail: Mail) => mail.id === props.currentMailId
     );
     const prevMail =
       currentIndex > 0

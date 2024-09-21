@@ -44,21 +44,6 @@ export const useWriteMailStore = defineStore("writeMail", () => {
     return str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
   }
 
-  // 객체의 모든 키를 camelCase에서 snake_case로 변환하는 함수
-  function convertKeysToSnakeCase(
-    obj: Record<string, any>
-  ): Record<string, any> {
-    return Object.keys(obj).reduce((result, key) => {
-      const newKey = camelToSnakeCase(key);
-      const value = obj[key];
-      result[newKey] =
-        typeof value === "object" && value !== null
-          ? convertKeysToSnakeCase(value)
-          : value;
-      return result;
-    }, {} as Record<string, any>);
-  }
-
   const sendMailTest = async () => {
     const { $axios } = useNuxtApp();
 
@@ -78,22 +63,7 @@ export const useWriteMailStore = defineStore("writeMail", () => {
       mailMessage.value.contents.to = toEmail;
 
       try {
-        const snakeData = convertKeysToSnakeCase(mailMessage.value);
-        console.log(mailMessage.value);
-        console.log(mailMessage.value);
-        console.log(mailMessage.value);
-        console.log(mailMessage.value);
-        console.log(mailMessage.value);
-        console.log(mailMessage.value);
-        console.log(mailMessage.value);
-        console.log(mailMessage.value);
-        console.log(mailMessage.value);
-        console.log(mailMessage.value);
-        console.log(mailMessage.value);
-        console.log(mailMessage.value);
-        console.log(mailMessage.value);
-        console.log(mailMessage.value);
-        const response = await $axios.post(apiEndpoint, snakeData);
+        const response = await $axios.post(apiEndpoint, mailMessage.value);
         console.log(`Email sent successfully to ${toEmail}:`, response.data);
         results.push({
           email: toEmail,

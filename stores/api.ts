@@ -13,7 +13,7 @@ export const useStore = defineStore("store", () => {
   // mail State
   const mailList = ref(<Mail>[
     {
-      _id: "66ebd34f7dd992837e473407",
+      id: "66ebd34f7dd992837e473407",
       from: "jjoo08152@gmail.com",
       to: "jjoo0815@gmail.com",
       subject: "Hello ✔",
@@ -41,9 +41,13 @@ export const useStore = defineStore("store", () => {
           // 필요한 경우 여기에 추가 헤더를 설정할 수 있습니다.
         },
       });
+      response.data.result.forEach((mail: Mail) => {
+        mail["reservedDate"] = new Date(mail.reservedTime.split("_")[0] * 1000);
+      });
+
+      // mailList.value=(...mailList.value, reservedTime:new Date(Number(mailList.value.reservedTime.split("_")[0]) * 1000);
 
       mailList.value = response.data.result;
-
       return response.data;
     } catch (error) {
       console.error("Error fetching will-send list:", error);
