@@ -123,21 +123,21 @@
       />
     </el-form-item> -->
     <el-form-item prop="text" label="내용">
-      <ClientOnly>
+      <!-- <ClientOnly>
         <QuillEditor
           v-model:content="writeMailStore.mailMessage.contents.text"
-          type="textarea"
+          content-type="text"
           theme="snow"
-          @update:content="handleInput"
+          @update:content="debouncedHandleInput"
         />
-      </ClientOnly>
-      <!-- <el-input
+      </ClientOnly> -->
+      <el-input
         v-model="writeMailStore.mailMessage.contents.text"
         type="textarea"
         :rows="10"
         placeholder="내용을 입력하세요. 스타일 적용: **볼드**, *이탤릭*, [red]빨간색[/red]"
         @input="debouncedHandleInput"
-      /> -->
+      />
 
       <!-- <TiptapEditor
         v-model="writeMailStore.mailMessage.contents.text"
@@ -346,18 +346,95 @@ const submitForm = async () => {
 //보내기
 let timeout = null;
 
+// function deltaToPlainText(delta) {
+//   if (typeof delta === "string") return delta;
+//   if (!delta || !delta.ops) return "";
+//   return delta.ops.map((op) => op.insert || "").join("");
+// }
+
+// // 에디터 업데이트 핸들러
+// const handleEditorUpdate = (content) => {
+//   // content는 델타 객체입니다
+//   const plainText = deltaToPlainText(content);
+//   debouncedHandleInput(plainText);
+// };
+
+// // 기존 handleInput 함수 (약간의 수정)
+// const handleInput = (value) => {
+//   if (timeout) {
+//     clearTimeout(timeout);
+//   }
+
+//   timeout = setTimeout(() => {
+//     let result = value;
+
+//     // 완전한 키워드 매칭 및 변환
+//     snippetStore.snippets.forEach((snippet) => {
+//       const regex = new RegExp(escapeRegExp(snippet.from), "g");
+//       result = result.replace(regex, snippet.to);
+//     });
+
+//     // 결과를 다시 델타 객체로 변환
+//     writeMailStore.mailMessage.contents.text = { ops: [{ insert: result }] };
+//   }, 100);
+// };
+
+// const handleInput = (quill, value) => {
+//   if (timeout) {
+//     clearTimeout(timeout);
+//   }
+
+//   timeout = setTimeout(() => {
+//     const range = quill.getSelection();
+//     if (!range) return;
+
+//     const originalCursorPosition = range.index;
+//     let result = value;
+//     let cursorOffset = 0;
+
+//     // 완전한 키워드 매칭 및 변환
+//     snippetStore.snippets.forEach((snippet) => {
+//       const regex = new RegExp(escapeRegExp(snippet.from), "g");
+//       result = result.replace(regex, (match, index) => {
+//         if (index < originalCursorPosition) {
+//           cursorOffset += snippet.to.length - match.length;
+//         }
+//         return snippet.to;
+//       });
+//     });
+
+//     // Quill의 내용 업데이트
+//     quill.setText(result);
+
+//     // 변환 완료 후 커서 위치 조정
+//     nextTick(() => {
+//       const newPosition = originalCursorPosition + cursorOffset;
+//       quill.setSelection(newPosition, 0);
+//     });
+
+//     // store 업데이트
+//     writeMailStore.mailMessage.contents.text = result;
+//   }, 100); // 100ms 지연
+// };
+
+// 정규표현식 특수문자 이스케이프 함수
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 const handleInput = (value) => {
   if (timeout) {
     clearTimeout(timeout);
   }
+  console.log;
 
   timeout = setTimeout(() => {
-    // const textarea = document.querySelector("textarea");
-    // if (!textarea) return;
+    const textarea = document.querySelector("textarea");
+    if (!textarea) return;
 
-    // const originalCursorPosition = textarea.selectionStart;
+    const originalCursorPosition = textarea.selectionStart;
     let result = value;
-    // let cursorOffset = 0;
+    let cursorOffset = 0;
 
     // 완전한 키워드 매칭 및 변환
     snippetStore.snippets.forEach((snippet) => {
