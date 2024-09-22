@@ -4,14 +4,15 @@ import axios from "axios";
 import type { MailMessage, MailContents } from "~/types/writeMailStore";
 
 export const useWriteMailStore = defineStore("writeMail", () => {
+  const route = useRoute();
   // State
 
   const mailMessage = ref<MailMessage>({
     contents: {
       from: "jjoo08152@gmail.com",
-      to: "jjoo08152@gmail.com",
-      subject: "p Sub ✔",
-      text: "p text ?",
+      to: "",
+      subject: "기본 제목",
+      text: "기본 내용",
       html: "<b>p html</b>",
       periodType: "no",
       reservedDate: new Date(),
@@ -168,6 +169,13 @@ export const useWriteMailStore = defineStore("writeMail", () => {
       case "monthly":
         apiEndpoint = `/send/booking/regularity/month`;
         break;
+    }
+
+    if (route.query.type === "toMe") {
+      mailMessage.value.contents.selectedTags = [];
+      mailMessage.value.contents.to = "";
+      // mailMessage.value.contents.selectedTags.push("shyk31971@gmail.com");
+      mailMessage.value.contents.selectedTags = ["shyk31971@gmail.com"];
     }
 
     for (const toEmail of mailMessage.value.contents.selectedTags) {

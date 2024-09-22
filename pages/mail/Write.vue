@@ -21,8 +21,11 @@
         />
 
         <el-button @click="saveDraft">임시저장</el-button>
-        <el-button @click="previewMail">미리보기</el-button>
+        <el-button @click="previewEmail">미리보기</el-button>
       </el-button-group>
+      <el-dialog v-model="previewVisible" title="이메일 미리보기" width="50%">
+        <div v-html="emailPreview"></div>
+      </el-dialog>
       <el-dropdown style="margin-left: 10px">
         <el-button
           >템플릿<el-icon class="el-icon--right"><arrow-down /></el-icon
@@ -55,13 +58,13 @@
         class="mr-4"
       >
         {{ `만료일:${writeMailStore.mailMessage.contents.expiredTimestamp}` }}
-        <!-- {{
+        {{
           writeMailStore.mailMessage.contents?.periodType === "weekly"
             ? ` ${getDayNames(writeMailStore.mailMessage.contents.days).join(
                 ", "
               )}요일`
             : ` ${writeMailStore.mailMessage.contents.days?.join(", ")}일`
-        }} -->
+        }}
       </div>
     </el-form-item>
 
@@ -102,41 +105,35 @@
       </el-select>
     </el-form-item>
 
-    <!-- <el-form-item label="참조">
-      <el-input v-model="form.cc" placeholder="참조 이메일" />
-    </el-form-item> -->
-
     <el-form-item prop="subject" label="제목">
       <el-input
         v-model="writeMailStore.mailMessage.contents.subject"
         placeholder="제목"
       >
-        <!-- <template #append>
-          <el-checkbox v-model="form.important" label="중요!" />
-        </template> -->
       </el-input>
     </el-form-item>
 
-    <!-- <el-form-item label="파일첨부">
-      <el-upload
-        action="#"
-        multiple
-        :auto-upload="false"
-        :on-change="handleFileChange"
-      >
-        <template #trigger>
-          <el-button type="primary">파일 선택</el-button>
-        </template>
-      </el-upload>
-    </el-form-item> -->
-
-    <el-form-item prop="text" label="내용">
+    <!-- <el-form-item prop="text" label="내용">
       <el-input
         v-model="writeMailStore.mailMessage.contents.text"
         type="textarea"
         :rows="10"
         placeholder="내용을 입력하세요"
         @input="debouncedHandleInput"
+      />
+    </el-form-item> -->
+    <el-form-item prop="text" label="내용">
+      <el-input
+        v-model="writeMailStore.mailMessage.contents.text"
+        type="textarea"
+        :rows="10"
+        placeholder="내용을 입력하세요. 스타일 적용: **볼드**, *이탤릭*, [red]빨간색[/red]"
+        @input="debouncedHandleInput"
+      />
+
+      <TiptapEditor
+        v-model="writeMailStore.mailMessage.contents.text"
+        @update:modelValue="debouncedHandleInput"
       />
     </el-form-item>
 
@@ -153,7 +150,7 @@ import { ElMessage } from "element-plus";
 import { useDebounceFn } from "@vueuse/core";
 import { useSnippetStore } from "~/stores/snippetStore"; // 스토어 파일 경로에 맞게 수정해주세요
 import { useWriteMailStore } from "~/stores/writeMailStore"; // 스토어 파일 경로에 맞게 수정해주세요
-
+import mjml2html from "mjml-browser";
 //store 불러오기
 const writeMailStore = useWriteMailStore();
 const snippetStore = useSnippetStore();
@@ -213,10 +210,6 @@ const remoteSearch = async (query) => {
 };
 
 const fetchAddressOptions = async (query) => {
-  // 예시: axios를 사용한 API 호출
-  // const response = await axios.get(`/api/email-addresses?query=${query}`);
-  // return response.data;
-
   // 임시로 더미 데이터를 반환하는 예시
 
   if (import.meta.env.SSR) {
@@ -247,79 +240,95 @@ const fetchAddressOptions = async (query) => {
 const loading = ref(false);
 const addressOptions = ref([]);
 
-// const getDayNames = (days) => {
-//   const dayNames = ["월", "화", "수", "목", "금", "토", "일"];
-//   return days.map((day) => dayNames[day]);
-// };
+function parseStyledContent(content) {
+  // 볼드 처리: **텍스트**
+  content = content.replace(
+    /\*\*(.*?)\*\*/g,
+    '<mj-text font-weight="bold">$1</mj-text>'
+  );
 
-const submitForm = () => {
-  writeMailStore.submitForm(mailFormRef.value);
+  // 이탤릭 처리: *텍스트*
+  content = content.replace(
+    /\*(.*?)\*/g,
+    '<mj-text font-style="italic">$1</mj-text>'
+  );
+
+  // 색상 처리: [색상]텍스트[/색상]
+  content = content.replace(
+    /\[(#[0-9A-Fa-f]{6}|[a-zA-Z]+)\](.*?)\[\/\1\]/g,
+    '<mj-text color="$1">$2</mj-text>'
+  );
+
+  // 글자 크기 처리: {크기px}텍스트{/크기}
+  content = content.replace(
+    /\{(\d+)px\}(.*?)\{\/\1\}/g,
+    '<mj-text font-size="$1px">$2</mj-text>'
+  );
+
+  // 링크 처리: [링크텍스트](URL)
+  content = content.replace(
+    /\[(.*?)\]\((https?:\/\/.*?)\)/g,
+    '<mj-text><a href="$2" style="color: #1155CC;">$1</a></mj-text>'
+  );
+
+  // 줄바꿈 처리
+  content = content.split("\n").join("</mj-text><mj-text>");
+
+  return `<mj-text>${content}</mj-text>`;
+}
+
+const generateEmailContent = () => {
+  const styledContent = parseStyledContent(
+    writeMailStore.mailMessage.contents.text
+  );
+
+  const mjmlTemplate = `
+    <mjml>
+      <mj-body>
+        <mj-section>
+          <mj-column>
+            <mj-text font-size="20px" color="#F45E43" font-family="helvetica">
+              ${writeMailStore.mailMessage.contents.subject}
+            </mj-text>
+          </mj-column>
+        </mj-section>
+        <mj-section background-color="#f0f0f0">
+          <mj-column>
+            ${styledContent}
+          </mj-column>
+        </mj-section>
+      </mj-body>
+    </mjml>
+  `;
+
+  const { html } = mjml2html(mjmlTemplate);
+  return html;
 };
+
+const submitForm = async () => {
+  if (!mailFormRef.value) return;
+
+  try {
+    await mailFormRef.value.validate();
+
+    const emailContent = generateEmailContent();
+
+    writeMailStore.mailMessage.contents = {
+      ...writeMailStore.mailMessage.contents,
+      html: emailContent,
+    };
+
+    // 생성된 HTML 내용을 사용하여 이메일 전송
+    await writeMailStore.submitForm(mailFormRef.value);
+
+    ElMessage.success("메일을 성공적으로 보냈습니다.");
+  } catch (error) {
+    console.error("Form validation failed:", error);
+    ElMessage.error("입력 내용을 확인해주세요.");
+  }
+};
+
 //보내기
-// async function submitForm() {
-//   if (!mailFormRef.value) return;
-
-//   try {
-//     const valid = await mailFormRef.value.validate();
-//     if (valid) {
-//       // 유효성 검사 통과 시 기존 로직 실행
-//       if (route.query.type === "toMe") {
-//         const a = {
-//           ...writeMailStore.mailMessage.contents,
-//           to: "example@email.com",
-//         };
-//         console.log(a);
-//       }
-
-//       switch (writeMailStore.mailMessage.contents.periodType) {
-//         case "no":
-//           try {
-//             const results = await writeMailStore.sendMailTest();
-//             console.log("All email sending results:", results);
-
-//             const successCount = results.filter((r) => r.success).length;
-//             const failCount = results.length - successCount;
-
-//             if (failCount === 0) {
-//               ElMessage.success(
-//                 `${successCount}개의 메일이 성공적으로 전송되었습니다.`
-//               );
-//             } else {
-//               ElMessage.warning(
-//                 `${successCount}개의 메일 전송 성공, ${failCount}개의 메일 전송 실패.`
-//               );
-//             }
-//           } catch (error) {
-//             console.error("Error sending emails:", error);
-//             ElMessage.error("메일 전송 중 오류가 발생했습니다.");
-//           }
-//           break;
-
-//         case "single":
-//           try {
-//             const result = await writeMailStore.sendMailTest();
-//             console.log("Email reservation result:", result);
-//             ElMessage.success("메일이 성공적으로 예약되었습니다.");
-//           } catch (error) {
-//             console.error("Error reserving email:", error);
-//             ElMessage.error("메일 예약 중 오류가 발생했습니다.");
-//           }
-//           break;
-
-//         default:
-//           ElMessage.error("지원하지 않는 전송 유형입니다.");
-//           break;
-//       }
-//     } else {
-//       // 유효성 검사 실패 시
-//       ElMessage.error("폼 유효성 검사에 실패했습니다. 입력을 확인해주세요.");
-//     }
-//   } catch (error) {
-//     console.error("Form validation error:", error);
-//     ElMessage.error("폼 검증 중 오류가 발생했습니다.");
-//   }
-// }
-
 let timeout = null;
 
 const handleInput = (value) => {
@@ -334,18 +343,6 @@ const handleInput = (value) => {
     const originalCursorPosition = textarea.selectionStart;
     let result = value;
     let cursorOffset = 0;
-
-    //     // 완전한 키워드 매칭 및 변환
-    // for (const [key, replacement] of Object.entries(snippet)) {
-    //   const regex = new RegExp("\\" + key, "g");
-    //   result = result.replace(regex, (match, index) => {
-    //     if (index < originalCursorPosition) {
-    //       cursorOffset += replacement.length - match.length;
-    //     }
-    //     return replacement;
-    //   });
-    // }
-    // form.content = result;
 
     // 완전한 키워드 매칭 및 변환
     snippetStore.snippets.forEach((snippet) => {
@@ -367,36 +364,6 @@ const handleInput = (value) => {
   }, 100); // 100ms 지연
 };
 
-// const handleInput = (value) => {
-//   if (timeout) {
-//     clearTimeout(timeout);
-//   }
-
-//   timeout = setTimeout(() => {
-//     const textarea = document.querySelector("textarea");
-//     const originalCursorPosition = textarea.selectionStart;
-//     let result = value;
-//     let cursorOffset = 0;
-
-//     // 완전한 키워드 매칭 및 변환
-//     for (const [key, replacement] of Object.entries(snippet)) {
-//       const regex = new RegExp("\\" + key, "g");
-//       result = result.replace(regex, (match, index) => {
-//         if (index < originalCursorPosition) {
-//           cursorOffset += replacement.length - match.length;
-//         }
-//         return replacement;
-//       });
-//     }
-//     form.content = result;
-
-//     // 변환 완료 후 커서 위치 조정
-//     nextTick(() => {
-//       const newPosition = originalCursorPosition + cursorOffset;
-//       textarea.setSelectionRange(newPosition, newPosition);
-//     });
-//   }, 100); // 100ms 지연
-// };
 const debouncedHandleInput = useDebounceFn(handleInput, 300);
 ///////////// 스니펫 끝//
 
@@ -451,10 +418,6 @@ const togglePersonalMode = () => {
   ElMessage.info("개인별 모드 전환");
 };
 
-// const handleFileChange = (file, fileList) => {
-//   writeMailStore.mailMessage.contents.attachments = fileList;
-// };
-
 /////////
 
 const handleShortcut = (event) => {
@@ -506,6 +469,17 @@ const insertSnippetText = (text) => {
     textarea.setSelectionRange(newCursorPosition, newCursorPosition);
     textarea.focus();
   });
+};
+
+//미리보기////////////////////////////////
+const previewVisible = ref(false);
+const emailPreview = ref("");
+const previewEmail = () => {
+  emailPreview.value = generateEmailContent(
+    writeMailStore.mailMessage.contents.subject,
+    writeMailStore.mailMessage.contents.text
+  );
+  previewVisible.value = true;
 };
 
 onMounted(() => {

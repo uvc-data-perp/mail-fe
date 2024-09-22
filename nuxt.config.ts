@@ -18,7 +18,12 @@ export default defineNuxtConfig({
     "element-plus/dist/index.css",
   ],
 
-  plugins: ["~/plugins/element-plus.ts", "~/plugins/axios.ts"],
+  plugins: [
+    "~/plugins/element-plus.ts",
+    "~/plugins/axios.ts",
+    "~/plugins/mjml.client.js",
+    { src: "~/plugins/tiptap.client.js", mode: "client" },
+  ],
 
   postcss: {
     plugins: {
