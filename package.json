@@ -21,6 +21,7 @@
     "@tiptap/vue-3": "^2.7.2",
     "@unocss/nuxt": "^0.58.5",
     "@vite-pwa/nuxt": "^0.4.0",
+    "@vueup/vue-quill": "^1.2.0",
     "@vueuse/nuxt": "^10.7.2",
     "animated-unocss": "^0.0.6",
     "axios": "^1.6.2",

@@ -123,18 +123,26 @@
       />
     </el-form-item> -->
     <el-form-item prop="text" label="내용">
-      <el-input
+      <ClientOnly>
+        <QuillEditor
+          v-model:content="writeMailStore.mailMessage.contents.text"
+          type="textarea"
+          theme="snow"
+          @update:content="handleInput"
+        />
+      </ClientOnly>
+      <!-- <el-input
         v-model="writeMailStore.mailMessage.contents.text"
         type="textarea"
         :rows="10"
         placeholder="내용을 입력하세요. 스타일 적용: **볼드**, *이탤릭*, [red]빨간색[/red]"
         @input="debouncedHandleInput"
-      />
+      /> -->
 
-      <TiptapEditor
+      <!-- <TiptapEditor
         v-model="writeMailStore.mailMessage.contents.text"
         @update:modelValue="debouncedHandleInput"
-      />
+      /> -->
     </el-form-item>
 
     <el-form-item>
@@ -151,6 +159,13 @@ import { useDebounceFn } from "@vueuse/core";
 import { useSnippetStore } from "~/stores/snippetStore"; // 스토어 파일 경로에 맞게 수정해주세요
 import { useWriteMailStore } from "~/stores/writeMailStore"; // 스토어 파일 경로에 맞게 수정해주세요
 import mjml2html from "mjml-browser";
+import { Editor, EditorContent } from "@tiptap/vue-3";
+import StarterKit from "@tiptap/starter-kit";
+
+//quill
+import { QuillEditor } from "@vueup/vue-quill";
+import "@vueup/vue-quill/dist/vue-quill.snow.css";
+
 //store 불러오기
 const writeMailStore = useWriteMailStore();
 const snippetStore = useSnippetStore();
@@ -337,12 +352,12 @@ const handleInput = (value) => {
   }
 
   timeout = setTimeout(() => {
-    const textarea = document.querySelector("textarea");
-    if (!textarea) return;
+    // const textarea = document.querySelector("textarea");
+    // if (!textarea) return;
 
-    const originalCursorPosition = textarea.selectionStart;
+    // const originalCursorPosition = textarea.selectionStart;
     let result = value;
-    let cursorOffset = 0;
+    // let cursorOffset = 0;
 
     // 완전한 키워드 매칭 및 변환
     snippetStore.snippets.forEach((snippet) => {
