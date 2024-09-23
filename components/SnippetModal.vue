@@ -17,7 +17,7 @@
 
     <el-table
       ref="multipleTableRef"
-      :data="snippetStore.snippets"
+      :data="snippetStore.paginatedSnippets"
       style="width: 100%"
       row-key="_id"
       @selection-change="handleSelectionChange"
@@ -61,6 +61,15 @@
         </template>
       </el-table-column>
     </el-table>
+
+    <!-- <PaginationMailList v-model:currentPage="currentPage" /> -->
+    <PaginationMailList
+      :currentPage="snippetStore.currentPage"
+      :totalResults="snippetStore.totalResults"
+      :pagerCount="snippetStore.pagerCount"
+      :pageSize="snippetStore.pageSize"
+      @update:currentPage="snippetStore.setPage"
+    />
 
     <br />
     <br />

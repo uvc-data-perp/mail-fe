@@ -16,6 +16,16 @@ export const useSnippetStore = defineStore("snippetStore", () => {
 
   const newSnippet = ref<Snippet>({ id: "", from: "", to: "", keyBoard: "" });
 
+  const currentPage = ref(1);
+  const totalResults = ref(1);
+  const pagerCount = ref(11);
+  const pageSize = ref(6);
+  const paginatedSnippets = computed(() => {
+    const startIndex = (currentPage.value - 1) * pageSize.value;
+    const endIndex = startIndex + pageSize.value;
+    return snippets.value.slice(startIndex, endIndex);
+  });
+
   // getters
   const snippetCount = computed(() => snippets.value.length);
 
@@ -29,10 +39,11 @@ export const useSnippetStore = defineStore("snippetStore", () => {
           // 필요한 경우 여기에 추가 헤더를 설정할 수 있습니다.
         },
       });
-      snippets.value = response.data.result;
+      totalResults.value = response.data.result.length;
+      snippets.value = response.data.result.reverse();
 
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error fetching will-send list:", error);
       if (error.response) {
         console.error(
@@ -130,15 +141,26 @@ export const useSnippetStore = defineStore("snippetStore", () => {
     // snippets.value = [];
   }
 
+  const setPage = (page: number) => {
+    currentPage.value = page;
+    // fetchArticles();
+  };
+
   return {
     snippets,
     newSnippet,
     snippetCount,
+    currentPage,
+    totalResults,
+    pagerCount,
+    pageSize,
+    paginatedSnippets,
     addSnippet,
     validationSnippet,
     updateSnippet,
     deleteSnippet,
     clearSnippets,
     fetchSnippetList,
+    setPage,
   };
 });
