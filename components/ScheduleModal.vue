@@ -6,32 +6,60 @@
     @close="handleClose"
   >
     <el-form
-      :model="writeMailContents"
+      :model="writeMailStore.mailMessage.contents"
       :rules="rules"
       ref="formRef"
       class="schedule-form flex flex-col gap-4"
     >
+      <el-form-item label="예약주기" class="form-item" label-width="100px">
+        <el-select
+          v-model="writeMailStore.mailMessage.contents.periodType"
+          placeholder="주기 선택"
+          class="select-picker period-select w-56"
+          @change="
+            writeMailStore.mailMessage.contents = {
+              ...writeMailStore.mailMessage.contents,
+              days: [],
+            }
+          "
+        >
+          <el-option label="없음" value="no" />
+          <el-option label="1번" value="single" />
+          <el-option label="요일마다" value="weekly" />
+          <el-option label="매월마다" value="monthly" />
+        </el-select>
+      </el-form-item>
+
       <el-form-item
-        label="시작일"
+        v-if="writeMailStore.mailMessage.contents.periodType !== 'no'"
+        :label="
+          writeMailStore.mailMessage.contents.periodType === 'single'
+            ? '발송시각'
+            : '시작일'
+        "
         class="form-item"
         prop="reservedDate"
         label-width="100px"
       >
         <el-date-picker
-          v-model="writeMailContents.reservedDate"
+          v-model="writeMailStore.mailMessage.contents.reservedDate"
           type="datetime"
           placeholder="Pick a Date"
           format="YYYY/MM/DD HH:mm:ss"
         />
       </el-form-item>
       <el-form-item
+        v-if="
+          writeMailStore.mailMessage.contents.periodType !== 'no' &&
+          writeMailStore.mailMessage.contents.periodType !== 'single'
+        "
         label="만료일"
         class="form-item"
         prop="expiredTimestamp"
         label-width="100px"
       >
         <el-date-picker
-          v-model="writeMailContents.expiredTimestamp"
+          v-model="writeMailStore.mailMessage.contents.expiredTimestamp"
           type="date"
           placeholder="만료 날짜 선택"
           format="YYYY/MM/DD"
@@ -41,31 +69,18 @@
           @change="updateReservedTimestamp"
         />
       </el-form-item>
-      <el-form-item label="예약주기" class="form-item" label-width="100px">
-        <el-select
-          v-model="writeMailContents.periodType"
-          placeholder="주기 선택"
-          class="select-picker period-select w-56"
-          @change="writeMailContents = { ...writeMailContents, days: [] }"
-        >
-          <el-option label="없음" value="no" />
-          <el-option label="1번" value="single" />
-          <el-option label="요일마다" value="weekly" />
-          <el-option label="매월마다" value="monthly" />
-        </el-select>
-      </el-form-item>
 
       <template
         v-if="
-          writeMailContents.periodType !== 'no' &&
-          writeMailContents.periodType !== 'single'
+          writeMailStore.mailMessage.contents.periodType !== 'no' &&
+          writeMailStore.mailMessage.contents.periodType !== 'single'
         "
       >
         <el-form-item
           :label="
-            writeMailContents.periodType === 'weekly'
+            writeMailStore.mailMessage.contents.periodType === 'weekly'
               ? '주 간격'
-              : writeMailContents.periodType === 'monthly'
+              : writeMailStore.mailMessage.contents.periodType === 'monthly'
               ? '월 간격'
               : null
           "
@@ -75,11 +90,11 @@
         </el-form-item>
         <el-form-item
           v-if="
-            writeMailContents.periodType !== 'no' &&
-            writeMailContents.periodType !== 'single'
+            writeMailStore.mailMessage.contents.periodType !== 'no' &&
+            writeMailStore.mailMessage.contents.periodType !== 'single'
           "
           :label="
-            writeMailContents.periodType === 'weekly'
+            writeMailStore.mailMessage.contents.periodType === 'weekly'
               ? '요일 선택'
               : '날짜 선택'
           "
@@ -89,10 +104,12 @@
           label-position="right"
         >
           <el-checkbox-group
-            v-model="writeMailContents.days"
+            v-model="writeMailStore.mailMessage.contents.days"
             class="checkbox-group"
           >
-            <template v-if="writeMailContents.periodType === 'weekly'">
+            <template
+              v-if="writeMailStore.mailMessage.contents.periodType === 'weekly'"
+            >
               <el-checkbox :value="0">월</el-checkbox>
               <el-checkbox :value="1">화</el-checkbox>
               <el-checkbox :value="2">수</el-checkbox>
@@ -101,7 +118,11 @@
               <el-checkbox :value="5">토</el-checkbox>
               <el-checkbox :value="6">일</el-checkbox>
             </template>
-            <template v-else-if="writeMailContents.periodType === 'monthly'">
+            <template
+              v-else-if="
+                writeMailStore.mailMessage.contents.periodType === 'monthly'
+              "
+            >
               <div class="grid grid-cols-7 gap-1">
                 <el-checkbox
                   v-for="day in 31"
@@ -123,10 +144,17 @@
         <el-button type="primary" @click="handleSave">확인</el-button>
       </span>
     </template>
-    {{ new Date(writeMailContents.expiredTimestamp).setHours(23, 59, 59, 999) }}
+    {{
+      new Date(writeMailStore.mailMessage.contents.expiredTimestamp).setHours(
+        23,
+        59,
+        59,
+        999
+      )
+    }}
 
     {{
-      `${writeMailContents.reservedDate.getHours()}:${writeMailContents.reservedDate.getMinutes()}`
+      `${writeMailStore.mailMessage.contents.reservedDate.getHours()}:${writeMailStore.mailMessage.contents.reservedDate.getMinutes()}`
     }}
   </el-dialog>
 </template>
@@ -138,7 +166,7 @@ import { useWriteMailStore } from "~/stores/writeMailStore";
 const writeMailStore = useWriteMailStore();
 const { updateReservedTimestamp, sendMailTest } = writeMailStore;
 const { mailMessage, computedTimestamp } = storeToRefs(writeMailStore);
-const writeMailContents = computed(() => mailMessage.value.contents);
+// const writeMailContents = ref(mailMessage.value.contents);
 
 const props = defineProps({
   visible: Boolean,
@@ -165,7 +193,7 @@ const rules = computed(() => {
     // 다른 필드에 대한 규칙들...
   };
 
-  if (writeMailContents.periodType !== "no") {
+  if (writeMailStore.mailMessage.contents.periodType !== "no") {
     baseRules.reservedTimestamp = [
       {
         required: true,
@@ -189,7 +217,8 @@ const rules = computed(() => {
       {
         validator: (rule, value, callback) => {
           if (
-            new Date(value) <= new Date(writeMailContents.reserved_timestamp)
+            new Date(value) <=
+            new Date(writeMailStore.mailMessage.contents.reserved_timestamp)
           ) {
             callback(new Error("만료 시각은 시작 시각보다 늦어야 합니다."));
           } else {
@@ -201,8 +230,8 @@ const rules = computed(() => {
     ];
   }
   if (
-    writeMailContents.periodType == "weekly" ||
-    writeMailContents.periodType == "monthly"
+    writeMailStore.mailMessage.contents.periodType == "weekly" ||
+    writeMailStore.mailMessage.contents.periodType == "monthly"
   ) {
     baseRules.days = [
       {
@@ -231,12 +260,12 @@ const handleSave = async () => {
 };
 
 const validationSetting = () => {
-  if (writeMailContents.periodType !== "no") {
+  if (writeMailStore.mailMessage.contents.periodType !== "no") {
     if (
-      !writeMailContents.reservedTimestamp ||
-      !writeMailContents.startTime ||
-      !writeMailContents.expiredTimestamp ||
-      writeMailContents.days.length === 0
+      !writeMailStore.mailMessage.contents.reservedTimestamp ||
+      !writeMailStore.mailMessage.contents.startTime ||
+      !writeMailStore.mailMessage.contents.expiredTimestamp ||
+      writeMailStore.mailMessage.contents.days.length === 0
     ) {
       ElMessage.error("값이 다 채워지지 않았습니다.");
       return;
@@ -244,7 +273,10 @@ const validationSetting = () => {
   }
 };
 const disabledDate = (time) => {
-  return time.getTime() < new Date(writeMailContents.reservedDate).getTime();
+  return (
+    time.getTime() <
+    new Date(writeMailStore.mailMessage.contents.reservedDate).getTime()
+  );
 };
 </script>
 <style scoped>

@@ -9,6 +9,7 @@ export interface Mail {
   sentTimestamp?: string;
   v?: number;
   reservedTime: String;
+  reservedDate?: Date;
   type?: "prev" | "next";
 }
 export interface ApiStructure {

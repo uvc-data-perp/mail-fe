@@ -574,6 +574,11 @@ const previewEmail = () => {
   previewVisible.value = true;
 };
 
+const getDayNames = (days) => {
+  const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
+  return days.map((day) => dayNames[day]);
+};
+
 onMounted(() => {
   document.addEventListener("keydown", handleShortcut);
 });

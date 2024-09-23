@@ -34,9 +34,7 @@
               folderId: route.params.folderId,
               documentId: scope.row.id,
             },
-            query: {
-              ...scope.row,
-            },
+            query: {},
           }"
           class="text-blue-600 hover:underline"
         >
@@ -49,8 +47,13 @@
         </NuxtLink>
       </template>
     </el-table-column>
-    <el-table-column label="Date" width="120">
-      <template #default="scope">{{ scope.row.reservedDate }}</template>
+    <el-table-column
+      :label="route.params.folderId == '2' ? '예약 발송일' : '발송일'"
+      width="120"
+    >
+      <template #default="scope">{{
+        formatDate(scope.row.reservedDate)
+      }}</template>
     </el-table-column>
   </el-table>
 </template>
@@ -102,5 +105,19 @@ const handleSelectionChange = (selectedRows: Mail[]) => {
   if (props.mode === "full") {
     console.log("Selected rows:", selectedRows);
   }
+};
+
+const formatDate = (timestamp) => {
+  if (!timestamp) return "";
+  const result = new Intl.DateTimeFormat("ko-KR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(timestamp);
+
+  return result;
 };
 </script>

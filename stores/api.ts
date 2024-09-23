@@ -81,11 +81,16 @@ export const useStore = defineStore("store", () => {
         },
       });
       response.data.result.forEach((mail: Mail) => {
-        mail["reservedDate"] = new Date(mail.reservedTime.split("_")[0] * 1000);
+        mail["reservedDate"] = new Date(
+          Number(mail.reservedTime.split("_")[0]) * 1000
+        );
+      });
+      response.data.result.sort((a, b) => {
+        return b.reservedDate.getTime() - a.reservedDate.getTime();
       });
 
-      mailList.value = response.data.result;
-      setmailList(response.data.result);
+      // mailList.value = response.data.result;
+      setMailList(response.data.result);
       setTotalResults(response.data.result.length);
       return response.data;
     } catch (error) {
@@ -133,7 +138,7 @@ export const useStore = defineStore("store", () => {
     // fetchArticles();
   };
 
-  const setmailList = (a: Mail[]) => {
+  const setMailList = (a: Mail[]) => {
     mailList.value = a;
   };
 
@@ -157,7 +162,7 @@ export const useStore = defineStore("store", () => {
     changeSearchValue,
     setPage,
     fetchWillSendList,
-    setmailList,
+    setMailList,
     setTotalResults,
     fetchMailDetail,
   };
