@@ -81,6 +81,9 @@ export const useWriteMailStore = defineStore("writeMail", () => {
         };
       case "weekly":
         //만료시간 설정//
+
+        console.log("변경전:", mailMessage.value.contents.expiredTimestamp);
+
         mailMessage.value.contents.expiredTimestamp = String(
           Math.floor(
             new Date(mailMessage.value.contents.expiredTimestamp).setHours(
@@ -91,13 +94,15 @@ export const useWriteMailStore = defineStore("writeMail", () => {
             ) / 1000
           )
         );
+        console.log("변경후:", mailMessage.value.contents.expiredTimestamp);
+
         console.log(
           "expiredTimestamp:",
           mailMessage.value.contents.expiredTimestamp
         );
 
         //sendTime 설정//
-        mailMessage.value.contents.sendTime = `${mailMessage.value.contents.reservedDate.getHours()}:${mailMessage.value.contents.reservedDate.getMinutes()}`;
+        // mailMessage.value.contents.sendTime = `${mailMessage.value.contents.reservedDate.getHours()}:${mailMessage.value.contents.reservedDate.getMinutes()}`;
         console.log("sendTime:", mailMessage.value.contents.sendTime);
 
         //요일 값 boolean 변경//
@@ -133,7 +138,7 @@ export const useWriteMailStore = defineStore("writeMail", () => {
         );
 
         //sendTime 설정//
-        mailMessage.value.contents.sendTime = `${mailMessage.value.contents.reservedDate.getHours()}:${mailMessage.value.contents.reservedDate.getMinutes()}`;
+        // mailMessage.value.contents.sendTime = `${mailMessage.value.contents.reservedDate.getHours()}:${mailMessage.value.contents.reservedDate.getMinutes()}`;
         console.log("sendTime:", mailMessage.value.contents.sendTime);
 
         // mailMessage.value.contents["expiredTimestamp"] = Math.floor(
@@ -200,6 +205,19 @@ export const useWriteMailStore = defineStore("writeMail", () => {
         const response = await $axios.post(apiEndpoint, mailMessage.value, {
           timeout: 50000,
         });
+        console.log("전송된 내용:", mailMessage.value);
+        console.log("전송된 내용:", mailMessage.value);
+        console.log("전송된 내용:", mailMessage.value);
+        console.log("전송된 내용:", mailMessage.value);
+        console.log("전송된 내용:", mailMessage.value);
+        console.log("전송된 내용:", mailMessage.value);
+        console.log("전송된 내용:", mailMessage.value);
+        console.log("전송된 내용:", mailMessage.value);
+        console.log("전송된 내용:", mailMessage.value);
+        console.log("전송된 내용:", mailMessage.value);
+        console.log("전송된 내용:", mailMessage.value);
+        console.log("전송된 내용:", mailMessage.value);
+        console.log("전송된 내용:", mailMessage.value);
         console.log(`Email sent successfully to ${toEmail}:`, response.data);
         results.push({
           email: toEmail,
@@ -237,13 +255,13 @@ export const useWriteMailStore = defineStore("writeMail", () => {
     } else {
       ElMessage.error(result.message || "메일 처리 중 오류가 발생했습니다.");
     }
-    resetMailmessage(mailMessage.value);
+    resetMailMessage();
   }
 
-  function resetMailmessage(mailMessage) {
-    mailMessage = {
+  function resetMailMessage() {
+    mailMessage.value = {
       contents: {
-        from: "jjoo08152@gmail.com",
+        from: "shyk31971@gmail.com",
         to: "jjoo08152@gmail.com",
         subject: "p Sub ✔",
         text: "p text ?",

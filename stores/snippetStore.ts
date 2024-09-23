@@ -1,7 +1,6 @@
-import { defineStore } from "pinia";
+import { defineStore, acceptHMRUpdate } from "pinia";
 import { ref, computed } from "vue";
 import type { Snippet } from "~/types/snippetStore";
-import axios from "axios";
 
 export const useSnippetStore = defineStore("snippetStore", () => {
   // state
@@ -10,16 +9,16 @@ export const useSnippetStore = defineStore("snippetStore", () => {
       id: "111e",
       from: "$기본값",
       to: "hello",
-      keyBoard: "Ctrl+I",
+      command: "Ctrl+I",
     },
   ]);
 
-  const newSnippet = ref<Snippet>({ id: "", from: "", to: "", keyBoard: "" });
+  const newSnippet = ref<Snippet>({ id: "", from: "", to: "", command: "" });
 
   const currentPage = ref(1);
   const totalResults = ref(1);
   const pagerCount = ref(11);
-  const pageSize = ref(6);
+  const pageSize = ref(5);
   const paginatedSnippets = computed(() => {
     const startIndex = (currentPage.value - 1) * pageSize.value;
     const endIndex = startIndex + pageSize.value;
@@ -70,7 +69,7 @@ export const useSnippetStore = defineStore("snippetStore", () => {
     if (snippets.value.some((s) => s.from === snippet.from)) {
       return "변경 전 문자가 이미 존재합니다.";
     }
-    if (snippets.value.some((s) => s.keyBoard === snippet.keyBoard)) {
+    if (snippets.value.some((s) => s.command === snippet.command)) {
       return "사용 중인 단축키가 이미 존재합니다.";
     }
 
@@ -164,3 +163,7 @@ export const useSnippetStore = defineStore("snippetStore", () => {
     setPage,
   };
 });
+// HMR 설정 추가
+if (import.meta.hot) {
+  import.meta.hot.accept(acceptHMRUpdate(useSnippetStore, import.meta.hot));
+}

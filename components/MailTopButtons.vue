@@ -31,10 +31,5 @@ const buttonsInfo = ref([
     buttonName: "삭제",
     clickEvent: () => {},
   },
-  {
-    type: "primary",
-    buttonName: "답장",
-    clickEvent: () => {},
-  },
 ]);
 </script>

@@ -31,12 +31,8 @@
       </el-form-item>
 
       <el-form-item
-        v-if="writeMailStore.mailMessage.contents.periodType !== 'no'"
-        :label="
-          writeMailStore.mailMessage.contents.periodType === 'single'
-            ? '발송시각'
-            : '시작일'
-        "
+        v-if="writeMailStore.mailMessage.contents.periodType === 'single'"
+        label="발송일"
         class="form-item"
         prop="reservedDate"
         label-width="100px"
@@ -48,6 +44,25 @@
           format="YYYY/MM/DD HH:mm:ss"
         />
       </el-form-item>
+      <el-form-item
+        v-if="
+          writeMailStore.mailMessage.contents.periodType === 'weekly' ||
+          writeMailStore.mailMessage.contents.periodType === 'monthly'
+        "
+        label="발송시각"
+        class="form-item"
+        prop="reservedDate"
+        label-width="100px"
+      >
+        <el-time-picker
+          v-model="writeMailStore.mailMessage.contents.sendTime"
+          format="HH:mm"
+          value-format="HH:mm"
+          placeholder="시간 선택"
+        >
+        </el-time-picker>
+      </el-form-item>
+
       <el-form-item
         v-if="
           writeMailStore.mailMessage.contents.periodType !== 'no' &&
@@ -153,9 +168,7 @@
       )
     }}
 
-    {{
-      `${writeMailStore.mailMessage.contents.reservedDate.getHours()}:${writeMailStore.mailMessage.contents.reservedDate.getMinutes()}`
-    }}
+    {{ `${writeMailStore.mailMessage.contents?.sendTime}` }}
   </el-dialog>
 </template>
 

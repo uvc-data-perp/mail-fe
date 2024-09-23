@@ -8,7 +8,7 @@
     <el-input v-model="newSnippet.from" placeholder="from" />
     <el-input v-model="newSnippet.to" placeholder="to" />
     <ElInput
-      v-model="newSnippet.keyBoard"
+      v-model="newSnippet.command"
       @keydown="onKeyDown"
       placeholder="단축키 입력 (예: Ctrl+I)"
     />
@@ -41,10 +41,10 @@
           />
         </template>
       </el-table-column>
-      <el-table-column property="keyBoard" label="단축키">
+      <el-table-column property="command" label="단축키">
         <template #default="scope">
           <el-input
-            v-model="scope.row.keyBoard"
+            v-model="scope.row.command"
             type="text"
             @change="snippetStore.updateSnippet(scope.row)"
           />
@@ -101,7 +101,7 @@ const addSnippet = async () => {
     ...newSnippet.value,
     from: `$` + newSnippet.value.from.trim(),
     to: newSnippet.value.to.trim(),
-    keyBoard: newSnippet.value.keyBoard.trim(),
+    command: newSnippet.value.command.trim(),
   };
   const validationResult = validationSnippet(newSnippet.value);
   if (validationResult !== null) {
@@ -112,7 +112,7 @@ const addSnippet = async () => {
   // 검증을 통과한 경우에만 이 부분이 실행됩니다
   await snippetStore.addSnippet(newSnippet.value);
   ElMessage.success("스니펫이 추가되었습니다");
-  newSnippet.value = { from: "", to: "", keyBoard: "" };
+  newSnippet.value = { from: "", to: "", command: "" };
   await snippetStore.fetchSnippetList();
 };
 
@@ -164,6 +164,6 @@ const onKeyDown = (evt: Event) => {
   if (key === " ") key = "Space";
   if (key.length === 1) key = key.toUpperCase();
 
-  newSnippet.value.keyBoard = [...modifiers, key].join("+");
+  newSnippet.value.command = [...modifiers, key].join("+");
 };
 </script>

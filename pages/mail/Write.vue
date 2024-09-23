@@ -123,26 +123,23 @@
       />
     </el-form-item> -->
     <el-form-item prop="text" label="내용">
-      <!-- <ClientOnly>
-        <QuillEditor
+      <ClientOnly>
+        <el-button
+          @click="
+            () => {
+              writeMailStore.mailMessage.contents.text = testText;
+            }
+          "
+          >클릭</el-button
+        >
+
+        <CustomQuillEditor
           v-model:content="writeMailStore.mailMessage.contents.text"
-          content-type="text"
+          content-type="html"
           theme="snow"
           @update:content="debouncedHandleInput"
         />
-      </ClientOnly> -->
-      <el-input
-        v-model="writeMailStore.mailMessage.contents.text"
-        type="textarea"
-        :rows="10"
-        placeholder="내용을 입력하세요. 스타일 적용: **볼드**, *이탤릭*, [red]빨간색[/red]"
-        @input="debouncedHandleInput"
-      />
-
-      <!-- <TiptapEditor
-        v-model="writeMailStore.mailMessage.contents.text"
-        @update:modelValue="debouncedHandleInput"
-      /> -->
+      </ClientOnly>
     </el-form-item>
 
     <el-form-item>
@@ -230,22 +227,14 @@ const fetchAddressOptions = async (query) => {
   if (import.meta.env.SSR) {
     // 서버 사이드 렌더링 시 동기적으로 처리
     return {
-      data: [
-        { email: `${query}@example.com` },
-        { email: `${query}.user@example.com` },
-        { email: `another.${query}@example.com` },
-      ],
+      data: [{ email: `shyk31971@gmail.com` }],
     };
   } else {
     // 클라이언트 사이드에서만 비동기 처리
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve({
-          data: [
-            { email: `${query}@example.com` },
-            { email: `${query}.user@example.com` },
-            { email: `another.${query}@example.com` },
-          ],
+          data: [{ email: `shyk31971@gmail.com` }],
         });
       }, 300);
     });
@@ -254,72 +243,65 @@ const fetchAddressOptions = async (query) => {
 
 const loading = ref(false);
 const addressOptions = ref([]);
-
-function parseStyledContent(content) {
-  // 볼드 처리: **텍스트**
-  content = content.replace(
-    /\*\*(.*?)\*\*/g,
-    '<mj-text font-weight="bold">$1</mj-text>'
-  );
-
-  // 이탤릭 처리: *텍스트*
-  content = content.replace(
-    /\*(.*?)\*/g,
-    '<mj-text font-style="italic">$1</mj-text>'
-  );
-
-  // 색상 처리: [색상]텍스트[/색상]
-  content = content.replace(
-    /\[(#[0-9A-Fa-f]{6}|[a-zA-Z]+)\](.*?)\[\/\1\]/g,
-    '<mj-text color="$1">$2</mj-text>'
-  );
-
-  // 글자 크기 처리: {크기px}텍스트{/크기}
-  content = content.replace(
-    /\{(\d+)px\}(.*?)\{\/\1\}/g,
-    '<mj-text font-size="$1px">$2</mj-text>'
-  );
-
-  // 링크 처리: [링크텍스트](URL)
-  content = content.replace(
-    /\[(.*?)\]\((https?:\/\/.*?)\)/g,
-    '<mj-text><a href="$2" style="color: #1155CC;">$1</a></mj-text>'
-  );
-
-  // 줄바꿈 처리
-  content = content.split("\n").join("</mj-text><mj-text>");
-
-  return `<mj-text>${content}</mj-text>`;
+function convertQuillClassesToInlineStyles(content) {
+  return content
+    .replace(/class="ql-size-huge"/g, 'style="font-size: 2.5em;"')
+    .replace(/class="ql-size-large"/g, 'style="font-size: 1.5em;"')
+    .replace(/class="ql-size-small"/g, 'style="font-size: 0.75em;"')
+    .replace(/class="ql-align-center"/g, 'style="text-align: center;"')
+    .replace(/class="ql-align-right"/g, 'style="text-align: right;"')
+    .replace(/class="ql-align-justify"/g, 'style="text-align: justify;"')
+    .replace(/class="ql-color-red"/g, 'style="color: #e60000;"')
+    .replace(/class="ql-color-green"/g, 'style="color: #008a00;"')
+    .replace(/class="ql-color-blue"/g, 'style="color: #06c;"')
+    .replace(/class="ql-bg-red"/g, 'style="background-color: #ffebeb;"')
+    .replace(/class="ql-bg-green"/g, 'style="background-color: #e6ffe6;"')
+    .replace(/class="ql-bg-blue"/g, 'style="background-color: #e6f2ff;"')
+    .replace(
+      /class="ql-font-serif"/g,
+      'style="font-family: Georgia, Times New Roman, serif;"'
+    )
+    .replace(
+      /class="ql-font-monospace"/g,
+      'style="font-family: Monaco, Courier New, monospace;"'
+    );
 }
 
 const generateEmailContent = () => {
-  const styledContent = parseStyledContent(
+  const subject = writeMailStore.mailMessage.contents.subject;
+  let content = convertQuillClassesToInlineStyles(
     writeMailStore.mailMessage.contents.text
-  );
+  ); // Quill 에디터의 HTML 내용
 
-  const mjmlTemplate = `
-    <mjml>
-      <mj-body>
-        <mj-section>
-          <mj-column>
-            <mj-text font-size="20px" color="#F45E43" font-family="helvetica">
-              ${writeMailStore.mailMessage.contents.subject}
-            </mj-text>
-          </mj-column>
-        </mj-section>
-        <mj-section background-color="#f0f0f0">
-          <mj-column>
-            ${styledContent}
-          </mj-column>
-        </mj-section>
-      </mj-body>
-    </mjml>
+  // Quill 클래스를 인라인 스타일로 변환
+
+  // 기타 필요한 Quill 클래스 변환 로직 추가
+
+  return `
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>${subject}</title>
+        <style>
+            .ql-align-center { text-align: center; }
+            .ql-align-right { text-align: right; }
+            .ql-align-justify { text-align: justify; }
+            /* 추가 Quill 스타일 정의 */
+        </style>
+    </head>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h1 style="color: #F45E43;">${subject}</h1>
+            <div style="background-color: #f0f0f0; padding: 15px; border-radius: 5px;">
+                ${content}
+            </div>
+        </div>
+    </body>
+    </html>
   `;
-
-  const { html } = mjml2html(mjmlTemplate);
-  return html;
 };
-
 const submitForm = async () => {
   if (!mailFormRef.value) return;
 
@@ -331,6 +313,7 @@ const submitForm = async () => {
     writeMailStore.mailMessage.contents = {
       ...writeMailStore.mailMessage.contents,
       html: emailContent,
+      text: emailContent,
     };
 
     // 생성된 HTML 내용을 사용하여 이메일 전송
@@ -521,8 +504,8 @@ const handleShortcut = (event) => {
   const shiftKey = event.shiftKey;
 
   const matchedSnippet = snippetStore.snippets.find((snippet) => {
-    if (!snippet.keyBoard) return false;
-    const shortcut = snippet.keyBoard.toLowerCase();
+    if (!snippet.command) return false;
+    const shortcut = snippet.command.toLowerCase();
     const [modifier, key] = shortcut.split("+");
     if (key === pressedKey) {
       if (modifier === "ctrl" && ctrlKey) return true;
@@ -536,7 +519,7 @@ const handleShortcut = (event) => {
     event.preventDefault();
     insertSnippetText(matchedSnippet.to);
     ElMessage.success(
-      `단축키 "${matchedSnippet.keyBoard}"가 입력되었습니다: "${matchedSnippet.to}"`
+      `단축키 "${matchedSnippet.command}"가 입력되었습니다: "${matchedSnippet.to}"`
     );
   }
 };
@@ -586,6 +569,38 @@ onMounted(() => {
 onUnmounted(() => {
   document.removeEventListener("keydown", handleShortcut);
 });
+
+const testText = `
+
+    <h2 style="background-color: rgb(52, 152, 219); color: white; padding: 10px; margin: 0; border: 20px solid black;">1. 프로젝트 현황</h2>
+    <p style="border: 20px solid black; border-top: none; padding: 0; margin: 0; background-color: rgb(241, 196, 15);">
+        <span style="background-color: rgb(52, 152, 219);" >진행률 70%</span>
+        
+    </p>
+    
+    <h2 style="background-color: rgb(46, 204, 113); color: white; padding: 10px; margin: 10px 0 0 0; border: 2px solid black;">2. 주요 성과</h2>
+    <p style="border: 2px solid black; border-top: none; padding: 0; margin: 0; background-color: rgb(236, 240, 241); display: flex; flex-wrap: wrap;">
+        <span style="flex: 1; padding: 5px; box-sizing: border-box; border-right: 2px solid black;"><span style="background-color: yellow;"><strong>신규 고객 5개사 유치</strong></span></span>
+        <span style="flex: 1; padding: 5px; box-sizing: border-box; border-right: 2px solid black;"><em><u>분기별 매출 목표 110% 달성</u></em></span>
+        <span style="flex: 1; padding: 5px; box-sizing: border-box;"><span style="color: rgb(142, 68, 173);">신제품 론칭 성공</span></span>
+    </p>
+    
+    <h2 style="background-color: rgb(230, 126, 34); color: white; padding: 10px; margin: 10px 0 0 0; border: 2px solid black;">3. 향후 계획</h2>
+    <p style="border: 2px solid black; border-top: none; padding: 0; margin: 0; background-color: rgb(236, 240, 241); display: flex; flex-wrap: wrap;">
+        <span style="flex: 1; padding: 5px; box-sizing: border-box; border-right: 2px solid black;"><strong style="color: rgb(52, 152, 219);">해외 시장 진출 준비</strong></span>
+        <span style="flex: 1; padding: 5px; box-sizing: border-box; border-right: 2px solid black;"><em style="color: rgb(155, 89, 182);">신규 인력 채용 및 교육</em></span>
+        <span style="flex: 1; padding: 5px; box-sizing: border-box;"><u style="color: rgb(231, 76, 60);">R&D 투자 확대</u></span>
+    </p>
+    
+    <p style="text-align: center; font-size: 18px; color: rgb(127, 140, 141); margin-top: 10px; font-style: italic; border: 2px solid black; padding: 10px;">본 보고서는 월간 성과와 계획을 요약한 것입니다. 자세한 내용은 부서별 상세 보고서를 참조하십시오.</p>
+</body>
+</html>`;
+
+const insertTable = () => {
+  if (customEditor.value) {
+    customEditor.value.insertTable(); // expose된 insertTable 메서드 호출
+  }
+};
 </script>
 
 <style scoped>

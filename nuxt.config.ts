@@ -70,6 +70,7 @@ export default defineNuxtConfig({
   // defineStore, acceptHMRUpdate를 일일히 선언하지 않아도 됩니다.
   vite: {
     server: {
+      hmr: true, // pinia hot-fix
       proxy: {
         "/api": {
           target: "http://158.247.200.126:3001",

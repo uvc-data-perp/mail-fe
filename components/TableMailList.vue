@@ -52,7 +52,8 @@
       width="120"
     >
       <template #default="scope">{{
-        formatDate(scope.row.reservedDate)
+        // formatDate(scope.row.reservedDate)
+        scope.row.reservedDate
       }}</template>
     </el-table-column>
   </el-table>
