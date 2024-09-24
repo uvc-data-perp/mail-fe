@@ -38,69 +38,30 @@ const route = useRoute();
 
 const store = useStore();
 
-switch (route.params.folderId) {
-  case "2":
-    await useAsyncData("fetchReservedMailList", async () => {
-      await store.fetchReservedMailList();
-      console.log(
-        "총수 및 매달결과:",
-        store.reservedMailTotalResults,
-        store.reservedMailList
-      );
-      console.log(
-        "총수 및 매달결과:",
-        store.reservedMailTotalResults,
-        store.reservedMailList
-      );
-      console.log(
-        "총수 및 매달결과:",
-        store.reservedMailTotalResults,
-        store.reservedMailList
-      );
-      console.log(
-        "총수 및 매달결과:",
-        store.reservedMailTotalResults,
-        store.reservedMailList
-      );
-      console.log(
-        "총수 및 매달결과:",
-        store.reservedMailTotalResults,
-        store.reservedMailList
-      );
-      console.log(
-        "총수 및 매달결과:",
-        store.reservedMailTotalResults,
-        store.reservedMailList
-      );
-      console.log(
-        "총수 및 매달결과:",
-        store.reservedMailTotalResults,
-        store.reservedMailList
-      );
-      console.log(
-        "총수 및 매달결과:",
-        store.reservedMailTotalResults,
-        store.reservedMailList
-      );
-      console.log(
-        "총수 및 매달결과:",
-        store.reservedMailTotalResults,
-        store.reservedMailList
-      );
-      console.log(
-        "총수 및 매달결과:",
-        store.reservedMailTotalResults,
-        store.reservedMailList
-      );
-      return null;
-    });
-    break;
-  default:
-    await useAsyncData("getWillSendList", async () => {
-      await store.fetchWillSendList();
-      return null;
-    });
-}
+await useAsyncData("fetchReservedMailList", async () => {
+  await store.fetchReservedMailList(route.params.folderId as string);
+  return null;
+});
+
+// switch (route.params.folderId) {
+//   case "2":
+//     await useAsyncData("fetchReservedMailList", async () => {
+//       await store.fetchReservedMailList();
+//       return null;
+//     });
+//     break;
+//     case "3":
+//     await useAsyncData("fetchReservedMailList", async () => {
+//       await store.fetchReservedMailList();
+//       return null;
+//     });
+//     break;
+//   default:
+//     await useAsyncData("getWillSendList", async () => {
+//       await store.fetchWillSendList();
+//       return null;
+//     });
+// }
 
 // 초기 설정
 

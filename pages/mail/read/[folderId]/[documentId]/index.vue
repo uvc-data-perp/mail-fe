@@ -20,7 +20,7 @@
       </div>
       <!-- 예약날짜 or 보낸 날짜 표시 -->
       <div
-        v-if="route.params.folderId === '2'"
+        v-if="route.params.folderId !== '1'"
         class="flex-1 items-center mb-2"
       >
         <el-tag
@@ -31,9 +31,15 @@
         >
 
         <el-button
-          @click="handleDeleteReservation(route.query.groupId)"
-          :type="route.query.status === `Cancelled` ? 'danger' : 'success'"
-          >{{ route.query.status === `Cancelled` ? "취소됨" : "취소하기" }}
+          @click="
+            handleDeleteReservation(
+              String(route.params.folderId),
+              String(route.query.groupId),
+              String(currentMail.id)
+            )
+          "
+          :type="currentMail.status === `Cancelled` ? 'danger' : 'success'"
+          >{{ currentMail.status === `Cancelled` ? "취소됨" : "취소하기" }}
         </el-button>
         <ScheduleModal
           v-if="scheduleDialogVisible"
@@ -42,7 +48,7 @@
         />
         <span
           class="text-sm text-gray-600"
-          :class="currentMail.status === 'Canceled' ? 'line-through' : ''"
+          :class="currentMail.status === 'Cancelled' ? 'line-through' : ''"
         >
           {{
             route.query.expiredDate ? ` 만료일:${route.query.expiredDate}` : ""
@@ -119,14 +125,16 @@ const getDayNames = (days) => {
   return days.map((day) => dayNames[day]);
 };
 
-const isSchedulePending = ref(false);
-
 const isScheduleDeleted = ref(false);
 
 const currentMailId = ref(Number(route.params.documentId)); // 예시 ID, 실제로는 prop이나 상태 관리를 통해 받아올 수 있습니다.
 
-const handleDeleteReservation = (groupId: string) => {
-  mailStore.deleteReservation(groupId);
+const handleDeleteReservation = (
+  folderId: string,
+  groupId: string,
+  mailId: string
+) => {
+  mailStore.deleteReservation(folderId, groupId, mailId);
   isScheduleDeleted.value = !isScheduleDeleted.value;
   ElMessage.success("예약을 삭제할 수 있습니다.");
 };

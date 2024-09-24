@@ -183,11 +183,23 @@ export const useStore = defineStore("store", () => {
 
   //// 예약 관련/////////
 
-  const fetchReservedMailList = async () => {
+  const fetchReservedMailList = async (folderId: string) => {
+    let apiEndpoint = "/send/booking";
+    switch (folderId) {
+      case "2":
+        apiEndpoint = "/regularity/month";
+        break;
+      case "3":
+        apiEndpoint = "/regularity/day";
+        break;
+      default:
+        apiEndpoint = "/send/booking";
+    }
+
     const { $axios } = useNuxtApp();
 
     try {
-      const monthlyResponse = await $axios.get("/regularity/month", {
+      const monthlyResponse = await $axios.get(apiEndpoint, {
         headers: {
           // 필요한 경우 여기에 추가 헤더를 설정할 수 있습니다.
         },
@@ -239,16 +251,45 @@ export const useStore = defineStore("store", () => {
     reservedMailList.value = value;
   };
 
-  const deleteReservation = async (groupId: string) => {
+  const deleteReservation = async (
+    folderId: string,
+    groupId: string,
+    mailId: string
+  ) => {
     const { $axios } = useNuxtApp();
+
+    let reservationType;
+    switch (folderId) {
+      case "2":
+        reservationType = "month";
+        break;
+      case "3":
+        reservationType = "day";
+        break;
+      case "4":
+        reservationType = "single";
+        break;
+      default:
+        throw new Error(`Invalid folderId: ${folderId}`);
+    }
+
+    console.log("백틱", `/regularity/${reservationType}/${groupId}`);
+    console.log("백틱", `/regularity/${reservationType}/${groupId}`);
+    console.log("백틱", `/regularity/${reservationType}/${groupId}`);
+    console.log("백틱", `/regularity/${reservationType}/${groupId}`);
+    console.log("백틱", `/regularity/${reservationType}/${groupId}`);
+    console.log("노백틱", `/regularity/day/${groupId}`);
+    console.log("노백틱", `/regularity/day/${groupId}`);
+    console.log("노백틱", `/regularity/day/${groupId}`);
+    console.log("노백틱", `/regularity/day/${groupId}`);
+    console.log("노백틱", `/regularity/day/${groupId}`);
+
     try {
-      const response = await $axios.delete(`/regularity/month/${groupId}`);
-      console.log("매달 삭제 확인");
-      console.log("매달 삭제 확인");
-      console.log("매달 삭제 확인");
-      console.log("매달 삭제 확인");
-      console.log("매달 삭제 확인");
-      console.log("매달 삭제 확인");
+      const response = await $axios.delete(
+        `/regularity/${reservationType}/${groupId}`
+      );
+      await fetchMailDetail(mailId);
+
       return response.data;
     } catch (error) {
       console.error("Error fetching will-send list:", error);
