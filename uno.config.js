@@ -17,7 +17,7 @@ export default defineConfig({
   },
   rules: [
     ["font-pretendard", { "font-family": "Pretendard, sans-serif" }],
-    [/^btn-(.*)$/, ([, c]) => `bg-${c}-400 text-${c}-100 py-2 px-4 rounded-lg`],
+    // [/^btn-(.*)$/, ([, c]) => `bg-${c}-400 text-${c}-100 py-2 px-4 rounded-lg`],
     [/^wp-(\d+)$/, ([, d]) => ({ width: `${d}%` })],
     [/^hp-(\d+)$/, ([, d]) => ({ height: `${d}%` })],
     [/^wv-(\d+)$/, ([, d]) => ({ width: `${d}vw` })],

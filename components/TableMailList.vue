@@ -42,7 +42,9 @@
           }"
           class="text-blue-600 hover:underline"
         >
-          <p class="font-bold text-lg">{{ scope.row.subject }}</p>
+          <p class="font-bold text-lg">
+            {{ scope.row.subject }}
+          </p>
           {{
             scope.row.text.length > 50
               ? scope.row.text.slice(0, 47) + "..."

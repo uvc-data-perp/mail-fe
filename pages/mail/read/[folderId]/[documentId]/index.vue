@@ -29,37 +29,27 @@
           class="mr-2 flex-shrink-0 cursor-pointer"
           >예약 변경</el-tag
         >
-        <el-button
-          @click="() => (isSchedulePending = !isSchedulePending)"
-          :type="route.query.status ? 'danger' : 'success'"
-          >{{ route.query.status }}
-        </el-button>
+
         <el-button
           @click="handleDeleteReservation(route.query.groupId)"
-          :type="route.query.status === `canceled` ? 'danger' : 'success'"
-          >{{ route.query.status === `canceled` ? "취소됨" : "취소하기" }}
+          :type="route.query.status === `Cancelled` ? 'danger' : 'success'"
+          >{{ route.query.status === `Cancelled` ? "취소됨" : "취소하기" }}
         </el-button>
-        {{ route.query.groupId }}
-        {{ route.query.expiredDate }}
-        {{ route.query.status }}
         <ScheduleModal
           v-if="scheduleDialogVisible"
           v-model:visible="scheduleDialogVisible"
           @save="saveSchedule"
         />
-        <!-- <span
+        <span
           class="text-sm text-gray-600"
-          :class="isSchedulePending || isScheduleDeleted ? 'line-through' : ''"
+          :class="currentMail.status === 'Canceled' ? 'line-through' : ''"
         >
           {{
-            scheduleForm.startDate
-              ? `최초 전송:  ${scheduleForm.startDate}  ${scheduleForm.startTime}`
-              : ""
+            route.query.expiredDate ? ` 만료일:${route.query.expiredDate}` : ""
           }}
-          {{
-            scheduleForm.expiryDate ? ` 만료일:${scheduleForm.expiryDate}` : ""
-          }}
-          {{
+          메일상태
+          {{ currentMail.status }}
+          <!-- {{
             scheduleForm.periodType !== "no"
               ? `주기
                 ${
@@ -68,8 +58,8 @@
                     : ` ${scheduleForm.days?.join(", ")}일`
                 }`
               : ""
-          }}
-        </span> -->
+          }} -->
+        </span>
       </div>
       <div v-else class="flex-1 items-center mb-2">
         <el-tag type="info" class="mr-2 flex-shrink-0">보낸날짜</el-tag>
@@ -135,9 +125,19 @@ const isScheduleDeleted = ref(false);
 
 const currentMailId = ref(Number(route.params.documentId)); // 예시 ID, 실제로는 prop이나 상태 관리를 통해 받아올 수 있습니다.
 
-const handleDeleteReservation = (groupId) => {
+const handleDeleteReservation = (groupId: string) => {
   mailStore.deleteReservation(groupId);
   isScheduleDeleted.value = !isScheduleDeleted.value;
   ElMessage.success("예약을 삭제할 수 있습니다.");
 };
+
+watch(
+  mailStore.currentMail,
+  (newValue) => {
+    if (newValue) {
+      mailStore.currentMail = { ...currentMail, ...newValue };
+    }
+  },
+  { immediate: true }
+);
 </script>

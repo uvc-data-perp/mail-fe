@@ -170,19 +170,19 @@ const menuItems: MenuItem[] = [
         path: `/mail/folders/1`,
       },
       {
-        title: "예약 메일함 📧",
+        title: "날짜 별 예약 📧",
         icon: "i-ic:outline-circle",
         index: "/mail/folders/2",
         path: `/mail/folders/2`,
       },
       {
-        title: "내게 쓴 메일함 📝",
+        title: "요일 별 예약 📝",
         icon: "i-ic:outline-circle",
         index: "/ai-data-analyze/defect-cause-analysis",
         path: `/mail/folders/3`,
       },
       {
-        title: "임시저장 메일함 📧",
+        title: "일회성 예약 📧",
         icon: "i-ic:outline-circle",
         index: "/ai-data-analyze/defect-cause-analysis",
         path: `/mail/folders/4`,

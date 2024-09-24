@@ -49,6 +49,35 @@ export const useStore = defineStore("store", () => {
       reservedTime: "9726709750",
     },
   ]);
+  const reservedMailList = ref(<ReservedMail[]>[
+    {
+      id: "66f22a7f77d141e1f4d5cf78",
+      groupId: "66f22a7f77d141e1f4d5cf78",
+      emailContents: ["66f22a7f77d141e1f4d5cf50"],
+      expiredDate: new Date(0),
+      expired_timestamp: "1735657199",
+      sendingDays: [],
+      status: "Waiting",
+      reservedDate: new Date(0),
+      reservedTime: "1735657199",
+      from: "jjoo08152@gmail.com",
+      sentTimestamp: "9726709750",
+      subject: "기본제목",
+      text: "기본내용",
+      to: "jjoo08152@gmail.com",
+      v: 0,
+    },
+  ]);
+
+  const filteredReservedMailList = computed(() => {
+    return reservedMailList.value.filter(
+      (mail) =>
+        mail.subject
+          .toLowerCase()
+          .includes(filterCondition.value.toLowerCase()) ||
+        mail.text.toLowerCase().includes(filterCondition.value.toLowerCase())
+    );
+  });
   const filteredMailList = computed(() => {
     return mailList.value.filter(
       (mail) =>
@@ -57,6 +86,12 @@ export const useStore = defineStore("store", () => {
           .includes(filterCondition.value.toLowerCase()) ||
         mail.text.toLowerCase().includes(filterCondition.value.toLowerCase())
     );
+  });
+
+  const paginatedFilteredReservedMailList = computed(() => {
+    const startIndex = (currentPage.value - 1) * pageSize.value;
+    const endIndex = startIndex + pageSize.value;
+    return filteredReservedMailList.value.slice(startIndex, endIndex);
   });
 
   const paginatedFilteredMailList = computed(() => {
@@ -162,7 +197,7 @@ export const useStore = defineStore("store", () => {
         monthlyResponse.data.result.map(async (result) => {
           result.expiredDate = new Date(Number(result.expiredTimestamp) * 1000);
 
-          result.groupId = result.Id;
+          result.groupId = result.id;
 
           const emailResponse = await $axios.get(
             `/email/${result.emailContents[result.emailContents.length - 1]}`,
@@ -203,22 +238,6 @@ export const useStore = defineStore("store", () => {
   const setReservedMailList = (value: ReservedMail[]) => {
     reservedMailList.value = value;
   };
-
-  const reservedMailTotalResults = ref(1);
-
-  const reservedMailList = ref(<ReservedMail[]>[
-    {
-      id: "66f22a7f77d141e1f4d5cf78",
-      emailContents: ["66f22a7f77d141e1f4d5cf50"],
-      expired_timestamp: "1735657199",
-      sendingDays: [],
-      status: "Waiting",
-      groupId: "66f22a7f77d141e1f4d5cf78",
-      reservedDate: new Date(0),
-      expiredDate: new Date(0),
-      reservedTime: "1735657199",
-    },
-  ]);
 
   const deleteReservation = async (groupId: string) => {
     const { $axios } = useNuxtApp();
@@ -289,7 +308,7 @@ export const useStore = defineStore("store", () => {
 
     //수정관련///
     reservedMailList,
-    reservedMailTotalResults,
+    paginatedFilteredReservedMailList,
     setReservedMailList,
     fetchReservedMailList,
     deleteReservation,

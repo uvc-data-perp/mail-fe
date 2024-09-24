@@ -12,7 +12,7 @@
       :mails="
         route.params.folderId == '1'
           ? store.paginatedFilteredMailList
-          : store.reservedMailList
+          : store.paginatedFilteredReservedMailList
       "
       mode="full"
     />
