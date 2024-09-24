@@ -31,14 +31,17 @@
         >
         <el-button
           @click="() => (isSchedulePending = !isSchedulePending)"
-          :type="currentMail.status ? 'danger' : 'success'"
-          >{{ currentMail.status }}
+          :type="route.query.status ? 'danger' : 'success'"
+          >{{ route.query.status }}
         </el-button>
         <el-button
-          @click="() => (isScheduleDeleted = true)"
-          :type="isScheduleDeleted ? 'danger' : 'success'"
-          >{{ isScheduleDeleted ? "취소됨" : "예약 취소" }}
+          @click="handleDeleteReservation(route.query.groupId)"
+          :type="route.query.status === `canceled` ? 'danger' : 'success'"
+          >{{ route.query.status === `canceled` ? "취소됨" : "취소하기" }}
         </el-button>
+        {{ route.query.groupId }}
+        {{ route.query.expiredDate }}
+        {{ route.query.status }}
         <ScheduleModal
           v-if="scheduleDialogVisible"
           v-model:visible="scheduleDialogVisible"
@@ -131,4 +134,10 @@ const isSchedulePending = ref(false);
 const isScheduleDeleted = ref(false);
 
 const currentMailId = ref(Number(route.params.documentId)); // 예시 ID, 실제로는 prop이나 상태 관리를 통해 받아올 수 있습니다.
+
+const handleDeleteReservation = (groupId) => {
+  mailStore.deleteReservation(groupId);
+  isScheduleDeleted.value = !isScheduleDeleted.value;
+  ElMessage.success("예약을 삭제할 수 있습니다.");
+};
 </script>

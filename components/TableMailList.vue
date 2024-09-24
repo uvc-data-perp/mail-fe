@@ -34,7 +34,11 @@
               folderId: route.params.folderId,
               documentId: scope.row.id,
             },
-            query: {},
+            query: {
+              groupId: scope.row.groupId,
+              status: scope.row.status,
+              expiredDate: scope.row.expiredDate,
+            },
           }"
           class="text-blue-600 hover:underline"
         >
@@ -48,12 +52,14 @@
       </template>
     </el-table-column>
     <el-table-column
-      :label="route.params.folderId == '2' ? '예약 발송일' : '발송일'"
+      :label="route.params.folderId == '1' ? '발송일' : '만료 예정일'"
       width="120"
     >
       <template #default="scope">{{
         // formatDate(scope.row.reservedDate)
-        scope.row.reservedDate
+        route.params.folderId == "1"
+          ? scope.row.reservedDate
+          : scope.row.expiredDate
       }}</template>
     </el-table-column>
   </el-table>

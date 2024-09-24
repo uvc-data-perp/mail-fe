@@ -29,7 +29,8 @@ type NuxtAppInjections =
   InjectionType<typeof import("../../plugins/element-plus").default> &
   InjectionType<typeof import("../../plugins/axios").default> &
   InjectionType<typeof import("../../plugins/mjml.client.js").default> &
-  InjectionType<typeof import("../../plugins/tiptap.client.js").default>
+  InjectionType<typeof import("../../plugins/tiptap.client.js").default> &
+  InjectionType<typeof import("../../plugins/quill.js").default>
 
 declare module '#app' {
   interface NuxtApp extends NuxtAppInjections { }

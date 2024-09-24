@@ -23,6 +23,7 @@ export default defineNuxtConfig({
     "~/plugins/axios.ts",
     "~/plugins/mjml.client.js",
     { src: "~/plugins/tiptap.client.js", mode: "client" },
+    { src: "~/plugins/quill.js", mode: "client" },
   ],
 
   postcss: {

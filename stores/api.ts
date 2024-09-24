@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import axios from "axios";
-import type { Article, Mail } from "~/types/api";
+import type { Article, Mail, ReservedMail } from "~/types/api";
 
 export const useStore = defineStore("store", () => {
   // State
@@ -146,6 +146,127 @@ export const useStore = defineStore("store", () => {
     totalResults.value = total;
   };
 
+  //// 예약 관련/////////
+
+  const fetchReservedMailList = async () => {
+    const { $axios } = useNuxtApp();
+
+    try {
+      const monthlyResponse = await $axios.get("/regularity/month", {
+        headers: {
+          // 필요한 경우 여기에 추가 헤더를 설정할 수 있습니다.
+        },
+      });
+
+      const updatedResults = await Promise.all(
+        monthlyResponse.data.result.map(async (result) => {
+          result.expiredDate = new Date(Number(result.expiredTimestamp) * 1000);
+
+          result.groupId = result.Id;
+
+          const emailResponse = await $axios.get(
+            `/email/${result.emailContents[result.emailContents.length - 1]}`,
+            {
+              headers: {
+                // 필요한 경우 여기에 추가 헤더를 설정할 수 있습니다.
+              },
+            }
+          );
+
+          // 여기서 emailResponse.data를 result에 추가합니다.
+          // 예를 들어:
+          result = { ...result, ...emailResponse.data.result };
+
+          return result;
+        })
+      );
+      setReservedMailList(updatedResults);
+      setTotalResults(updatedResults.length);
+      return updatedResults;
+    } catch (error) {
+      console.error("Error fetching data", error);
+      if (error.response) {
+        console.error(
+          "Server responded with:",
+          error.response.status,
+          error.response.data
+        );
+      } else if (error.request) {
+        console.error("No response received:", error.request);
+      } else {
+        console.error("Error setting up request:", error.message);
+      }
+      throw error;
+    }
+  };
+
+  const setReservedMailList = (value: ReservedMail[]) => {
+    reservedMailList.value = value;
+  };
+
+  const reservedMailTotalResults = ref(1);
+
+  const reservedMailList = ref(<ReservedMail[]>[
+    {
+      id: "66f22a7f77d141e1f4d5cf78",
+      emailContents: ["66f22a7f77d141e1f4d5cf50"],
+      expired_timestamp: "1735657199",
+      sendingDays: [],
+      status: "Waiting",
+      groupId: "66f22a7f77d141e1f4d5cf78",
+      reservedDate: new Date(0),
+      expiredDate: new Date(0),
+      reservedTime: "1735657199",
+    },
+  ]);
+
+  const deleteReservation = async (groupId: string) => {
+    const { $axios } = useNuxtApp();
+    try {
+      const response = await $axios.delete(`/regularity/month/${groupId}`);
+      console.log("매달 삭제 확인");
+      console.log("매달 삭제 확인");
+      console.log("매달 삭제 확인");
+      console.log("매달 삭제 확인");
+      console.log("매달 삭제 확인");
+      console.log("매달 삭제 확인");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching will-send list:", error);
+      if (error.response) {
+        console.error(
+          "Server responded with:",
+          error.response.status,
+          error.response.data
+        );
+      } else if (error.request) {
+        console.error("No response received:", error.request);
+      } else {
+        console.error("Error setting up request:", error.message);
+      }
+      throw error;
+    }
+  };
+
+  ////수정,삭제 관련///////
+  // const deleteMail = async (mailId: string) => {
+
+  //   const { $axios } = useNuxtApp();
+
+  //   try {
+  //     const response = await $axios.delete(`/email/${mailId}`);
+  //     return response.data;
+  //   } catch (error) {
+  //     console.error("Error fetching will-send list:", error);}
+  //     if (error.response) {
+  //       console.error()}
+  //     else if (error.request) {
+  //       console.error("No response received:", error.request);}
+  //     else {
+  //       console.error("Error setting up request:", error.message);}
+  //     throw error;
+  // }
+
   return {
     currentMail,
     mailList,
@@ -165,5 +286,12 @@ export const useStore = defineStore("store", () => {
     setMailList,
     setTotalResults,
     fetchMailDetail,
+
+    //수정관련///
+    reservedMailList,
+    reservedMailTotalResults,
+    setReservedMailList,
+    fetchReservedMailList,
+    deleteReservation,
   };
 });

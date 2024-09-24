@@ -18,6 +18,8 @@ import ImageUploader from "quill-image-uploader";
 import { quillTable } from "quill-table";
 import quillTableUI from "quill-table-ui";
 
+import QuillBetterTable from "quill-better-table";
+
 const props = defineProps(["modelValue"]);
 const emit = defineEmits(["update:modelValue"]);
 
@@ -45,7 +47,7 @@ const editorOptions = ref({
       [{ align: [] }],
       ["clean"],
       ["link", "image", "video"],
-      ["table"], // 테이블 버튼 추가
+      [{ table: "TD" }],
     ],
   },
   theme: "snow",
@@ -96,6 +98,7 @@ onMounted(() => {
     QuillEditor.Quill.register("modules/imageUploader", ImageUploader);
     QuillEditor.Quill.register("modules/table", quillTable);
     QuillEditor.Quill.register("modules/tableUI", quillTableUI);
+    QuillEditor.Quill.register("modules/better-table", QuillBetterTable);
 
     // QuillEditor가 마운트되면 테이블 삽입
     insertTable(); // 에디터 로드 후 테이블 자동 삽입

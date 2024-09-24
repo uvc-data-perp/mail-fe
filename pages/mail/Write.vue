@@ -113,15 +113,16 @@
       </el-input>
     </el-form-item>
 
-    <!-- <el-form-item prop="text" label="내용">
+    <el-form-item prop="text" label="내용">
       <el-input
+        v-show="false"
         v-model="writeMailStore.mailMessage.contents.text"
         type="textarea"
         :rows="10"
         placeholder="내용을 입력하세요"
         @input="debouncedHandleInput"
       />
-    </el-form-item> -->
+    </el-form-item>
     <el-form-item prop="text" label="내용">
       <ClientOnly>
         <el-button
@@ -139,6 +140,10 @@
           theme="snow"
           @update:content="debouncedHandleInput"
         />
+        <!-- <CustomQuill /> -->
+
+        <!-- <QuillTable /> -->
+        <QuillTest />
       </ClientOnly>
     </el-form-item>
 
@@ -162,6 +167,10 @@ import StarterKit from "@tiptap/starter-kit";
 //quill
 import { QuillEditor } from "@vueup/vue-quill";
 import "@vueup/vue-quill/dist/vue-quill.snow.css";
+
+defineNuxtComponent({
+  ssr: false,
+});
 
 //store 불러오기
 const writeMailStore = useWriteMailStore();

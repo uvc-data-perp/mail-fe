@@ -18,6 +18,16 @@ export interface ApiStructure {
   totalResults: number;
 }
 
+export interface ReservedMail extends Mail {
+  groupId: string;
+  id: string;
+  emailContents: string[];
+  expired_timestamp: string;
+  expiredDate?: Date;
+  sendingDays: number[];
+  status: string;
+}
+
 export interface Article {
   author: string;
   content: string;
