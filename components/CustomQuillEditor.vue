@@ -7,8 +7,10 @@
     content-type="html"
     theme="snow"
     @update:content="handleUpdate"
-    class="wp-100 h-[1000px] border-b-8"
+    class="w-full max-w-[calc(100%-230px)] !hpx-200 border-b-8 overflow-y-hidden"
   />
+
+  <!-- class="w-full max-w-[calc(100%-230px)]" -->
 </template>
 
 <script setup>

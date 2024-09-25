@@ -2,13 +2,13 @@
   <el-form
     :model="writeMailStore.mailMessage.contents"
     ref="mailFormRef"
-    label-position="top"
+    label-position="left"
     :rules="rules"
     class="mail-form"
   >
-    <div>
+    <!-- <div>
       {{ writeMailStore.mailMessage.contents }}
-    </div>
+    </div> -->
     <el-form-item>
       <el-button-group>
         <el-button type="primary" @click="submitForm">보내기</el-button>
@@ -20,10 +20,22 @@
           @save="saveSchedule"
         />
 
-        <el-button @click="saveDraft">임시저장</el-button>
         <el-button @click="previewEmail">미리보기</el-button>
       </el-button-group>
-      <el-dialog v-model="previewVisible" title="이메일 미리보기" width="50%">
+      <el-dialog
+        v-model="previewVisible"
+        width="50%"
+        center="true"
+        title="이메일 미리보기"
+        align-center="true"
+        :draggable="true"
+        :close-on-click-modal="false"
+      >
+        <template #header>
+          <div class="flex justify-center font-bold text-xl">
+            <p>이메일 미리보기</p>
+          </div>
+        </template>
         <div v-html="emailPreview"></div>
       </el-dialog>
       <el-dropdown style="margin-left: 10px">
@@ -32,7 +44,7 @@
         ></el-button>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item @click="useTemplate">템플릿</el-dropdown-item>
+            <el-dropdown-item @click="useTemplate">템플릿1</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
@@ -72,8 +84,17 @@
       v-if="route?.query?.type !== 'toMe'"
       prop="selectedTags"
       label="받는사람"
+      label-width="120px"
+      flex
+      justify-between
+      text-bold
+      pb-4
     >
+      <template #label>
+        <span class="font-bold mr-4">받는사람</span>
+      </template>
       <el-select
+        class="w-full max-w-[calc(100%-230px)]"
         v-model="writeMailStore.mailMessage.contents.selectedTags"
         multiple
         filterable
@@ -105,15 +126,20 @@
       </el-select>
     </el-form-item>
 
-    <el-form-item prop="subject" label="제목">
+    <el-form-item label-width="120px" prop="subject" label="제목">
+      <template #label>
+        <span class="font-bold mr-4">제목</span>
+      </template>
       <el-input
+        class="w-full max-w-[calc(100%-230px)]"
         v-model="writeMailStore.mailMessage.contents.subject"
+        width:10px
         placeholder="제목"
       >
       </el-input>
     </el-form-item>
 
-    <el-form-item prop="text" label="내용">
+    <el-form-item prop="text">
       <el-input
         v-show="false"
         v-model="writeMailStore.mailMessage.contents.text"
@@ -123,27 +149,17 @@
         @input="debouncedHandleInput"
       />
     </el-form-item>
-    <el-form-item prop="text" label="내용">
+    <el-form-item prop="text" label="내용" label-position="top">
+      <template #label>
+        <span class="font-bold mr-20">내용</span>
+      </template>
       <ClientOnly>
-        <el-button
-          @click="
-            () => {
-              writeMailStore.mailMessage.contents.text = testText;
-            }
-          "
-          >클릭</el-button
-        >
-
         <CustomQuillEditor
           v-model:content="writeMailStore.mailMessage.contents.text"
           content-type="html"
           theme="snow"
           @update:content="debouncedHandleInput"
         />
-        <!-- <CustomQuill /> -->
-
-        <!-- <QuillTable /> -->
-        <QuillTest />
       </ClientOnly>
     </el-form-item>
 
@@ -482,20 +498,13 @@ const saveSchedule = (updatedData) => {
   scheduleDialogVisible.value = false;
 };
 
-const scheduleMail = () => {
-  ElMessage.info("메일 예약 기능은 아직 구현되지 않았습니다.");
-};
-
-const saveDraft = () => {
-  ElMessage.success("임시저장 되었습니다.");
-};
-
 const previewMail = () => {
   ElMessage.info("미리보기 기능은 아직 구현되지 않았습니다.");
 };
 
 const useTemplate = () => {
-  ElMessage.info("템플릿 기능은 아직 구현되지 않았습니다.");
+  ElMessage.info("템플릿 기능을 적용하였습니다.");
+  writeMailStore.mailMessage.contents.text = testText;
 };
 
 const togglePersonalMode = () => {

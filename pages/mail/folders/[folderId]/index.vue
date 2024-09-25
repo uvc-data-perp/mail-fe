@@ -10,7 +10,7 @@
   <div class="flex mail-list px-8 w-[100%]">
     <TableMailList
       :mails="
-        route.params.folderId == '1'
+        route.params.folderId == '1' || route.params.folderId == '4'
           ? store.paginatedFilteredMailList
           : store.paginatedFilteredReservedMailList
       "

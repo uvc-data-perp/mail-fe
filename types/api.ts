@@ -7,6 +7,7 @@ export interface Mail {
   html?: string;
   status: string;
   sentTimestamp?: string;
+  sentDate?: Date;
   v?: number;
   reservedTime: String;
   reservedDate?: Date;

@@ -32,6 +32,7 @@ export const useStore = defineStore("store", () => {
     html: "<b>안녕하세요 김신영2입니다 반갑습니다!!</b>",
     status: "Waiting",
     sentTimestamp: "9726709750",
+    sentDate: new Date(0),
     v: 0,
     reservedTime: "9726709750",
   });
@@ -45,10 +46,12 @@ export const useStore = defineStore("store", () => {
       html: "<b>안녕하세요 김신영2입니다 반갑습니다!!</b>",
       status: "Waiting",
       sentTimestamp: "9726709750",
+      sentDate: new Date(0),
       v: 0,
       reservedTime: "9726709750",
     },
   ]);
+
   const reservedMailList = ref(<ReservedMail[]>[
     {
       id: "66f22a7f77d141e1f4d5cf78",
@@ -62,6 +65,7 @@ export const useStore = defineStore("store", () => {
       reservedTime: "1735657199",
       from: "jjoo08152@gmail.com",
       sentTimestamp: "9726709750",
+      sentDate: new Date(0),
       subject: "기본제목",
       text: "기본내용",
       to: "jjoo08152@gmail.com",
@@ -106,30 +110,119 @@ export const useStore = defineStore("store", () => {
     searchValue.value = payload;
   };
 
-  const fetchWillSendList = async () => {
+  // const fetchWillSendList = async () => {
+  //   const { $axios } = useNuxtApp();
+
+  //   try {
+  //     const response = await $axios.get("/email/sent", {
+  //       headers: {
+  //         // 필요한 경우 여기에 추가 헤더를 설정할 수 있습니다.
+  //       },
+  //     });
+  //     response.data.result.forEach((mail: Mail) => {
+  //       mail["reservedDate"] = new Date(
+  //         Number(mail.sentTimestamp.split("_")[0]) * 1000
+  //       );
+  //     });
+  //     response.data.result.sort((a, b) => {
+  //       return b.reservedDate.getTime() - a.reservedDate.getTime();
+  //     });
+
+  //     // mailList.value = response.data.result;
+  //     setMailList(response.data.result);
+  //     setTotalResults(response.data.result.length);
+  //     return response.data;
+  //   } catch (error) {
+  //     console.error("Error fetching will-send list:", error);
+  //     if (error.response) {
+  //       console.error(
+  //         "Server responded with:",
+  //         error.response.status,
+  //         error.response.data
+  //       );
+  //     } else if (error.request) {
+  //       console.error("No response received:", error.request);
+  //     } else {
+  //       console.error("Error setting up request:", error.message);
+  //     }
+  //     throw error;
+  //   }
+  // };
+
+  const fetchSentList = async () => {
     const { $axios } = useNuxtApp();
 
     try {
-      const response = await $axios.get("/will-send", {
+      const response = await $axios.get("/email/sent", {
         headers: {
           // 필요한 경우 여기에 추가 헤더를 설정할 수 있습니다.
         },
       });
-      response.data.result.forEach((mail: Mail) => {
-        mail["reservedDate"] = new Date(
-          Number(mail.reservedTime.split("_")[0]) * 1000
-        );
+      // 새로운 배열을 생성하여 각 메일 객체를 복사하고 sentDate를 추가합니다.
+      const updatedMails = response.data.result.map((mail: Mail) => {
+        const sentDate = new Date(Number(mail.sentTimestamp) * 1000);
+        return { ...mail, sentDate };
       });
-      response.data.result.sort((a, b) => {
+      updatedMails.sort((a, b) => {
+        return b.sentDate.getTime() - a.sentDate.getTime();
+      });
+
+      // mailList.value = response.data.result;
+      setMailList(updatedMails);
+
+      setTotalResults(updatedMails.length);
+      return updatedMails;
+    } catch (error) {
+      console.error("Error fetching sent list:", error);
+      if (error.response) {
+        console.error(
+          "Server responded with:",
+          error.response.status,
+          error.response.data
+        );
+      } else if (error.request) {
+        console.error("No response received:", error.request);
+      } else {
+        console.error("Error setting up request:", error.message);
+      }
+      throw error;
+    }
+  };
+
+  const transformEmailData = (data) => {
+    return data.map((item) => {
+      // Spread the emailContent properties to the top level
+      // and include the reserved_timestamp
+      return {
+        ...item.emailContent,
+        reservedDate: new Date(Number(item.reservedTimestamp) * 1000),
+      };
+    });
+  };
+
+  const fetchWillSingleList = async () => {
+    const { $axios } = useNuxtApp();
+    let result;
+
+    try {
+      const response = await $axios.get("/will-send/single", {
+        headers: {
+          // 필요한 경우 여기에 추가 헤더를 설정할 수 있습니다.
+        },
+      });
+      result = transformEmailData(response.data.result);
+      result.sort((a, b) => {
         return b.reservedDate.getTime() - a.reservedDate.getTime();
       });
 
       // mailList.value = response.data.result;
-      setMailList(response.data.result);
-      setTotalResults(response.data.result.length);
-      return response.data;
+      console.log("일회성 결과:", result);
+      console.log("일회성 결과길이:", result.length);
+      setMailList(result);
+      setTotalResults(result.length);
+      return result;
     } catch (error) {
-      console.error("Error fetching will-send list:", error);
+      console.error("Error fetching will-sing list:", error);
       if (error.response) {
         console.error(
           "Server responded with:",
@@ -149,10 +242,21 @@ export const useStore = defineStore("store", () => {
     const { $axios } = useNuxtApp();
     try {
       const response = await $axios.get(`/email/${mailId}`);
+
+      response.data.result = {
+        ...response.data.result,
+        reservedDate: response.data.result.reservedTimestamp
+          ? new Date(Number(response.data.result.reservedTimestamp) * 1000)
+          : null,
+        sentDate: response.data.result.sentTimestamp
+          ? new Date(Number(response.data.result.sentTimestamp))
+          : null,
+      };
       currentMail.value = response.data.result;
+
       return response.data;
     } catch (error) {
-      console.error("Error fetching will-send list:", error);
+      console.error("Error fetching will-detail:", error);
       if (error.response) {
         console.error(
           "Server responded with:",
@@ -184,18 +288,32 @@ export const useStore = defineStore("store", () => {
   //// 예약 관련/////////
 
   const fetchReservedMailList = async (folderId: string) => {
-    let apiEndpoint = "/send/booking";
+    let apiEndpoint = "/email/sent";
     switch (folderId) {
-      case "2":
-        apiEndpoint = "/regularity/month";
+      case "1":
+        apiEndpoint = "/email/sent";
+        fetchSentList();
         break;
+      case "2":
+        break;
+      // apiEndpoint = "/regularity/month";
       case "3":
-        apiEndpoint = "/regularity/day";
+        break;
+
+      // apiEndpoint = "/regularity/day";
+      case "4":
+        apiEndpoint = "/will-send/single";
+        fetchWillSingleList();
+        break;
+      case "5":
+        apiEndpoint = "/get-all-trashed-email";
         break;
       default:
-        apiEndpoint = "/send/booking";
+        apiEndpoint = "/email/sent";
     }
+  };
 
+  const monthTemp = async () => {
     const { $axios } = useNuxtApp();
 
     try {
@@ -229,6 +347,8 @@ export const useStore = defineStore("store", () => {
       );
       setReservedMailList(updatedResults);
       setTotalResults(updatedResults.length);
+      // setTotalResults(1000);
+
       return updatedResults;
     } catch (error) {
       console.error("Error fetching data", error);
@@ -253,46 +373,41 @@ export const useStore = defineStore("store", () => {
 
   const deleteReservation = async (
     folderId: string,
-    groupId: string,
-    mailId: string
+    mailId: string,
+    groupId: string
   ) => {
     const { $axios } = useNuxtApp();
 
     let reservationType;
-    switch (folderId) {
-      case "2":
-        reservationType = "month";
-        break;
-      case "3":
-        reservationType = "day";
-        break;
-      case "4":
-        reservationType = "single";
-        break;
-      default:
-        throw new Error(`Invalid folderId: ${folderId}`);
-    }
-
-    console.log("백틱", `/regularity/${reservationType}/${groupId}`);
-    console.log("백틱", `/regularity/${reservationType}/${groupId}`);
-    console.log("백틱", `/regularity/${reservationType}/${groupId}`);
-    console.log("백틱", `/regularity/${reservationType}/${groupId}`);
-    console.log("백틱", `/regularity/${reservationType}/${groupId}`);
-    console.log("노백틱", `/regularity/day/${groupId}`);
-    console.log("노백틱", `/regularity/day/${groupId}`);
-    console.log("노백틱", `/regularity/day/${groupId}`);
-    console.log("노백틱", `/regularity/day/${groupId}`);
-    console.log("노백틱", `/regularity/day/${groupId}`);
+    let response;
 
     try {
-      const response = await $axios.delete(
-        `/regularity/${reservationType}/${groupId}`
-      );
+      switch (folderId) {
+        case "2":
+          reservationType = "month";
+          response = await $axios.delete(
+            `/regularity/${reservationType}/${groupId}`
+          );
+          break;
+        case "3":
+          reservationType = "day";
+          response = await $axios.delete(
+            `/regularity/${reservationType}/${groupId}`
+          );
+          break;
+        case "4":
+          reservationType = "single";
+          response = await $axios.delete(`/send/booking/cancel/${mailId}`);
+          break;
+        default:
+          throw new Error(`Invalid folderId: ${folderId}`);
+      }
+
       await fetchMailDetail(mailId);
 
       return response.data;
     } catch (error) {
-      console.error("Error fetching will-send list:", error);
+      console.error("Error delete reservation mails:", error);
       if (error.response) {
         console.error(
           "Server responded with:",
@@ -342,7 +457,6 @@ export const useStore = defineStore("store", () => {
     setFilterCondition,
     changeSearchValue,
     setPage,
-    fetchWillSendList,
     setMailList,
     setTotalResults,
     fetchMailDetail,

@@ -5,22 +5,22 @@
 
       <div class="title">
         <h2 class="text-2xl font-bold mb-6">
-          {{ currentMail.subject }}
+          {{ currentMail?.subject }}
         </h2>
       </div>
       <!-- 보낸 사람 -->
       <div class="flex w-full items-center mb-2">
         <el-tag type="info" class="mr-2 flex-shrink-0">보낸사람</el-tag>
-        <span flex-grow border-b> {{ currentMail.from }} </span>
+        <span flex-grow border-b> {{ currentMail?.from }} </span>
       </div>
       <!-- 받는 사람 -->
       <div class="flex w-full items-center mb-2">
         <el-tag type="success" class="mr-2">받는사람</el-tag>
-        <span flex-grow border-b>{{ currentMail.to }}</span>
+        <span flex-grow border-b>{{ currentMail?.to }}</span>
       </div>
       <!-- 예약날짜 or 보낸 날짜 표시 -->
       <div
-        v-if="route.params.folderId !== '1'"
+        v-if="route.params.folderId == '2' || route.params.folderId == '3'"
         class="flex-1 items-center mb-2"
       >
         <el-tag
@@ -34,8 +34,8 @@
           @click="
             handleDeleteReservation(
               String(route.params.folderId),
-              String(route.query.groupId),
-              String(currentMail.id)
+              String(currentMail.id),
+              String(route.query.groupId)
             )
           "
           :type="currentMail.status === `Cancelled` ? 'danger' : 'success'"
@@ -67,11 +67,19 @@
           }} -->
         </span>
       </div>
-      <div v-else class="flex-1 items-center mb-2">
-        <el-tag type="info" class="mr-2 flex-shrink-0">보낸날짜</el-tag>
-        <span class="text-sm text-gray-600">
-          {{ currentMail.sentTimestamp ? currentMail.sentTimestamp : "미전송" }}
-        </span>
+      <div class="flex-1 items-center mb-2">
+        <div v-if="route.params.folderId === '1'">
+          <el-tag type="info" class="mr-2 flex-shrink-0">보낸 날짜</el-tag>
+          <span class="text-sm text-gray-600">
+            {{ currentMail.sentDate }}
+          </span>
+        </div>
+        <div v-else-if="route.params.folderId === `4`">
+          <el-tag type="info" class="mr-2 flex-shrink-0">보낼 날짜</el-tag>
+          <span class="text-sm text-gray-600">
+            {{ route.query.reservedDate }}
+          </span>
+        </div>
       </div>
     </div>
     <!-- 본문내용 -->

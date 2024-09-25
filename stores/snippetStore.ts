@@ -43,7 +43,7 @@ export const useSnippetStore = defineStore("snippetStore", () => {
 
       return response.data;
     } catch (error: any) {
-      console.error("Error fetching will-send list:", error);
+      console.error("Error fetching snippet list:", error);
       if (error.response) {
         console.error(
           "Server responded with:",
@@ -83,7 +83,7 @@ export const useSnippetStore = defineStore("snippetStore", () => {
 
       return response.data;
     } catch (error) {
-      console.error("Error fetching will-send list:", error);
+      console.error("Error add snippet:", error);
       if (error.response) {
         console.error(
           "Server responded with:",
@@ -106,7 +106,7 @@ export const useSnippetStore = defineStore("snippetStore", () => {
       snippets.value = snippets.value.filter((s) => s.id !== id);
       return response.data;
     } catch (error) {
-      console.error("Error fetching will-send list:", error);
+      console.error("Error delete snippet:", error);
       if (error.response) {
         console.error(
           "Server responded with:",

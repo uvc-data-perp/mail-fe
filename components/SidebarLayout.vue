@@ -1,55 +1,80 @@
 <!-- components/SidebarLayout.vue -->
 <template>
-  <aside
-    class="el-aside sidebar"
-    :class="{ 'dark:bg-[#181818] light:bg-[#f4f5fa]': true }"
-    m-0
-    h-screen
-    p-0
-    hp-100
-  >
-    <div class="aside-header" relative flex items-center justify-center>
-      <a href="/" class="mb-3 mt-2">
-        <div flex cursor-default items-center justify-center text-2xl font-300>
-          <div m-4 flex flex-col children:mx-auto>
-            <div wp-100>
-              <span mr-1 text-green-7>CPS</span>
-              <span>PORTAL</span>
+  <el-scrollbar height="100%">
+    <aside
+      class="el-aside sidebar"
+      :class="{ 'dark:bg-[#181818] light:bg-[#f4f5fa]': true }"
+      m-0
+      h-screen
+      p-0
+      hp-100
+    >
+      <div class="aside-header" relative flex items-center justify-center>
+        <a href="/" class="mb-3 mt-2">
+          <div
+            flex
+            cursor-pointer
+            items-center
+            justify-center
+            text-2xl
+            font-300
+          >
+            <div m-4 flex flex-col children:mx-auto>
+              <div wp-100>
+                <span mr-1 text-green-7>CPS</span>
+                <span>PORTAL</span>
+              </div>
             </div>
           </div>
+        </a>
+        <div
+          right="-2"
+          absolute
+          top-5
+          ml-auto
+          h-5
+          w-50
+          flex
+          items-center
+          justify-center
+          rounded-full
+          text-sm
+          md:hidden
+        >
+          <div i-mdi-close md:hidden></div>
         </div>
-      </a>
-      <div
-        right="-2"
-        absolute
-        top-5
-        ml-auto
-        h-5
-        w-5
-        flex
-        items-center
-        justify-center
-        rounded-full
-        text-sm
-        md:hidden
-      >
-        <div i-mdi-close md:hidden></div>
       </div>
-    </div>
-    <el-scrollbar height="100%">
+
       <el-menu :default-active="activeIndex">
         <template v-for="item in menuItems" :key="item.index">
           <el-menu-item
             v-if="!item.children"
             :index="item.index"
-            class="w-[300px]"
+            class="hover: transition-colors duration-200 !hover:text-emerald-400"
+            :class="{
+              'bg-gradient-to-tr from-blue-700 to-green-500 ':
+                activeIndex == item.path,
+              'font-bold': activeIndex == item.path,
+              '!text-white': activeIndex == item.path,
+            }"
           >
             <div :class="item.icon" mr-3></div>
             <span>{{ item.title }}</span>
           </el-menu-item>
-          <el-sub-menu v-else :index="item.index">
+          <!-- 서브메뉴가 있는 경우 el-menu-item 상단에 el-sub-menu 래핑 -->
+          <el-sub-menu
+            v-else
+            :index="item.index"
+            class="hover: transition-colors duration-200"
+          >
             <template #title>
-              <div flex items-center justify-center>
+              <div
+                w-full
+                flex
+                items-center
+                justify-start
+                class="!hover:text-emerald-400"
+              >
                 <div :class="item.icon" mr-3 text-base></div>
                 <span>{{ item.title }}</span>
               </div>
@@ -58,18 +83,27 @@
               v-for="child in item.children"
               :key="child.index"
               :index="child.index"
-              class=""
+              class="hover: transition-colors duration-200"
+              :class="{
+                'bg-gradient-to-tr from-blue-700 to-green-500 ':
+                  activeIndex == child.path,
+                'font-bold': activeIndex == child.path,
+                '!text-white': activeIndex == child.path,
+              }"
             >
-              <NuxtLink :to="child.path" class="flex items-center w-full">
+              <NuxtLink
+                :to="child.path"
+                class="flex items-center w-full hover:text-emerald-400"
+              >
                 <div :class="child.icon" class="mr-3 text-2"></div>
-                <span class="hover:text-green">{{ child.title }}</span>
+                <span>{{ child.title }}</span>
               </NuxtLink>
             </el-menu-item>
           </el-sub-menu>
         </template>
       </el-menu>
-    </el-scrollbar>
-  </aside>
+    </aside>
+  </el-scrollbar>
 </template>
 
 <script setup lang="ts">
@@ -92,37 +126,37 @@ const menuItems: MenuItem[] = [
     title: "커스텀 대시보드",
     icon: "i-ic:outline-circle",
     index: "/dashboard",
-    path: "/",
+    path: "/dummy",
   },
   {
     title: "설비 관리",
     icon: "i-ic:outline-circle",
     index: "/facility",
-    path: "/",
+    path: "/dummy",
   },
   {
     title: "엣지 관리",
     icon: "i-ic:outline-circle",
     index: "/edge",
-    path: "/",
+    path: "/dummy",
   },
   {
     title: "인증서 관리",
     icon: "i-ic:outline-circle",
     index: "/certification",
-    path: "/",
+    path: "/dummy",
   },
   {
     title: "데이터 수집",
     icon: "i-ic:outline-circle",
     index: "data-collect",
-    path: "/",
+    path: "/dummy",
     children: [
       {
         title: "모델러",
         icon: "i-ic:outline-circle",
         index: "/data-collect/opcua-modeler",
-        path: "/",
+        path: "/dummy",
       },
       // 더 많은 서브 메뉴 아이템들...
     ],
@@ -131,7 +165,7 @@ const menuItems: MenuItem[] = [
     title: "데이터 조회",
     icon: "i-ic:outline-circle",
     index: "data-retrieve",
-    path: "/",
+    path: "/dummy",
     children: [
       // 서브 메뉴 아이템들...
     ],
@@ -140,13 +174,13 @@ const menuItems: MenuItem[] = [
     title: "AI 데이터 분석",
     icon: "i-ic:outline-circle",
     index: "ai-data-analyze",
-    path: "/",
+    path: "/dummy",
     children: [
       {
         title: "불량원인 데이터 분석",
         icon: "i-ic:outline-circle",
         index: "/ai-data-analyze/defect-cause-analysis",
-        path: "/",
+        path: "/dummy",
       },
       // 더 많은 서브 메뉴 아이템들...
     ],

@@ -52,10 +52,10 @@ function updatePageTitle() {
         setPageTitle("예약 메일함");
         break;
       case "3":
-        setPageTitle("내게 쓴 메일함");
+        setPageTitle("요일 별 예약");
         break;
       case "4":
-        setPageTitle("임시저장 메일함");
+        setPageTitle("일회성 예약");
         break;
       case "5":
         setPageTitle("휴지통");
