@@ -1,6 +1,6 @@
 <template>
   <div class="px-8 py-4 border-b border-t bg-gray-200 flex">
-    <MailTopButtons />
+    <MailTopButtons @deleteRows="store.deleteRows" />
     <div class="flex wp-10">
       <el-input v-model="store.filterCondition" placeholder="검색"></el-input>
       <el-input v-model="store.filterCondition" placeholder="검색"></el-input>
@@ -9,6 +9,7 @@
 
   <div class="flex mail-list px-8 w-[100%]">
     <TableMailList
+      v-model="selectedRows"
       :mails="
         route.params.folderId == '1' || route.params.folderId == '4'
           ? store.paginatedFilteredMailList
@@ -27,6 +28,7 @@
     @update:currentPage="store.setPage"
   />
   <!-- {{ store.paginatedFilteredMailList }} -->
+  <el-button @click="store.deleteRows(selectedRows)">버튼</el-button>
 </template>
 
 <script lang="tsx" setup>
@@ -37,6 +39,7 @@ const { setPageTitle } = usePageTitle();
 const route = useRoute();
 
 const store = useStore();
+const selectedRows = ref([]);
 
 await useAsyncData("fetchReservedMailList", async () => {
   await store.fetchReservedMailList(route.params.folderId as string);

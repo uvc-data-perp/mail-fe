@@ -110,44 +110,24 @@ export const useStore = defineStore("store", () => {
     searchValue.value = payload;
   };
 
-  // const fetchWillSendList = async () => {
-  //   const { $axios } = useNuxtApp();
+ function deleteRows (Rows: string[]) {
+  const { $axios } = useNuxtApp();
+  Rows.forEach((element: string) => {
+    $axios.post(`/email/throw-away/${element}`,{})
+    .then((response) => {
+      console.log(response.data);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+ })
+} 
+  
 
-  //   try {
-  //     const response = await $axios.get("/email/sent", {
-  //       headers: {
-  //         // 필요한 경우 여기에 추가 헤더를 설정할 수 있습니다.
-  //       },
-  //     });
-  //     response.data.result.forEach((mail: Mail) => {
-  //       mail["reservedDate"] = new Date(
-  //         Number(mail.sentTimestamp.split("_")[0]) * 1000
-  //       );
-  //     });
-  //     response.data.result.sort((a, b) => {
-  //       return b.reservedDate.getTime() - a.reservedDate.getTime();
-  //     });
+ 
 
-  //     // mailList.value = response.data.result;
-  //     setMailList(response.data.result);
-  //     setTotalResults(response.data.result.length);
-  //     return response.data;
-  //   } catch (error) {
-  //     console.error("Error fetching will-send list:", error);
-  //     if (error.response) {
-  //       console.error(
-  //         "Server responded with:",
-  //         error.response.status,
-  //         error.response.data
-  //       );
-  //     } else if (error.request) {
-  //       console.error("No response received:", error.request);
-  //     } else {
-  //       console.error("Error setting up request:", error.message);
-  //     }
-  //     throw error;
-  //   }
-  // };
+
+
 
   const fetchSentList = async () => {
     const { $axios } = useNuxtApp();
@@ -272,6 +252,11 @@ export const useStore = defineStore("store", () => {
     }
   };
 
+
+  const setReservedMailList = (value: ReservedMail[]) => {
+    reservedMailList.value = value;
+  };
+
   const setPage = (page: number) => {
     currentPage.value = page;
     // fetchArticles();
@@ -295,12 +280,15 @@ export const useStore = defineStore("store", () => {
         fetchSentList();
         break;
       case "2":
-        break;
-      // apiEndpoint = "/regularity/month";
+        
+      apiEndpoint = "/regularity/month";
+      fetchScheduledMails(apiEndpoint);
+      break;
       case "3":
+        apiEndpoint = "/regularity/day";
+        fetchScheduledMails(apiEndpoint);
         break;
-
-      // apiEndpoint = "/regularity/day";
+    
       case "4":
         apiEndpoint = "/will-send/single";
         fetchWillSingleList();
@@ -313,7 +301,7 @@ export const useStore = defineStore("store", () => {
     }
   };
 
-  const monthTemp = async () => {
+  const fetchScheduledMails = async (apiEndpoint as string) => {
     const { $axios } = useNuxtApp();
 
     try {
@@ -347,7 +335,6 @@ export const useStore = defineStore("store", () => {
       );
       setReservedMailList(updatedResults);
       setTotalResults(updatedResults.length);
-      // setTotalResults(1000);
 
       return updatedResults;
     } catch (error) {
@@ -367,9 +354,6 @@ export const useStore = defineStore("store", () => {
     }
   };
 
-  const setReservedMailList = (value: ReservedMail[]) => {
-    reservedMailList.value = value;
-  };
 
   const deleteReservation = async (
     folderId: string,
@@ -467,5 +451,6 @@ export const useStore = defineStore("store", () => {
     setReservedMailList,
     fetchReservedMailList,
     deleteReservation,
+    deleteRows,
   };
 });

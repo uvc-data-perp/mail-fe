@@ -1,4 +1,10 @@
 <template>
+  <div>
+    <el-button @click="delRows">컴포넌트 내 삭제버튼 </el-button>
+    {{ row2 }}
+    {{ selectedRows }}
+  </div>
+
   <el-table
     ref="multipleTableRef"
     :data="tableData"
@@ -66,8 +72,6 @@
             ? scope.row.sentDate
             : scope.row.expiredDate
         }}
-
-        {{ scope.row }}
       </template>
     </el-table-column>
   </el-table>
@@ -78,6 +82,7 @@ import { ref, computed } from "vue";
 import { ElTable, ElTag } from "element-plus";
 import type { Mail } from "~/types/api";
 
+const emit = defineEmits(["update:selectedRows"]);
 const props = defineProps({
   mails: {
     type: Array,
@@ -86,6 +91,10 @@ const props = defineProps({
   currentMailId: {
     type: Number,
     default: null,
+  },
+  selectedRows: {
+    type: Array,
+    default: () => [],
   },
   mode: {
     type: String,
@@ -116,10 +125,37 @@ const tableData = computed(() => {
   }
 });
 
+const row2 = ref([]);
+const delRows = async () => {
+  console.log(row2.value);
+  const { $axios } = useNuxtApp();
+  const id = row2.value[0].id;
+  try {
+    const response = await $axios.post(`/email/throw-away/${id}`, {});
+
+    return response.data;
+  } catch (error) {
+    console.error("Error add snippet:", error);
+    if (error.response) {
+      console.error(
+        "Server responded with:",
+        error.response.status,
+        error.response.data
+      );
+    } else if (error.request) {
+      console.error("No response received:", error.request);
+    } else {
+      console.error("Error setting up request:", error.message);
+    }
+    throw error;
+  }
+};
+
 const handleSelectionChange = (selectedRows: Mail[]) => {
   if (props.mode === "full") {
-    console.log("Selected rows:", selectedRows);
+    emit("update:selectedRows", selectedRows);
   }
+  row2.value = selectedRows;
 };
 
 const formatDate = (timestamp) => {

@@ -20,6 +20,8 @@ import {
   Share,
 } from "@element-plus/icons-vue";
 
+const emit = defineEmits(["deleteRows"]);
+
 const buttonsInfo = ref([
   {
     type: "primary",
@@ -29,7 +31,10 @@ const buttonsInfo = ref([
   {
     type: "primary",
     buttonName: "삭제",
-    clickEvent: () => {},
+    clickEvent: () => {
+      emit("deleteRows", true);
+      console.log("메일삭제");
+    },
   },
 ]);
 </script>
