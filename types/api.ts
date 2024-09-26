@@ -11,6 +11,7 @@ export interface Mail {
   v?: number;
   reservedTime: String;
   reservedDate?: Date;
+  expiredDate?: Date;
   type?: "prev" | "next";
 }
 export interface ApiStructure {

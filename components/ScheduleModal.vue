@@ -32,7 +32,7 @@
 
       <el-form-item
         v-if="writeMailStore.mailMessage.contents.periodType === 'single'"
-        label="발송일"
+        label="발송 시각"
         class="form-item"
         prop="reservedDate"
         label-width="100px"
@@ -42,6 +42,7 @@
           type="datetime"
           placeholder="Pick a Date"
           format="YYYY/MM/DD HH:mm:ss"
+          :disabled-date="disabledDate"
         />
       </el-form-item>
       <el-form-item
@@ -286,10 +287,7 @@ const validationSetting = () => {
   }
 };
 const disabledDate = (time) => {
-  return (
-    time.getTime() <
-    new Date(writeMailStore.mailMessage.contents.reservedDate).getTime()
-  );
+  return time.getTime() < new Date(Date.now() - 1000 * 60 * 60 * 24).getTime();
 };
 </script>
 <style scoped>

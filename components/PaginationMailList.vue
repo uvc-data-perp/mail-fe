@@ -38,9 +38,4 @@ const currentPageValue = computed({
   get: () => props.currentPage,
   set: (value) => emit("update:currentPage", value),
 });
-
-// const onPageChange = (page) => {
-//   console.log("Page changed to:", page);
-// };
-// <-- @current-change="onPageChange" -->
 </script>

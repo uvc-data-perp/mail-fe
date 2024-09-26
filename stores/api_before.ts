@@ -106,101 +106,28 @@ export const useStore = defineStore("store", () => {
 
   // Actions
   // Mutations => State를 변경할 목적으로 작성된 코드
-
-  const setPage = (page: number) => {
-    currentPage.value = page;
-    // fetchArticles();
-  };
-
-  const setMailList = (a: Mail[]) => {
-    mailList.value = a;
-  };
-  const setReservedMailList = (value: ReservedMail[]) => {
-    reservedMailList.value = value;
-  };
-
-  const setTotalResults = (total: number) => {
-    totalResults.value = total;
-  };
   const changeSearchValue = (payload: string) => {
     searchValue.value = payload;
   };
 
-  const deleteReservation = async (
-    folderId: string,
-    mailId: string,
-    groupId: string
-  ) => {
-    const { $axios } = useNuxtApp();
-
-    let reservationType;
-    let response;
-
-    try {
-      switch (folderId) {
-        case "2":
-          reservationType = "month";
-          response = await $axios.delete(
-            `/regularity/${reservationType}/${groupId}`
-          );
-          break;
-        case "3":
-          reservationType = "day";
-          response = await $axios.delete(
-            `/regularity/${reservationType}/${groupId}`
-          );
-          break;
-        case "4":
-          reservationType = "single";
-          response = await $axios.delete(`/send/booking/cancel/${mailId}`);
-          break;
-        default:
-          throw new Error(`Invalid folderId: ${folderId}`);
-      }
-
-      await fetchMailDetail(mailId);
-
-      return response.data;
-    } catch (error: any) {
-      console.error("Error delete reservation mails:", error);
-      if (error.response) {
-        console.error(
-          "Server responded with:",
-          error.response.status,
-          error.response.data
-        );
-      } else if (error.request) {
-        console.error("No response received:", error.request);
-      } else {
-        console.error("Error setting up request:", error.message);
-      }
-      throw error;
-    }
-  }; // Added closing curly brace and semicolon here
-
-  function deleteRows(Rows: Mail[]) {
-    const { $axios } = useNuxtApp();
-
-    Rows.forEach((element: Mail) => {
-      console.log(element);
-      console.log(element);
-      console.log(element);
-      console.log(element);
-      console.log(element);
-      console.log(element);
-      console.log(element);
-      console.log(element);
-      console.log(element);
-      $axios
-        .post(`/email/throw-away/${element.id}`, {})
-        .then((response) => {
-          console.log(response.data);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
+ function deleteRows (Rows: string[]) {
+  const { $axios } = useNuxtApp();
+  Rows.forEach((element: string) => {
+    $axios.post(`/email/throw-away/${element}`,{})
+    .then((response) => {
+      console.log(response.data);
+    })
+    .catch((error) => {
+      console.error(error);
     });
-  }
+ })
+}
+  
+
+ 
+
+
+
 
   const fetchSentList = async () => {
     const { $axios } = useNuxtApp();
@@ -214,10 +141,10 @@ export const useStore = defineStore("store", () => {
       // 새로운 배열을 생성하여 각 메일 객체를 복사하고 sentDate를 추가합니다.
       const updatedMails = response.data.result.map((mail: Mail) => {
         //* 받은 mail.sentTimestamp값이 ms단위라서 s->ms(*1000)없이 변환 *///
-        const sentDate = new Date(Number(mail.sentTimestamp));
+        const sentDate = new Date(Number(mail.sentTimestamp) );
         return { ...mail, sentDate };
       });
-      updatedMails.sort((a: any, b: any) => {
+      updatedMails.sort((a, b) => {
         return b.sentDate.getTime() - a.sentDate.getTime();
       });
 
@@ -226,7 +153,7 @@ export const useStore = defineStore("store", () => {
 
       setTotalResults(updatedMails.length);
       return updatedMails;
-    } catch (error: any) {
+    } catch (error:any) {
       console.error("Error fetching sent list:", error);
       if (error.response) {
         console.error(
@@ -243,10 +170,11 @@ export const useStore = defineStore("store", () => {
     }
   };
 
-  const transformEmailData = (data: any) => {
-    return data.map((item: any) => {
+  const transformEmailData = (data) => {
+    return data.map((item) => {
       // emailContent 속성의 값인 객체에 있는 속성,값을 구조분해로 가져오고 timestamp에서 예약Date값을 추가
       return {
+        
         ...item.emailContent,
         reservedDate: new Date(Number(item.reservedTimestamp) * 1000),
       };
@@ -264,7 +192,7 @@ export const useStore = defineStore("store", () => {
         },
       });
       result = transformEmailData(response.data.result);
-      result.sort((a: any, b: any) => {
+      result.sort((a, b) => {
         return b.reservedDate.getTime() - a.reservedDate.getTime();
       });
 
@@ -274,7 +202,7 @@ export const useStore = defineStore("store", () => {
       setMailList(result);
       setTotalResults(result.length);
       return result;
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error fetching will-sing list:", error);
       if (error.response) {
         console.error(
@@ -308,7 +236,7 @@ export const useStore = defineStore("store", () => {
       currentMail.value = response.data.result;
 
       return response.data;
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error fetching will-detail:", error);
       if (error.response) {
         console.error(
@@ -325,7 +253,25 @@ export const useStore = defineStore("store", () => {
     }
   };
 
-  //   //// 예약 관련/////////
+
+  const setReservedMailList = (value: ReservedMail[]) => {
+    reservedMailList.value = value;
+  };
+
+  const setPage = (page: number) => {
+    currentPage.value = page;
+    // fetchArticles();
+  };
+
+  const setMailList = (a: Mail[]) => {
+    mailList.value = a;
+  };
+
+  const setTotalResults = (total: number) => {
+    totalResults.value = total;
+  };
+
+  //// 예약 관련/////////
 
   const fetchReservedMailList = async (folderId: string) => {
     let apiEndpoint = "/email/sent";
@@ -335,14 +281,15 @@ export const useStore = defineStore("store", () => {
         fetchSentList();
         break;
       case "2":
-        apiEndpoint = "/regularity/month";
-        fetchScheduledMails(apiEndpoint);
-        break;
+        
+      apiEndpoint = "/regularity/month";
+      fetchScheduledMails(apiEndpoint);
+      break;
       case "3":
         apiEndpoint = "/regularity/day";
         fetchScheduledMails(apiEndpoint);
         break;
-
+    
       case "4":
         apiEndpoint = "/will-send/single";
         fetchWillSingleList();
@@ -355,7 +302,7 @@ export const useStore = defineStore("store", () => {
     }
   };
 
-  const fetchScheduledMails = async (apiEndpoint: string) => {
+  const fetchScheduledMails = async (apiEndpoint as string) => {
     const { $axios } = useNuxtApp();
 
     try {
@@ -366,7 +313,7 @@ export const useStore = defineStore("store", () => {
       });
 
       const updatedResults = await Promise.all(
-        monthlyResponse.data.result.map(async (result: any) => {
+        monthlyResponse.data.result.map(async (result) => {
           result.expiredDate = new Date(Number(result.expiredTimestamp) * 1000);
 
           result.groupId = result.id;
@@ -391,7 +338,7 @@ export const useStore = defineStore("store", () => {
       setTotalResults(updatedResults.length);
 
       return updatedResults;
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error fetching data", error);
       if (error.response) {
         console.error(
@@ -407,6 +354,115 @@ export const useStore = defineStore("store", () => {
       throw error;
     }
   };
+
+  
+
+
+  // const deleteReservation = async (
+  //   folderId: string,
+  //   mailId: string,
+  //   groupId: string
+  // ) => {
+  //   const { $axios } = useNuxtApp();
+
+  //   let reservationType;
+  //   let response;
+
+  //   try {
+  //     switch (folderId) {
+  //       case "2":
+  //         reservationType = "month";
+  //         response = await $axios.delete(
+  //           `/regularity/${reservationType}/${groupId}`
+  //         );
+  //         break;
+  //       case "3":
+  //         reservationType = "day";
+  //         response = await $axios.delete(
+  //           `/regularity/${reservationType}/${groupId}`
+  //         );
+  //         break;
+  //       case "4":
+  //         reservationType = "single";
+  //         response = await $axios.delete(`/send/booking/cancel/${mailId}`);
+  //         break;
+  //       default:
+  //         throw new Error(`Invalid folderId: ${folderId}`);
+  //     }
+
+  //     await fetchMailDetail(mailId);
+
+  //     return response.data;
+  //   } catch (error) {
+  //     console.error("Error delete reservation mails:", error);
+  //     if (error.response) {
+  //       console.error(
+  //         "Server responded with:",
+  //         error.response.status,
+  //         error.response.data
+  //       );
+  //     } else if (error.request) {
+  //       console.error("No response received:", error.request);
+  //     } else {
+  //       console.error("Error setting up request:", error.message);
+  //     }
+  //     throw error;
+  //   }
+  // };
+  // const deleteReservation = async (
+  //   folderId: string,
+  //   mailId: string,
+  //   groupId: string
+  // ) => {
+  //   const { $axios } = useNuxtApp();
+
+  //   let reservationType;
+  //   let response;
+
+  //   try {
+  //     switch (folderId) {
+  //       case "2":
+  //         reservationType = "month";
+  //         response = await $axios.delete(
+  //           `/regularity/${reservationType}/${groupId}`
+  //         );
+  //         break;
+  //       case "3":
+  //         reservationType = "day";
+  //         response = await $axios.delete(
+  //           `/regularity/${reservationType}/${groupId}`
+  //         );
+  //         break;
+  //       case "4":
+  //         reservationType = "single";
+  //         response = await $axios.delete(`/send/booking/cancel/${mailId}`);
+  //         break;
+  //       default:
+  //         throw new Error(`Invalid folderId: ${folderId}`);
+  //     }
+
+  //     await fetchMailDetail(mailId);
+
+  //     return response.data;
+  //   } catch (error) {
+  //     console.error("Error delete reservation mails:", error);
+  //     if (error.response) {
+  //       console.error(
+  //         "Server responded with:",
+  //         error.response.status,
+  //         error.response.data
+  //       );
+  //     } else if (error.request) {
+  //       console.error("No response received:", error.request);
+  //     } else {
+  //       console.error("Error setting up request:", error.message);
+  //     }
+  //     throw error;
+  //   }
+  // }; // Added closing curly brace and semicolon here
+
+
+ 
 
   return {
     currentMail,

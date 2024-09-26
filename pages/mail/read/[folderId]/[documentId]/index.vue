@@ -1,22 +1,26 @@
 <template>
-  <div class="bg-white rounded-lg shadow-md p-6 w-full">
+  <div v-if="loading">로딩중</div>
+  <div v-else-if="error">에러 발생: {{ error }}</div>
+  <div v-else-if="!mailStore.currentMail">메일 데이터를 찾을 수 없습니다.</div>
+  <div v-else class="bg-white rounded-lg shadow-md p-6 w-full">
     <div class="mb-4 border-b-4 w-full">
       <!-- 제목 -->
-
       <div class="title">
         <h2 class="text-2xl font-bold mb-6">
-          {{ currentMail?.subject }}
+          {{ mailStore.currentMail.subject }}
         </h2>
       </div>
       <!-- 보낸 사람 -->
       <div class="flex w-full items-center mb-2">
         <el-tag type="info" class="mr-2 flex-shrink-0">보낸사람</el-tag>
-        <span flex-grow border-b> {{ currentMail?.from }} </span>
+        <span flex-grow border-b>
+          {{ mailStore.currentMail.from }}
+        </span>
       </div>
       <!-- 받는 사람 -->
       <div class="flex w-full items-center mb-2">
         <el-tag type="success" class="mr-2">받는사람</el-tag>
-        <span flex-grow border-b>{{ currentMail?.to }}</span>
+        <span flex-grow border-b>{{ mailStore.currentMail.to }}</span>
       </div>
       <!-- 예약날짜 or 보낸 날짜 표시 -->
       <div
@@ -34,57 +38,55 @@
           @click="
             handleDeleteReservation(
               String(route.params.folderId),
-              String(currentMail.id),
+              String(mailStore.currentMail.id),
               String(route.query.groupId)
             )
           "
-          :type="currentMail.status === `Cancelled` ? 'danger' : 'success'"
-          >{{ currentMail.status === `Cancelled` ? "취소됨" : "취소하기" }}
+          :type="
+            mailStore.currentMail.status === `Cancelled` ? 'danger' : 'success'
+          "
+          >{{
+            mailStore.currentMail.status === `Cancelled` ? "취소됨" : "취소하기"
+          }}
         </el-button>
         <ScheduleModal
           v-if="scheduleDialogVisible"
           v-model:visible="scheduleDialogVisible"
           @save="saveSchedule"
         />
-        <span
+        <p
           class="text-sm text-gray-600"
-          :class="currentMail.status === 'Cancelled' ? 'line-through' : ''"
+          :class="
+            mailStore.currentMail.status === 'Cancelled' ? 'line-through' : ''
+          "
         >
           {{
             route.query.expiredDate ? ` 만료일:${route.query.expiredDate}` : ""
           }}
-          메일상태
-          {{ currentMail.status }}
-          <!-- {{
-            scheduleForm.periodType !== "no"
-              ? `주기
-                ${
-                  scheduleForm?.periodType === "weekly"
-                    ? ` ${getDayNames(scheduleForm.days).join(", ")}요일`
-                    : ` ${scheduleForm.days?.join(", ")}일`
-                }`
-              : ""
-          }} -->
-        </span>
+
+          {{ `주기: ${computedSendingDays}` }}
+
+          {{ `전송시각: ${route.query.sendingTime}` }}
+        </p>
       </div>
       <div class="flex-1 items-center mb-2">
         <div v-if="route.params.folderId === '1'">
           <el-tag type="info" class="mr-2 flex-shrink-0">보낸 날짜</el-tag>
           <span class="text-sm text-gray-600">
-            {{ currentMail.sentDate }}
+            {{ route.query?.sentDate }}
           </span>
         </div>
         <div v-else-if="route.params.folderId === `4`">
           <el-tag type="info" class="mr-2 flex-shrink-0">보낼 날짜</el-tag>
           <span class="text-sm text-gray-600">
-            {{ route.query.reservedDate }}
+            {{ route.query?.reservedDate }}
           </span>
         </div>
       </div>
     </div>
     <!-- 본문내용 -->
     <div class="content flex overflow-x-auto w-full border-b-4">
-      <div v-html="currentMail.html"></div>
+      <div v-html="mailStore.currentMail.html"></div>
     </div>
     <!-- 이전/이후 목록 조회 -->
     <div class="footer">
@@ -98,12 +100,16 @@
 </template>
 
 <script setup lang="ts">
+import { ref, watch, onMounted } from "vue";
+import { useRoute } from "vue-router";
 import { useStore } from "~/stores/api";
+import { storeToRefs } from "pinia";
 
 const mailStore = useStore();
 const { currentMail } = storeToRefs(mailStore);
 
 const route = useRoute();
+const folderId = route.params.folderId;
 
 const scheduleDialogVisible = ref(false);
 const scheduleForm = ref({
@@ -111,20 +117,37 @@ const scheduleForm = ref({
   startTime: "",
   expiryDate: "",
   periodType: "no",
-
   days: [],
-  // ...props.editData,
 });
 
-await useAsyncData("getWillSendList", async () => {
-  await mailStore.fetchMailDetail(route.params.documentId as string);
-  return null;
+const loading = ref(false);
+const error = ref(null);
+
+const fetchMailData = async (documentId: string) => {
+  loading.value = true;
+  error.value = null;
+  try {
+    await mailStore.fetchMailDetail(documentId);
+    if (!mailStore.currentMail) {
+      throw new Error("메일 데이터를 찾을 수 없습니다.");
+    }
+  } catch (e) {
+    error.value = e.message || "메일을 불러오는 데 실패했습니다.";
+    console.error("Failed to fetch mail details:", e);
+  } finally {
+    loading.value = false;
+  }
+};
+
+onMounted(async () => {
+  if (route.params.documentId) {
+    await fetchMailData(route.params.documentId as string);
+  }
 });
 
 const saveSchedule = (updatedData) => {
   scheduleForm.value = updatedData;
   ElMessage.success("변경된 예약설정이 반영되었습니다.");
-
   scheduleDialogVisible.value = false;
 };
 
@@ -133,9 +156,25 @@ const getDayNames = (days) => {
   return days.map((day) => dayNames[day]);
 };
 
+const computedSendingDays = computed(() => {
+  const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
+  if (
+    route.query.sendingDays[0] === "true" ||
+    route.query.sendingDays[0] === "false"
+  ) {
+    const a = route.query.sendingDays
+      .map((day: string, index) => (day === "true" ? dayNames[index] : null))
+      .filter((day) => day !== null)
+      .join(",");
+    return a;
+  } else {
+    return route.query.sendingDays;
+  }
+});
+
 const isScheduleDeleted = ref(false);
 
-const currentMailId = ref(Number(route.params.documentId)); // 예시 ID, 실제로는 prop이나 상태 관리를 통해 받아올 수 있습니다.
+const currentMailId = ref(Number(route.params.documentId));
 
 const handleDeleteReservation = (
   folderId: string,
@@ -148,10 +187,10 @@ const handleDeleteReservation = (
 };
 
 watch(
-  mailStore.currentMail,
-  (newValue) => {
-    if (newValue) {
-      mailStore.currentMail = { ...currentMail, ...newValue };
+  () => route.params.documentId,
+  async (newDocumentId, oldDocumentId) => {
+    if (newDocumentId && newDocumentId !== oldDocumentId) {
+      await fetchMailData(newDocumentId as string);
     }
   },
   { immediate: true }

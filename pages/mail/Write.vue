@@ -576,7 +576,7 @@ const previewEmail = () => {
 };
 
 const getDayNames = (days) => {
-  const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
+  const dayNames = ["월", "화", "수", "목", "금", "토", "일"];
   return days.map((day) => dayNames[day]);
 };
 

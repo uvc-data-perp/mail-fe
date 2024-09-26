@@ -4,19 +4,12 @@
 
     <div class="flex-grow overflow-hidden flex flex-col">
       <header class="h-16 border-b flex items-center px-8 cursor-pointer">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="1em"
-          height="1em"
-          viewBox="0 0 24 24"
-        >
-          <path
-            fill="currentColor"
-            fill-rule="evenodd"
-            d="m15 4l2 2l-6 6l6 6l-2 2l-8-8z"
-          />
-        </svg>
-        <h1 class="text-xl font-semibold">{{ pageTitle }}</h1>
+        <NuxtLink :to="routeInfo.path" custom v-slot="{ navigate }">
+          <el-button :icon="ArrowLeft" @click="navigate" role="link">
+          </el-button>
+        </NuxtLink>
+        <h1 :icon="ArrowLeft" class="text-xl font-semibold">{{ pageTitle }}</h1>
+        <a href="/mail/folders/1" class="mb-3 mt-2"></a>
       </header>
       <MailHeader />
 
@@ -28,11 +21,23 @@
 </template>
 
 <script setup lang="ts">
+import { ArrowLeft } from "@element-plus/icons-vue";
 import SidebarLayout from "~/components/SidebarLayout.vue";
 
 import { usePageTitle } from "~/composables/usePageTitle";
 
 const route = useRoute();
+
+const routeInfo = computed(() => {
+  if (route.params.folderId) {
+    return {
+      path: "/mail/folders/" + route.params.folderId,
+    };
+  }
+  return {
+    path: route.path,
+  };
+});
 
 const { pageTitle, setPageTitle } = usePageTitle();
 

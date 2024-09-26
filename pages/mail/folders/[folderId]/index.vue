@@ -1,6 +1,6 @@
 <template>
   <div class="px-8 py-4 border-b border-t bg-gray-200 flex">
-    <MailTopButtons @deleteRows="store.deleteRows" />
+    <MailTopButtons @deleteRows="store.deleteRows(selectedRows)" />
     <div class="flex wp-10">
       <el-input v-model="store.filterCondition" placeholder="검색"></el-input>
       <el-input v-model="store.filterCondition" placeholder="검색"></el-input>
@@ -28,7 +28,6 @@
     @update:currentPage="store.setPage"
   />
   <!-- {{ store.paginatedFilteredMailList }} -->
-  <el-button @click="store.deleteRows(selectedRows)">버튼</el-button>
 </template>
 
 <script lang="tsx" setup>
@@ -45,37 +44,6 @@ await useAsyncData("fetchReservedMailList", async () => {
   await store.fetchReservedMailList(route.params.folderId as string);
   return null;
 });
-
-// switch (route.params.folderId) {
-//   case "2":
-//     await useAsyncData("fetchReservedMailList", async () => {
-//       await store.fetchReservedMailList();
-//       return null;
-//     });
-//     break;
-//     case "3":
-//     await useAsyncData("fetchReservedMailList", async () => {
-//       await store.fetchReservedMailList();
-//       return null;
-//     });
-//     break;
-//   default:
-//     await useAsyncData("getWillSendList", async () => {
-//       await store.fetchWillSendList();
-//       return null;
-//     });
-// }
-
-// 초기 설정
-
-const Row = ({ cells, rowData }) => {
-  if (rowData.detail) return <div class="p-6">{rowData.detail}</div>;
-  return cells;
-};
-
-Row.inheritAttrs = false;
-
-//페이지네이션 관련//
 </script>
 
 <style lang="scss" scoped></style>

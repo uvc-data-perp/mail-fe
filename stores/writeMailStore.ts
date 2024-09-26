@@ -9,7 +9,7 @@ export const useWriteMailStore = defineStore("writeMail", () => {
 
   const mailMessage = ref<MailMessage>({
     contents: {
-      from: "jjoo08152@gmail.com",
+      from: "defatult@groundkim.com",
       to: "",
       subject: "기본 제목",
       text: "기본 내용",
@@ -205,19 +205,7 @@ export const useWriteMailStore = defineStore("writeMail", () => {
         const response = await $axios.post(apiEndpoint, mailMessage.value, {
           timeout: 50000,
         });
-        console.log("전송된 내용:", mailMessage.value);
-        console.log("전송된 내용:", mailMessage.value);
-        console.log("전송된 내용:", mailMessage.value);
-        console.log("전송된 내용:", mailMessage.value);
-        console.log("전송된 내용:", mailMessage.value);
-        console.log("전송된 내용:", mailMessage.value);
-        console.log("전송된 내용:", mailMessage.value);
-        console.log("전송된 내용:", mailMessage.value);
-        console.log("전송된 내용:", mailMessage.value);
-        console.log("전송된 내용:", mailMessage.value);
-        console.log("전송된 내용:", mailMessage.value);
-        console.log("전송된 내용:", mailMessage.value);
-        console.log("전송된 내용:", mailMessage.value);
+
         console.log(`Email sent successfully to ${toEmail}:`, response.data);
         results.push({
           email: toEmail,

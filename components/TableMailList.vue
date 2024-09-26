@@ -1,10 +1,4 @@
 <template>
-  <div>
-    <el-button @click="delRows">컴포넌트 내 삭제버튼 </el-button>
-    {{ row2 }}
-    {{ selectedRows }}
-  </div>
-
   <el-table
     ref="multipleTableRef"
     :data="tableData"
@@ -46,6 +40,8 @@
               expiredDate: scope.row.expiredDate,
               reservedDate: scope.row.reservedDate,
               sentDate: scope.row.sentDate,
+              sendingTime: scope.row.sendingTime,
+              sendingDays: scope.row.sendingDays,
             },
           }"
           class="text-blue-600 hover:underline"
@@ -65,13 +61,8 @@
       :label="route.params.folderId == '1' ? '발송일' : '만료 예정일'"
       width="120"
     >
-      <template #default="scope"
-        >{{
-          // formatDate(scope.row.reservedDate)
-          route.params.folderId == "1"
-            ? scope.row.sentDate
-            : scope.row.expiredDate
-        }}
+      <template #default="scope">
+        {{ computedFolderDate(folderId, scope.row) }}
       </template>
     </el-table-column>
   </el-table>
@@ -82,7 +73,7 @@ import { ref, computed } from "vue";
 import { ElTable, ElTag } from "element-plus";
 import type { Mail } from "~/types/api";
 
-const emit = defineEmits(["update:selectedRows"]);
+const emit = defineEmits(["update:modelValue"]);
 const props = defineProps({
   mails: {
     type: Array,
@@ -92,7 +83,7 @@ const props = defineProps({
     type: Number,
     default: null,
   },
-  selectedRows: {
+  modelValue: {
     type: Array,
     default: () => [],
   },
@@ -103,6 +94,7 @@ const props = defineProps({
   },
 });
 const route = useRoute();
+const folderId = computed(() => route.params.folderId);
 
 const multipleTableRef = ref<InstanceType<typeof ElTable>>();
 
@@ -125,37 +117,10 @@ const tableData = computed(() => {
   }
 });
 
-const row2 = ref([]);
-const delRows = async () => {
-  console.log(row2.value);
-  const { $axios } = useNuxtApp();
-  const id = row2.value[0].id;
-  try {
-    const response = await $axios.post(`/email/throw-away/${id}`, {});
-
-    return response.data;
-  } catch (error) {
-    console.error("Error add snippet:", error);
-    if (error.response) {
-      console.error(
-        "Server responded with:",
-        error.response.status,
-        error.response.data
-      );
-    } else if (error.request) {
-      console.error("No response received:", error.request);
-    } else {
-      console.error("Error setting up request:", error.message);
-    }
-    throw error;
-  }
-};
-
 const handleSelectionChange = (selectedRows: Mail[]) => {
   if (props.mode === "full") {
-    emit("update:selectedRows", selectedRows);
+    emit("update:modelValue", selectedRows);
   }
-  row2.value = selectedRows;
 };
 
 const formatDate = (timestamp) => {
@@ -171,4 +136,18 @@ const formatDate = (timestamp) => {
 
   return result;
 };
+
+const computedFolderDate = computed(() => (folderId: any, row: Mail) => {
+  switch (folderId) {
+    case "1":
+      return row.sentDate;
+    case "2":
+    case "3":
+      return row.expiredDate;
+    case "4":
+      return row.reservedDate;
+    default:
+      return ""; // 또는 적절한 기본값
+  }
+});
 </script>
