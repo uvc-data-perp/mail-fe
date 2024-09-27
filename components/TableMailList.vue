@@ -4,6 +4,7 @@
     :data="tableData"
     style="width: 100%"
     row-key="id"
+    header-row-class-name="text-lg font-bold"
     @selection-change="handleSelectionChange"
   >
     <el-table-column v-if="mode === 'full'" type="selection" width="55" />
@@ -19,6 +20,20 @@
         </el-tag>
       </template>
     </el-table-column>
+    <el-table-column property="status" label="상태" width="120">
+      <template #default="scope">
+        <el-tag
+          :type="
+            mailStore.getStatusName(scope.row.status) === `보냄`
+              ? 'success'
+              : 'danger'
+          "
+        >
+          {{ mailStore.getStatusName(scope.row.status) }}
+        </el-tag>
+      </template>
+    </el-table-column>
+
     <el-table-column
       property="to"
       label="수신인"
@@ -58,7 +73,11 @@
       </template>
     </el-table-column>
     <el-table-column
-      :label="route.params.folderId == '1' ? '발송일' : '만료 예정일'"
+      :label="
+        route.params.folderId == '1' || route.params.folderId == '5'
+          ? '발송일'
+          : '만료 예정일'
+      "
       width="120"
     >
       <template #default="scope">
@@ -96,6 +115,8 @@ const props = defineProps({
 const route = useRoute();
 const folderId = computed(() => route.params.folderId);
 
+const mailStore = useStore();
+
 const multipleTableRef = ref<InstanceType<typeof ElTable>>();
 
 const tableData = computed(() => {
@@ -103,17 +124,25 @@ const tableData = computed(() => {
     return props.mails;
   } else {
     const currentIndex = props.mails.findIndex(
-      (mail: Mail) => mail.id === props.currentMailId
+      (mail: any) => mail.id === props.currentMailId
     );
-    const prevMail =
-      currentIndex > 0
-        ? { ...props.mails[currentIndex - 1], type: "prev" as const }
-        : null;
-    const nextMail =
-      currentIndex < props.mails.length - 1
-        ? { ...props.mails[currentIndex + 1], type: "next" as const }
-        : null;
-    return [prevMail, nextMail].filter(Boolean) as Mail[];
+
+    // currentIndex가 유효한 경우에만 이전/다음 메일을 찾습니다.
+    if (currentIndex !== -1) {
+      const prevMail =
+        currentIndex > 0
+          ? { ...props.mails[currentIndex - 1], type: "prev" as const }
+          : null;
+      const nextMail =
+        currentIndex < props.mails.length - 1
+          ? { ...props.mails[currentIndex + 1], type: "next" as const }
+          : null;
+      return [prevMail, nextMail].filter(Boolean) as Mail[];
+    } else {
+      // currentIndex가 -1인 경우, 현재 메일을 찾지 못했으므로 빈 배열을 반환합니다.
+      console.warn("Current mail not found in the list");
+      return [];
+    }
   }
 });
 
@@ -146,6 +175,8 @@ const computedFolderDate = computed(() => (folderId: any, row: Mail) => {
       return row.expiredDate;
     case "4":
       return row.reservedDate;
+    case "5":
+      return row.sentDate;
     default:
       return ""; // 또는 적절한 기본값
   }

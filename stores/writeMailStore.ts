@@ -249,10 +249,10 @@ export const useWriteMailStore = defineStore("writeMail", () => {
   function resetMailMessage() {
     mailMessage.value = {
       contents: {
-        from: "shyk31971@gmail.com",
+        from: "shyk31971@groundkim.com",
         to: "jjoo08152@gmail.com",
-        subject: "p Sub ✔",
-        text: "p text ?",
+        subject: "",
+        text: "",
         html: "<b>p html</b>",
         periodType: "no",
         reservedDate: new Date(),

@@ -1,9 +1,15 @@
 <template>
-  <div class="px-8 py-4 border-b border-t bg-gray-200 flex">
+  <div class="mx-4 px-8 py-4 border-b border-t bg-blue-300 flex">
     <MailTopButtons @deleteRows="store.deleteRows(selectedRows)" />
-    <div class="flex wp-10">
-      <el-input v-model="store.filterCondition" placeholder="검색"></el-input>
-      <el-input v-model="store.filterCondition" placeholder="검색"></el-input>
+
+    <div class="">
+      <el-input
+        v-model="store.filterCondition"
+        style="max-width: 600px"
+        placeholder="Please input"
+        class="input-with-select"
+      >
+      </el-input>
     </div>
   </div>
 
@@ -11,7 +17,9 @@
     <TableMailList
       v-model="selectedRows"
       :mails="
-        route.params.folderId == '1' || route.params.folderId == '4'
+        route.params.folderId == '1' ||
+        route.params.folderId == '4' ||
+        route.params.folderId == '5'
           ? store.paginatedFilteredMailList
           : store.paginatedFilteredReservedMailList
       "

@@ -7,9 +7,6 @@
       layout="prev, pager, next"
       :total="totalResults"
     />
-
-    {{ currentPageValue }},
-    {{ props.totalResults }}
   </div>
 </template>
 

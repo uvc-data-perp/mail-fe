@@ -13,36 +13,6 @@
         v-model:visible="snippetDialogVisible"
       />
     </div>
-    <div class="mt-4">
-      <el-input
-        v-model="searchData"
-        style="max-width: 600px"
-        placeholder="Please input"
-        class="input-with-select"
-      >
-        <template #prepend>
-          <div class="flex justify-center">
-            <el-button
-              type="primary"
-              @click="visibleSearch = !visibleSearch"
-              class="top-0 left-0 z-10 flex justify-center items-center text-center"
-            >
-              <div
-                v-if="visibleSearch"
-                class="i-ic:round-open-in-new w-1em h-1em"
-              ></div>
-              <div
-                v-if="!visibleSearch"
-                class="i-ic:round-close w-1em h-1em"
-              ></div>
-            </el-button>
-          </div>
-        </template>
-        <template #append>
-          <el-button type="primary"> 검색 </el-button>
-        </template>
-      </el-input>
-    </div>
   </div>
 </template>
 

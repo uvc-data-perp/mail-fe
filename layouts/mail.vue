@@ -4,12 +4,13 @@
 
     <div class="flex-grow overflow-hidden flex flex-col">
       <header class="h-16 border-b flex items-center px-8 cursor-pointer">
-        <NuxtLink :to="routeInfo.path" custom v-slot="{ navigate }">
-          <el-button :icon="ArrowLeft" @click="navigate" role="link">
-          </el-button>
+        <NuxtLink :to="routeInfo.path">
+          <el-button :icon="ArrowLeft" role="link"> </el-button>
         </NuxtLink>
-        <h1 :icon="ArrowLeft" class="text-xl font-semibold">{{ pageTitle }}</h1>
-        <a href="/mail/folders/1" class="mb-3 mt-2"></a>
+        <h1 :icon="ArrowLeft" class="text-2xl font-semibold">
+          {{ pageTitle }}
+        </h1>
+        <a href="/" class="mb-3 mt-2"></a>
       </header>
       <MailHeader />
 

@@ -408,6 +408,21 @@ export const useStore = defineStore("store", () => {
     }
   };
 
+  const getStatusName = (status: string) => {
+    switch (status) {
+      case "Waiting":
+        return "예약 중";
+      case "Sent":
+        return "보냄";
+      case "Cancelled":
+        return "취소됨";
+      case "Trashed":
+        return "삭제됨";
+      default:
+        return "";
+    }
+  };
+
   return {
     currentMail,
     mailList,
@@ -426,6 +441,7 @@ export const useStore = defineStore("store", () => {
     setMailList,
     setTotalResults,
     fetchMailDetail,
+    getStatusName,
 
     //수정관련///
     reservedMailList,

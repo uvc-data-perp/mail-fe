@@ -70,7 +70,9 @@
         </p>
       </div>
       <div class="flex-1 items-center mb-2">
-        <div v-if="route.params.folderId === '1'">
+        <div
+          v-if="route.params.folderId === '1' || route.params.folderId === '5'"
+        >
           <el-tag type="info" class="mr-2 flex-shrink-0">보낸 날짜</el-tag>
           <span class="text-sm text-gray-600">
             {{ route.query?.sentDate }}
@@ -91,7 +93,14 @@
     <!-- 이전/이후 목록 조회 -->
     <div class="footer">
       <TableMailList
-        :mails="mailStore.articleList"
+        v-model="selectedRows"
+        :mails="
+          route.params.folderId == '1' ||
+          route.params.folderId == '4' ||
+          route.params.folderId == '5'
+            ? mailStore.paginatedFilteredMailList
+            : mailStore.paginatedFilteredReservedMailList
+        "
         :currentMailId="currentMailId"
         mode="adjacent"
       />
@@ -122,6 +131,8 @@ const scheduleForm = ref({
 
 const loading = ref(false);
 const error = ref(null);
+
+const selectedRows = ref([]);
 
 const fetchMailData = async (documentId: string) => {
   loading.value = true;
@@ -174,7 +185,7 @@ const computedSendingDays = computed(() => {
 
 const isScheduleDeleted = ref(false);
 
-const currentMailId = ref(Number(route.params.documentId));
+const currentMailId = ref(route.params.documentId as string);
 
 const handleDeleteReservation = (
   folderId: string,

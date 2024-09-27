@@ -5,6 +5,7 @@
     label-position="left"
     :rules="rules"
     class="mail-form"
+    :hide-required-asterisk="!isSubmitting"
   >
     <!-- <div>
       {{ writeMailStore.mailMessage.contents }}
@@ -194,18 +195,20 @@ const snippetStore = useSnippetStore();
 
 const mailFormRef = ref(null);
 
+const isSubmitting = ref(false);
+
 const rules = computed(() => {
   const baseRules = {
     subject: [
       {
-        required: true,
+        required: false,
         message: "제목을 지정해주세요",
         trigger: "submit",
       },
     ],
     content: [
       {
-        required: true,
+        required: false,
         message: "내용을 작성해주세요",
         trigger: "submit",
       },
@@ -252,14 +255,17 @@ const fetchAddressOptions = async (query) => {
   if (import.meta.env.SSR) {
     // 서버 사이드 렌더링 시 동기적으로 처리
     return {
-      data: [{ email: `shyk31971@gmail.com` }],
+      data: [{ email: `${query}@gmail.com` }, { email: `shyk31971@gmail.com` }],
     };
   } else {
     // 클라이언트 사이드에서만 비동기 처리
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve({
-          data: [{ email: `shyk31971@gmail.com` }],
+          data: [
+            { email: `${query}@gmail.com` },
+            { email: `shyk31971@gmail.com` },
+          ],
         });
       }, 300);
     });
@@ -331,6 +337,7 @@ const submitForm = async () => {
   if (!mailFormRef.value) return;
 
   try {
+    isSubmitting.value = true;
     await mailFormRef.value.validate();
 
     const emailContent = generateEmailContent();
@@ -348,6 +355,8 @@ const submitForm = async () => {
   } catch (error) {
     console.error("Form validation failed:", error);
     ElMessage.error("입력 내용을 확인해주세요.");
+  } finally {
+    isSubmitting.value = false;
   }
 };
 
