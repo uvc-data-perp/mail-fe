@@ -273,5 +273,6 @@ export const useWriteMailStore = defineStore("writeMail", () => {
     processMailSending,
     sendMailTest,
     handleMailSendingResult,
+    resetMailMessage,
   };
 });

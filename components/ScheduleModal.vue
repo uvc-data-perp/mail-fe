@@ -10,6 +10,7 @@
       :rules="rules"
       ref="formRef"
       class="schedule-form flex flex-col gap-4"
+      :hide-required-asterisk="!isSubmitting"
     >
       <el-form-item label="예약주기" class="form-item" label-width="100px">
         <el-select
@@ -160,16 +161,6 @@
         <el-button type="primary" @click="handleSave">확인</el-button>
       </span>
     </template>
-    {{
-      new Date(writeMailStore.mailMessage.contents.expiredTimestamp).setHours(
-        23,
-        59,
-        59,
-        999
-      )
-    }}
-
-    {{ `${writeMailStore.mailMessage.contents?.sendTime}` }}
   </el-dialog>
 </template>
 
@@ -191,6 +182,8 @@ const emit = defineEmits(["update:visible", "save"]);
 
 const dialogVisible = ref(props.visible);
 
+const isSubmitting = ref(false);
+
 watch(
   () => props.visible,
   (newValue) => {
@@ -199,6 +192,7 @@ watch(
 );
 
 const handleClose = () => {
+  isSubmitting.value = false;
   emit("update:visible", false);
 };
 
@@ -265,8 +259,9 @@ const handleSave = async () => {
   if (!formRef.value) return;
 
   try {
+    isSubmitting.value = true;
     await formRef.value.validate();
-    // emit("save", form.value);
+
     handleClose();
   } catch (error) {
     console.error("Validation failed", error);

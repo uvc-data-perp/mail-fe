@@ -202,11 +202,11 @@ export const useStore = defineStore("store", () => {
     });
   }
 
-  const fetchSentList = async () => {
+  const fetchSentList = async (apiEndpoint: string) => {
     const { $axios } = useNuxtApp();
 
     try {
-      const response = await $axios.get("/email/sent", {
+      const response = await $axios.get(apiEndpoint, {
         headers: {
           // 필요한 경우 여기에 추가 헤더를 설정할 수 있습니다.
         },
@@ -332,7 +332,7 @@ export const useStore = defineStore("store", () => {
     switch (folderId) {
       case "1":
         apiEndpoint = "/email/sent";
-        fetchSentList();
+        fetchSentList(apiEndpoint);
         break;
       case "2":
         apiEndpoint = "/regularity/month";
@@ -342,13 +342,13 @@ export const useStore = defineStore("store", () => {
         apiEndpoint = "/regularity/day";
         fetchScheduledMails(apiEndpoint);
         break;
-
       case "4":
         apiEndpoint = "/will-send/single";
         fetchWillSingleList();
         break;
       case "5":
-        apiEndpoint = "/get-all-trashed-email";
+        apiEndpoint = "/email/get-all-trashed-email";
+        fetchSentList(apiEndpoint);
         break;
       default:
         apiEndpoint = "/email/sent";

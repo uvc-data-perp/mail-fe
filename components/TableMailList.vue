@@ -166,17 +166,28 @@ const formatDate = (timestamp) => {
   return result;
 };
 
+const convertDateFormat = (dateInfo: Date) => {
+  return new Intl.DateTimeFormat("ko-KR", {
+    year: "numeric",
+    month: "long",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(new Date(dateInfo));
+};
+
 const computedFolderDate = computed(() => (folderId: any, row: Mail) => {
   switch (folderId) {
     case "1":
-      return row.sentDate;
+      return row.sentDate ? convertDateFormat(row.sentDate) : "";
     case "2":
     case "3":
-      return row.expiredDate;
+      return row.expiredDate ? convertDateFormat(row.expiredDate) : "";
     case "4":
-      return row.reservedDate;
+      return row.reservedDate ? convertDateFormat(row.reservedDate) : "";
     case "5":
-      return row.sentDate;
+      return row.sentDate ? convertDateFormat(row.sentDate) : "";
     default:
       return ""; // 또는 적절한 기본값
   }

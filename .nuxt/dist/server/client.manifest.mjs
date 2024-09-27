@@ -1,1 +1,0 @@
-export { default } from "file:///C:/Users/UVC/Desktop/uvc-mail/mail-FE%20-%20%EB%B3%B5%EC%82%AC%EB%B3%B8/node_modules/@nuxt/vite-builder/dist/runtime/client.manifest.mjs"

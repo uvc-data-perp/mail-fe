@@ -24,7 +24,11 @@
       </div>
       <!-- 예약날짜 or 보낸 날짜 표시 -->
       <div
-        v-if="route.params.folderId == '2' || route.params.folderId == '3'"
+        v-if="
+          route.params.folderId == '2' ||
+          route.params.folderId == '3' ||
+          route.params.folderId == '4'
+        "
         class="flex-1 items-center mb-2"
       >
         <el-tag
@@ -64,9 +68,19 @@
             route.query.expiredDate ? ` 만료일:${route.query.expiredDate}` : ""
           }}
 
-          {{ `주기: ${computedSendingDays}` }}
+          {{ route.query.sendingDays ? `주기: ${computedSendingDays}` : "" }}
 
-          {{ `전송시각: ${route.query.sendingTime}` }}
+          {{
+            route.query.sendingTime
+              ? `전송시각: ${route.query.sendingTime}`
+              : ""
+          }}
+
+          {{
+            route.query.reservedDate
+              ? `보낼 날짜: ${route.query.reservedDate}`
+              : ""
+          }}
         </p>
       </div>
       <div class="flex-1 items-center mb-2">
@@ -76,12 +90,6 @@
           <el-tag type="info" class="mr-2 flex-shrink-0">보낸 날짜</el-tag>
           <span class="text-sm text-gray-600">
             {{ route.query?.sentDate }}
-          </span>
-        </div>
-        <div v-else-if="route.params.folderId === `4`">
-          <el-tag type="info" class="mr-2 flex-shrink-0">보낼 날짜</el-tag>
-          <span class="text-sm text-gray-600">
-            {{ route.query?.reservedDate }}
           </span>
         </div>
       </div>

@@ -7,9 +7,6 @@
     class="mail-form"
     :hide-required-asterisk="!isSubmitting"
   >
-    <!-- <div>
-      {{ writeMailStore.mailMessage.contents }}
-    </div> -->
     <el-form-item>
       <el-button-group>
         <el-button type="primary" @click="submitForm">보내기</el-button>
@@ -333,6 +330,30 @@ const generateEmailContent = () => {
     </html>
   `;
 };
+function removeHTMLStructure(input) {
+  // 백틱, 스타일 태그, 스크립트 태그 제거
+  input = input.replace(
+    /`|<style[^>]*>[\s\S]*?<\/style>|<script[^>]*>[\s\S]*?<\/script>/gi,
+    ""
+  );
+
+  // HTML 태그 제거
+  input = input.replace(/<[^>]+>/g, "");
+
+  // HTML 엔티티 디코딩
+  input = input
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, "'");
+
+  // 연속된 공백 및 줄바꿈 정리
+  input = input.replace(/\s+/g, " ").trim();
+
+  return input;
+}
+
 const submitForm = async () => {
   if (!mailFormRef.value) return;
 
@@ -345,11 +366,12 @@ const submitForm = async () => {
     writeMailStore.mailMessage.contents = {
       ...writeMailStore.mailMessage.contents,
       html: emailContent,
-      text: emailContent,
+      text: removeHTMLStructure(emailContent),
     };
 
     // 생성된 HTML 내용을 사용하여 이메일 전송
     await writeMailStore.submitForm(mailFormRef.value);
+    writeMailStore.resetMailMessage();
 
     ElMessage.success("메일을 성공적으로 보냈습니다.");
   } catch (error) {
@@ -598,31 +620,9 @@ onUnmounted(() => {
 });
 
 const testText = `
+<p> </p><h2 style="background-color: rgb(52, 152, 219); color: white; padding: 10px; margin: 0; border: 20px solid black;">1. 프로젝트 현황</h2><p> </p><p style="border: 20px solid black; border-top: none; padding: 10px; margin: 0; background-color: rgb(241, 196, 15);" class="ql-align-center"> <span style="background-color: rgb(52, 152, 219); color: white; padding: 5px; margin-right: 10px;">프로젝트1: 70%</span> <span style="background-color: rgb(52, 152, 219); color: white; padding: 5px; margin-right: 10px;">프로젝트2: 80%</span> <span style="background-color: rgb(52, 152, 219); color: white; padding: 5px;">프로젝트3: 90%</span> </p><p> </p><h2 style="background-color: rgb(46, 204, 113); color: white; padding: 10px; margin: 10px 0 0 0; border: 2px solid black;">2. 주요 성과</h2><p> </p><p style="border: 2px solid black; border-top: none; padding: 0; margin: 0; background-color: rgb(236, 240, 241); display: flex; flex-wrap: wrap;"> <strong style="background-color: yellow;">신규 고객 5개사 유치</strong> <em><u>분기별 매출 목표 110% 달성</u></em> <span style="color: rgb(142, 68, 173);">신제품 론칭 성공</span> </p><p> </p><h2 style="background-color: rgb(230, 126, 34); color: white; padding: 10px; margin: 10px 0 0 0; border: 2px solid black;">3. 향후 계획</h2><p> </p><p style="border: 2px solid black; border-top: none; padding: 0; margin: 0; background-color: rgb(236, 240, 241); display: flex; flex-wrap: wrap;"> <strong style="color: rgb(52, 152, 219);">해외 시장 진출 준비</strong> <em style="color: rgb(155, 89, 182);">신규 인력 채용 및 교육</em> <u style="color: rgb(231, 76, 60);">R&amp;D 투자 확대</u> </p><p> </p><p style="text-align: center; font-size: 18px; color: rgb(127, 140, 141); margin-top: 10px; font-style: italic; border: 2px solid black; padding: 10px;">본 보고서는 월간 성과와 계획을 요약한 것입니다. 자세한 내용은 부서별 상세 보고서를 참조하십시오.</p>
 
-    <h2 style="background-color: rgb(52, 152, 219); color: white; padding: 10px; margin: 0; border: 20px solid black;">1. 프로젝트 현황</h2>
-    <p style="border: 20px solid black; border-top: none; padding: 0; margin: 0; background-color: rgb(241, 196, 15);">
-        <span style="background-color: rgb(52, 152, 219);" >진행률 70%</span>
-        
-    </p>
-    
-    <h2 style="background-color: rgb(46, 204, 113); color: white; padding: 10px; margin: 10px 0 0 0; border: 2px solid black;">2. 주요 성과</h2>
-    <p style="border: 2px solid black; border-top: none; padding: 0; margin: 0; background-color: rgb(236, 240, 241); display: flex; flex-wrap: wrap;">
-        <span style="flex: 1; padding: 5px; box-sizing: border-box; border-right: 2px solid black;"><span style="background-color: yellow;"><strong>신규 고객 5개사 유치</strong></span></span>
-        <span style="flex: 1; padding: 5px; box-sizing: border-box; border-right: 2px solid black;"><em><u>분기별 매출 목표 110% 달성</u></em></span>
-        <span style="flex: 1; padding: 5px; box-sizing: border-box;"><span style="color: rgb(142, 68, 173);">신제품 론칭 성공</span></span>
-    </p>
-    
-    <h2 style="background-color: rgb(230, 126, 34); color: white; padding: 10px; margin: 10px 0 0 0; border: 2px solid black;">3. 향후 계획</h2>
-    <p style="border: 2px solid black; border-top: none; padding: 0; margin: 0; background-color: rgb(236, 240, 241); display: flex; flex-wrap: wrap;">
-        <span style="flex: 1; padding: 5px; box-sizing: border-box; border-right: 2px solid black;"><strong style="color: rgb(52, 152, 219);">해외 시장 진출 준비</strong></span>
-        <span style="flex: 1; padding: 5px; box-sizing: border-box; border-right: 2px solid black;"><em style="color: rgb(155, 89, 182);">신규 인력 채용 및 교육</em></span>
-        <span style="flex: 1; padding: 5px; box-sizing: border-box;"><u style="color: rgb(231, 76, 60);">R&D 투자 확대</u></span>
-    </p>
-    
-    <p style="text-align: center; font-size: 18px; color: rgb(127, 140, 141); margin-top: 10px; font-style: italic; border: 2px solid black; padding: 10px;">본 보고서는 월간 성과와 계획을 요약한 것입니다. 자세한 내용은 부서별 상세 보고서를 참조하십시오.</p>
-</body>
-</html>`;
-
+`;
 const insertTable = () => {
   if (customEditor.value) {
     customEditor.value.insertTable(); // expose된 insertTable 메서드 호출
