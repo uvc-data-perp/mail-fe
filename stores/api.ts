@@ -1,5 +1,4 @@
 import { defineStore } from "pinia";
-import axios from "axios";
 import type { Article, Mail, ReservedMail } from "~/types/api";
 
 export const useStore = defineStore("store", () => {
@@ -13,13 +12,20 @@ export const useStore = defineStore("store", () => {
   const pagerCount = ref(11);
 
   // 필터 조건 (예: 검색어)
-  const filterCondition = ref("");
+  const filterConditions = ref({
+    to: "",
+    subject: "",
+    html: "",
+    text: "",
+    status: "",
+    sentDateCondition: "",
+  });
 
   // 필터링된 메일 리스트
 
   // 필터 조건 변경 함수
-  function setFilterCondition(condition: string) {
-    filterCondition.value = condition;
+  function setFilterConditions(conditions: any) {
+    filterConditions.value = conditions;
   }
 
   // mail State
@@ -69,6 +75,7 @@ export const useStore = defineStore("store", () => {
       subject: "기본제목",
       text: "기본내용",
       to: "jjoo08152@gmail.com",
+      html: "<b>기본내용</b>",
       v: 0,
     },
   ]);
@@ -76,19 +83,29 @@ export const useStore = defineStore("store", () => {
   const filteredReservedMailList = computed(() => {
     return reservedMailList.value.filter(
       (mail) =>
+        mail.to
+          .toLowerCase()
+          .includes(filterConditions.value.to.toLowerCase()) &&
         mail.subject
           .toLowerCase()
-          .includes(filterCondition.value.toLowerCase()) ||
-        mail.text.toLowerCase().includes(filterCondition.value.toLowerCase())
+          .includes(filterConditions.value.subject.toLowerCase()) &&
+        mail.html
+          .toLowerCase()
+          .includes(filterConditions.value.html.toLowerCase())
     );
   });
   const filteredMailList = computed(() => {
     return mailList.value.filter(
       (mail) =>
+        mail.to
+          .toLowerCase()
+          .includes(filterConditions.value.to.toLowerCase()) &&
         mail.subject
           .toLowerCase()
-          .includes(filterCondition.value.toLowerCase()) ||
-        mail.text.toLowerCase().includes(filterCondition.value.toLowerCase())
+          .includes(filterConditions.value.subject.toLowerCase()) &&
+        mail.html
+          .toLowerCase()
+          .includes(filterConditions.value.html.toLowerCase())
     );
   });
 
@@ -182,15 +199,6 @@ export const useStore = defineStore("store", () => {
     const { $axios } = useNuxtApp();
 
     Rows.forEach((element: Mail) => {
-      console.log(element);
-      console.log(element);
-      console.log(element);
-      console.log(element);
-      console.log(element);
-      console.log(element);
-      console.log(element);
-      console.log(element);
-      console.log(element);
       $axios
         .post(`/email/throw-away/${element.id}`, {})
         .then((response) => {
@@ -433,9 +441,9 @@ export const useStore = defineStore("store", () => {
     pagerCount,
     pageSize,
     filteredMailList,
-    filterCondition,
+    filterConditions,
     paginatedFilteredMailList,
-    setFilterCondition,
+    setFilterConditions,
     changeSearchValue,
     setPage,
     setMailList,

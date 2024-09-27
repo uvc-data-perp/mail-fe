@@ -82,7 +82,7 @@ export const useSnippetStore = defineStore("snippetStore", () => {
       const response = await $axios.post("/snippets", newSnippet);
 
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error add snippet:", error);
       if (error.response) {
         console.error(
@@ -105,7 +105,7 @@ export const useSnippetStore = defineStore("snippetStore", () => {
       const response = await $axios.delete(`/snippets/${id}`);
       snippets.value = snippets.value.filter((s) => s.id !== id);
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error delete snippet:", error);
       if (error.response) {
         console.error(
@@ -122,7 +122,7 @@ export const useSnippetStore = defineStore("snippetStore", () => {
     }
   };
 
-  const updateSnippet = async (scopeInfo) => {
+  const updateSnippet = async (scopeInfo: any) => {
     const target = snippets.value.find((s) => s.id === scopeInfo.id);
     if (target) {
       await deleteSnippet(target.id);
@@ -136,13 +136,10 @@ export const useSnippetStore = defineStore("snippetStore", () => {
       deleteSnippet(s.id);
     });
     fetchSnippetList();
-    // const { $axios } = useNuxtApp();
-    // snippets.value = [];
   }
 
   const setPage = (page: number) => {
     currentPage.value = page;
-    // fetchArticles();
   };
 
   return {

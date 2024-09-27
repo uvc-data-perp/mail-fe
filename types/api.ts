@@ -4,7 +4,7 @@ export interface Mail {
   to: string;
   subject: string;
   text: string;
-  html?: string;
+  html: string;
   status: string;
   sentTimestamp?: string;
   sentDate?: Date;

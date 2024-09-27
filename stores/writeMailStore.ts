@@ -244,6 +244,8 @@ export const useWriteMailStore = defineStore("writeMail", () => {
       ElMessage.error(result.message || "메일 처리 중 오류가 발생했습니다.");
     }
     resetMailMessage();
+    mailMessage.value.contents.text = "";
+    mailMessage.value.contents.html = "";
   }
 
   function resetMailMessage() {

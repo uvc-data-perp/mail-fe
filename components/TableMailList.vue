@@ -99,7 +99,7 @@ const props = defineProps({
     required: true,
   },
   currentMailId: {
-    type: Number,
+    type: String,
     default: null,
   },
   modelValue: {
@@ -152,7 +152,7 @@ const handleSelectionChange = (selectedRows: Mail[]) => {
   }
 };
 
-const formatDate = (timestamp) => {
+const formatDate = (timestamp: any) => {
   if (!timestamp) return "";
   const result = new Intl.DateTimeFormat("ko-KR", {
     year: "numeric",

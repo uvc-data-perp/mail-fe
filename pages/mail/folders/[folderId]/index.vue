@@ -1,16 +1,28 @@
 <template>
   <div class="mx-4 px-8 py-4 border-b border-t bg-blue-300 flex">
     <MailTopButtons @deleteRows="store.deleteRows(selectedRows)" />
+    <el-input
+      v-model="store.filterConditions.to"
+      style="max-width: 600px"
+      placeholder="Please input recipient"
+      class="input-with-select"
+    >
+    </el-input>
 
-    <div class="">
-      <el-input
-        v-model="store.filterCondition"
-        style="max-width: 600px"
-        placeholder="Please input"
-        class="input-with-select"
-      >
-      </el-input>
-    </div>
+    <el-input
+      v-model="store.filterConditions.subject"
+      style="max-width: 600px"
+      placeholder="Please input subject"
+      class="input-with-select"
+    >
+    </el-input>
+    <el-input
+      v-model="store.filterConditions.html"
+      style="max-width: 600px"
+      placeholder="Please input content"
+      class="input-with-select"
+    >
+    </el-input>
   </div>
 
   <div class="flex mail-list px-8 w-[100%]">

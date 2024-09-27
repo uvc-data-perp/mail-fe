@@ -174,12 +174,8 @@ import { ElMessage } from "element-plus";
 import { useDebounceFn } from "@vueuse/core";
 import { useSnippetStore } from "~/stores/snippetStore"; // 스토어 파일 경로에 맞게 수정해주세요
 import { useWriteMailStore } from "~/stores/writeMailStore"; // 스토어 파일 경로에 맞게 수정해주세요
-import mjml2html from "mjml-browser";
-import { Editor, EditorContent } from "@tiptap/vue-3";
-import StarterKit from "@tiptap/starter-kit";
 
 //quill
-import { QuillEditor } from "@vueup/vue-quill";
 import "@vueup/vue-quill/dist/vue-quill.snow.css";
 
 defineNuxtComponent({
@@ -193,6 +189,7 @@ const snippetStore = useSnippetStore();
 const mailFormRef = ref(null);
 
 const isSubmitting = ref(false);
+let timeout = null;
 
 const rules = computed(() => {
   const baseRules = {
@@ -382,84 +379,7 @@ const submitForm = async () => {
   }
 };
 
-//보내기
-let timeout = null;
-
-// function deltaToPlainText(delta) {
-//   if (typeof delta === "string") return delta;
-//   if (!delta || !delta.ops) return "";
-//   return delta.ops.map((op) => op.insert || "").join("");
-// }
-
-// // 에디터 업데이트 핸들러
-// const handleEditorUpdate = (content) => {
-//   // content는 델타 객체입니다
-//   const plainText = deltaToPlainText(content);
-//   debouncedHandleInput(plainText);
-// };
-
-// // 기존 handleInput 함수 (약간의 수정)
-// const handleInput = (value) => {
-//   if (timeout) {
-//     clearTimeout(timeout);
-//   }
-
-//   timeout = setTimeout(() => {
-//     let result = value;
-
-//     // 완전한 키워드 매칭 및 변환
-//     snippetStore.snippets.forEach((snippet) => {
-//       const regex = new RegExp(escapeRegExp(snippet.from), "g");
-//       result = result.replace(regex, snippet.to);
-//     });
-
-//     // 결과를 다시 델타 객체로 변환
-//     writeMailStore.mailMessage.contents.text = { ops: [{ insert: result }] };
-//   }, 100);
-// };
-
-// const handleInput = (quill, value) => {
-//   if (timeout) {
-//     clearTimeout(timeout);
-//   }
-
-//   timeout = setTimeout(() => {
-//     const range = quill.getSelection();
-//     if (!range) return;
-
-//     const originalCursorPosition = range.index;
-//     let result = value;
-//     let cursorOffset = 0;
-
-//     // 완전한 키워드 매칭 및 변환
-//     snippetStore.snippets.forEach((snippet) => {
-//       const regex = new RegExp(escapeRegExp(snippet.from), "g");
-//       result = result.replace(regex, (match, index) => {
-//         if (index < originalCursorPosition) {
-//           cursorOffset += snippet.to.length - match.length;
-//         }
-//         return snippet.to;
-//       });
-//     });
-
-//     // Quill의 내용 업데이트
-//     quill.setText(result);
-
-//     // 변환 완료 후 커서 위치 조정
-//     nextTick(() => {
-//       const newPosition = originalCursorPosition + cursorOffset;
-//       quill.setSelection(newPosition, 0);
-//     });
-
-//     // store 업데이트
-//     writeMailStore.mailMessage.contents.text = result;
-//   }, 100); // 100ms 지연
-// };
-
 // 정규표현식 특수문자 이스케이프 함수
-function escapeRegExp(string) {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
 
 const handleInput = (value) => {
   if (timeout) {
@@ -623,11 +543,6 @@ const testText = `
 <p> </p><h2 style="background-color: rgb(52, 152, 219); color: white; padding: 10px; margin: 0; border: 20px solid black;">1. 프로젝트 현황</h2><p> </p><p style="border: 20px solid black; border-top: none; padding: 10px; margin: 0; background-color: rgb(241, 196, 15);" class="ql-align-center"> <span style="background-color: rgb(52, 152, 219); color: white; padding: 5px; margin-right: 10px;">프로젝트1: 70%</span> <span style="background-color: rgb(52, 152, 219); color: white; padding: 5px; margin-right: 10px;">프로젝트2: 80%</span> <span style="background-color: rgb(52, 152, 219); color: white; padding: 5px;">프로젝트3: 90%</span> </p><p> </p><h2 style="background-color: rgb(46, 204, 113); color: white; padding: 10px; margin: 10px 0 0 0; border: 2px solid black;">2. 주요 성과</h2><p> </p><p style="border: 2px solid black; border-top: none; padding: 0; margin: 0; background-color: rgb(236, 240, 241); display: flex; flex-wrap: wrap;"> <strong style="background-color: yellow;">신규 고객 5개사 유치</strong> <em><u>분기별 매출 목표 110% 달성</u></em> <span style="color: rgb(142, 68, 173);">신제품 론칭 성공</span> </p><p> </p><h2 style="background-color: rgb(230, 126, 34); color: white; padding: 10px; margin: 10px 0 0 0; border: 2px solid black;">3. 향후 계획</h2><p> </p><p style="border: 2px solid black; border-top: none; padding: 0; margin: 0; background-color: rgb(236, 240, 241); display: flex; flex-wrap: wrap;"> <strong style="color: rgb(52, 152, 219);">해외 시장 진출 준비</strong> <em style="color: rgb(155, 89, 182);">신규 인력 채용 및 교육</em> <u style="color: rgb(231, 76, 60);">R&amp;D 투자 확대</u> </p><p> </p><p style="text-align: center; font-size: 18px; color: rgb(127, 140, 141); margin-top: 10px; font-style: italic; border: 2px solid black; padding: 10px;">본 보고서는 월간 성과와 계획을 요약한 것입니다. 자세한 내용은 부서별 상세 보고서를 참조하십시오.</p>
 
 `;
-const insertTable = () => {
-  if (customEditor.value) {
-    customEditor.value.insertTable(); // expose된 insertTable 메서드 호출
-  }
-};
 </script>
 
 <style scoped>

@@ -164,19 +164,14 @@ onMounted(async () => {
   }
 });
 
-const saveSchedule = (updatedData) => {
+const saveSchedule = (updatedData: any) => {
   scheduleForm.value = updatedData;
-  ElMessage.success("변경된 예약설정이 반영되었습니다.");
+  ElMessage.success("예약 변경은 구현예정입니다.");
   scheduleDialogVisible.value = false;
 };
 
-const getDayNames = (days) => {
-  const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
-  return days.map((day) => dayNames[day]);
-};
-
 const computedSendingDays = computed(() => {
-  const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
+  const dayNames = ["월", "화", "수", "목", "금", "토", "일"];
   if (
     route.query.sendingDays[0] === "true" ||
     route.query.sendingDays[0] === "false"
@@ -185,9 +180,9 @@ const computedSendingDays = computed(() => {
       .map((day: string, index) => (day === "true" ? dayNames[index] : null))
       .filter((day) => day !== null)
       .join(",");
-    return a;
+    return `${a}요일`;
   } else {
-    return route.query.sendingDays;
+    return `${route.query.sendingDays}일`;
   }
 });
 
