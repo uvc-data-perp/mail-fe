@@ -365,13 +365,13 @@ const submitForm = async () => {
     writeMailStore.mailMessage.contents = {
       ...writeMailStore.mailMessage.contents,
       html: emailContent,
-      text: removeHTMLStructure(emailContent),
+      text: removeHTMLStructure(writeMailStore.mailMessage.contents.text),
     };
 
     // 생성된 HTML 내용을 사용하여 이메일 전송
     await writeMailStore.submitForm(mailFormRef.value);
-    await writeMailStore.resetMailMessage();
-    writeMailStore.mailMessage.contents.text = " ";
+    // await writeMailStore.resetMailMessage();
+    // writeMailStore.mailMessage.contents.text = " ";
 
     ElMessage.success("메일을 성공적으로 보냈습니다.");
   } catch (error) {

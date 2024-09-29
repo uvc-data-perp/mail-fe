@@ -62,7 +62,6 @@ export const useWriteMailStore = defineStore("writeMail", () => {
     }
   }
   console.log("🚀 ~ submitForm ~ mailMessage.value:", mailMessage.value);
-  console.log("🚀 ~ submitForm ~ mailMessage:", mailMessage);
 
   async function processMailSending() {
     const { periodType } = mailMessage.value.contents;
@@ -160,8 +159,13 @@ export const useWriteMailStore = defineStore("writeMail", () => {
 
   const sendMailTest = async () => {
     const { $axios } = useNuxtApp();
-
     const results = [];
+    console.log("before text:", mailMessage.value.contents.text);
+    mailMessage.value.contents.text = removeHTMLStructure(
+      mailMessage.value.contents.text
+    );
+    console.log("aftertext:", mailMessage.value.contents.text);
+
     let apiEndpoint = `/send/once`;
     switch (mailMessage.value.contents.periodType) {
       case "no":
@@ -190,20 +194,6 @@ export const useWriteMailStore = defineStore("writeMail", () => {
       mailMessage.value.contents.to = toEmail;
 
       try {
-        // const postman = {
-        //   contents: {
-        //     from: "jjoo08152@gmail.com",
-        //     to: "jjoo08152@gmail.com",
-        //     subject: "Hello ✔",
-        //     text: "Hello Jisang?",
-        //     html: "<b>반갑</b>",
-
-        //     expired_timestamp: "1735632060",
-        //     sendTime: "3:47",
-        //     //       MON.  TUES, ....
-        //     days: [true, true, true, true, true, true, true],
-        //   },
-        // };
         const response = await $axios.post(apiEndpoint, mailMessage.value, {
           timeout: 50000,
         });
@@ -246,8 +236,29 @@ export const useWriteMailStore = defineStore("writeMail", () => {
       ElMessage.error(result.message || "메일 처리 중 오류가 발생했습니다.");
     }
     resetMailMessage();
-    mailMessage.value.contents.text = "";
-    mailMessage.value.contents.html = "";
+  }
+  function removeHTMLStructure(input: string) {
+    // 백틱, 스타일 태그, 스크립트 태그 제거
+    input = input.replace(
+      /`|<style[^>]*>[\s\S]*?<\/style>|<script[^>]*>[\s\S]*?<\/script>/gi,
+      ""
+    );
+
+    // HTML 태그 제거
+    input = input.replace(/<[^>]+>/g, "");
+
+    // HTML 엔티티 디코딩
+    input = input
+      .replace(/&amp;/g, "&")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&quot;/g, '"')
+      .replace(/&#039;/g, "'");
+
+    // 연속된 공백 및 줄바꿈 정리
+    input = input.replace(/\s+/g, " ").trim();
+
+    return input;
   }
 
   function resetMailMessage() {
@@ -267,6 +278,8 @@ export const useWriteMailStore = defineStore("writeMail", () => {
         days: [],
       },
     };
+    mailMessage.value.contents.text = " ";
+    mailMessage.value.contents.html = " ";
   }
 
   return {
