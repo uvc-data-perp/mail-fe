@@ -119,7 +119,7 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from "vue";
 import { useRoute } from "vue-router";
-import { useStore } from "~/stores/api";
+import { useStore } from "~/stores/readMailStore";
 import { storeToRefs } from "pinia";
 
 const mailStore = useStore();

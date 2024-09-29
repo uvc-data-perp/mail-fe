@@ -61,6 +61,8 @@ export const useWriteMailStore = defineStore("writeMail", () => {
       ElMessage.error("폼 제출 중 오류가 발생했습니다.");
     }
   }
+  console.log("🚀 ~ submitForm ~ mailMessage.value:", mailMessage.value);
+  console.log("🚀 ~ submitForm ~ mailMessage:", mailMessage);
 
   async function processMailSending() {
     const { periodType } = mailMessage.value.contents;
@@ -255,7 +257,7 @@ export const useWriteMailStore = defineStore("writeMail", () => {
         to: "jjoo08152@gmail.com",
         subject: "",
         text: "",
-        html: "<b>p html</b>",
+        html: "<b></b>",
         periodType: "no",
         reservedDate: new Date(),
         reservedTimestamp: "0",

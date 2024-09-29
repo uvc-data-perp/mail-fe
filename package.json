@@ -32,7 +32,6 @@
     "mjml-browser": "^4.15.3",
     "nuxt": "^3.9.3",
     "pinia": "^2.1.7",
-    "quill": "^2.0.2",
     "quill-better-table": "^1.2.10",
     "quill-image-drop-module": "^1.0.3",
     "quill-image-resize-module": "^3.0.0",

@@ -38,7 +38,9 @@
       </el-dialog>
       <el-dropdown style="margin-left: 10px">
         <el-button
-          >템플릿<el-icon class="el-icon--right"><arrow-down /></el-icon
+          >템플릿
+
+          <el-icon class="el-icon--right"><arrow-down /></el-icon
         ></el-button>
         <template #dropdown>
           <el-dropdown-menu>
@@ -368,7 +370,8 @@ const submitForm = async () => {
 
     // 생성된 HTML 내용을 사용하여 이메일 전송
     await writeMailStore.submitForm(mailFormRef.value);
-    writeMailStore.resetMailMessage();
+    await writeMailStore.resetMailMessage();
+    writeMailStore.mailMessage.contents.text = " ";
 
     ElMessage.success("메일을 성공적으로 보냈습니다.");
   } catch (error) {

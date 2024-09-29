@@ -52,7 +52,7 @@
 
 <script lang="tsx" setup>
 import { usePageTitle } from "~/composables/usePageTitle";
-import { useStore } from "~/stores/api";
+import { useStore } from "~/stores/readMailStore";
 
 const { setPageTitle } = usePageTitle();
 const route = useRoute();
