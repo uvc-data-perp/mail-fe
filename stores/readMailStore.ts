@@ -211,6 +211,8 @@ export const useStore = defineStore("store", () => {
   }
 
   const fetchSentList = async (apiEndpoint: string) => {
+    console.log("fetchSentList 진입");
+
     const { $axios } = useNuxtApp();
 
     try {
@@ -233,6 +235,55 @@ export const useStore = defineStore("store", () => {
       setMailList(updatedMails);
 
       setTotalResults(updatedMails.length);
+      return updatedMails;
+    } catch (error: any) {
+      console.error("Error fetching sent list:", error);
+      if (error.response) {
+        console.error(
+          "Server responded with:",
+          error.response.status,
+          error.response.data
+        );
+      } else if (error.request) {
+        console.error("No response received:", error.request);
+      } else {
+        console.error("Error setting up request:", error.message);
+      }
+      throw error;
+    }
+  };
+
+  const fetchCalendarList = async (apiEndpoint: string) => {
+    console.log("fetchSentList 진입");
+
+    const { $axios } = useNuxtApp();
+
+    fetchSentList(`/email/sent`);
+
+    try {
+      const response = await $axios.get(`/will-send/`, {
+        headers: {
+          // 필요한 경우 여기에 추가 헤더를 설정할 수 있습니다.
+        },
+      });
+      // 새로운 배열을 생성하여 각 메일 객체를 복사하고 sentDate를 추가합니다.
+      const updatedMails = response.data.result.map((mail: Mail) => {
+        //* 받은 mail.sentTimestamp값이 ms단위라서 s->ms(*1000)없이 변환 *///
+        const reservedDate = new Date(
+          Number(mail.reservedTime.split("_")[0]) * 1000
+        );
+
+        return { ...mail, reservedDate };
+      });
+      updatedMails.sort((a: any, b: any) => {
+        return b.reservedDate.getTime() - a.reservedDate.getTime();
+      });
+
+      // mailList.value = response.data.result;
+
+      mailList.value = [...mailList.value, ...updatedMails];
+
+      setTotalResults(totalResults.value + updatedMails.length);
       return updatedMails;
     } catch (error: any) {
       console.error("Error fetching sent list:", error);
@@ -358,9 +409,13 @@ export const useStore = defineStore("store", () => {
         apiEndpoint = "/email/get-all-trashed-email";
         fetchSentList(apiEndpoint);
         break;
+      case "calendar":
+        fetchCalendarList(apiEndpoint);
+        break;
       default:
         apiEndpoint = "/email/sent";
     }
+    console.log("🚀 ~ fetchReservedMailList ~ apiEndpoint:", apiEndpoint);
   };
 
   const fetchScheduledMails = async (apiEndpoint: string) => {

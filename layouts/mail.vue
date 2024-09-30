@@ -67,7 +67,7 @@ function updatePageTitle() {
         setPageTitle("휴지통");
         break;
       default:
-        setPageTitle("메일 시스템");
+        setPageTitle(" 월간 요약");
     }
   }
 }

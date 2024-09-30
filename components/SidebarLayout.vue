@@ -192,6 +192,12 @@ const menuItems: MenuItem[] = [
     path: "/",
     children: [
       {
+        title: "월간요약 📅",
+        icon: "i-guidance:calendar",
+        index: "/ai-data-analyze/defect-cause-analysis",
+        path: "/mail/",
+      },
+      {
         title: "메일쓰기 🖋️",
         icon: "i-ic:outline-circle",
         index: "/ai-data-analyze/defect-cause-analysis",
@@ -204,13 +210,13 @@ const menuItems: MenuItem[] = [
         path: `/mail/folders/1`,
       },
       {
-        title: "날짜 별 예약 📧",
+        title: "날짜 별 예약 3️⃣0️⃣",
         icon: "i-ic:outline-circle",
         index: "/mail/folders/2",
         path: `/mail/folders/2`,
       },
       {
-        title: "요일 별 예약 📝",
+        title: "요일 별 예약 7️⃣ ",
         icon: "i-ic:outline-circle",
         index: "/ai-data-analyze/defect-cause-analysis",
         path: `/mail/folders/3`,
@@ -227,16 +233,6 @@ const menuItems: MenuItem[] = [
         icon: "i-ic:outline-circle",
         index: "/ai-data-analyze/defect-cause-analysis",
         path: `/mail/folders/5`,
-      },
-
-      {
-        title:
-          route.params.folderId === "10"
-            ? "받은 메일함"
-            : `보낸 메일함 - ${route.params.folderId}`,
-        icon: "i-ic:outline-circle",
-        index: "/ai-data-analyze/defect-cause-analysis",
-        path: `/mail/folders/:id`,
       },
 
       // 더 많은 서브 메뉴 아이템들...
